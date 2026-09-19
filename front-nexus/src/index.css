@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import "tailwindcss";
+body {
+  font-family: "Inter", sans-serif;
+}
+.Toastify__toast-container.confirm-toast-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  transform: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+}
+
+.confirm-toast-container .Toastify__toast {
+  width: 320px !important;
+  max-width: 90vw !important;
+  height: auto !important;
+  min-height: auto !important;
+  flex: 0 0 auto !important;
+  align-self: center !important;
+  margin: 0 !important;
+  border-radius: 12px;
+}
