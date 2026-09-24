@@ -208,20 +208,19 @@ const Payroll = {
   createPayslip: async (payslipData) => {
     const query = `
       INSERT INTO payslips (
-        payroll_setup_id, employee_id, user_id, payslip_number,
+        payroll_setup_id, employee_id, payslip_number,
         basic_salary, allowances, overtime_pay,
         bonus, other_earnings,
         sss_deduction, philhealth_deduction, pagibig_deduction,
         withholding_tax, loan_deduction, other_deductions,
         days_worked, overtime_hours, late_hours,
         absences, remarks
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [result] = await db.query(query, [
       payslipData.payroll_setup_id,
       payslipData.employee_id || null,
-      payslipData.user_id || null,
       payslipData.payslip_number,
       payslipData.basic_salary || 0,
       payslipData.allowances || 0,
