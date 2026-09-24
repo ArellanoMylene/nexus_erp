@@ -151,18 +151,18 @@ const StudentCommunication = () => {
   ];
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <MessageCircle size={24} className="text-indigo-600" />
             Communication
           </h2>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -170,8 +170,8 @@ const StudentCommunication = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300"
+                    ? "border-indigo-600 text-indigo-600 "
+                    : "border-transparent text-slate-600  hover:text-slate-900 "
                   }`}
               >
                 <Icon size={16} />
@@ -184,17 +184,17 @@ const StudentCommunication = () => {
         {/* Tab Content */}
         {activeTab === "chat" ? (
           // Chat Interface
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex" style={{ height: "600px" }}>
+          <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden flex" style={{ height: "600px" }}>
             {/* Conversations List */}
-            <div className="w-full md:w-1/3 border-r border-slate-200 dark:border-slate-700 flex flex-col">
-              <div className="p-3 border-b border-slate-200 dark:border-slate-700">
+            <div className="w-full md:w-1/3 border-r border-slate-200  flex flex-col">
+              <div className="p-3 border-b border-slate-200 ">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search conversations..."
                     value={chatSearchTerm}
                     onChange={(e) => setChatSearchTerm(e.target.value)}
-                    className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+                    className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
                   />
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                 </div>
@@ -204,14 +204,14 @@ const StudentCommunication = () => {
                 {filteredConversations.length === 0 ? (
                   <div className="p-8 text-center">
                     <MessageCircle size={48} className="mx-auto text-slate-400 mb-3" />
-                    <p className="text-sm text-slate-500 dark:text-slate-400">No conversations yet</p>
+                    <p className="text-sm text-slate-500 ">No conversations yet</p>
                   </div>
                 ) : (
                   filteredConversations.map((conv) => (
                     <div
                       key={conv.conversation_id}
                       onClick={() => setSelectedConversation(conv)}
-                      className={`p-3 border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 ${selectedConversation?.conversation_id === conv.conversation_id ? "bg-indigo-50 dark:bg-indigo-900/20" : ""
+                      className={`p-3 border-b border-slate-200  cursor-pointer hover:bg-slate-50  ${selectedConversation?.conversation_id === conv.conversation_id ? "bg-indigo-50 " : ""
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -219,8 +219,8 @@ const StudentCommunication = () => {
                           {conv.name?.[0] || "U"}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-slate-900 dark:text-white truncate">{conv.name}</h4>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{conv.last_message || "No messages yet"}</p>
+                          <h4 className="font-semibold text-slate-900  truncate">{conv.name}</h4>
+                          <p className="text-xs text-slate-500  truncate">{conv.last_message || "No messages yet"}</p>
                         </div>
                         {conv.unread_count > 0 && (
                           <span className="bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">{conv.unread_count}</span>
@@ -237,13 +237,13 @@ const StudentCommunication = () => {
               {selectedConversation ? (
                 <>
                   {/* Chat Header */}
-                  <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                  <div className="p-4 border-b border-slate-200  flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
                       {selectedConversation.name?.[0] || "U"}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 dark:text-white">{selectedConversation.name}</h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{selectedConversation.role || "Faculty"}</p>
+                      <h3 className="font-bold text-slate-900 ">{selectedConversation.name}</h3>
+                      <p className="text-xs text-slate-500 ">{selectedConversation.role || "Faculty"}</p>
                     </div>
                   </div>
 
@@ -256,10 +256,10 @@ const StudentCommunication = () => {
                       >
                         <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${msg.is_sender
                             ? "bg-indigo-600 text-white"
-                            : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
+                            : "bg-slate-100  text-slate-900 "
                           }`}>
                           <p className="text-sm">{msg.message}</p>
-                          <p className={`text-xs mt-1 ${msg.is_sender ? "text-indigo-200" : "text-slate-500 dark:text-slate-400"}`}>
+                          <p className={`text-xs mt-1 ${msg.is_sender ? "text-indigo-200" : "text-slate-500 "}`}>
                             {new Date(msg.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
@@ -268,14 +268,14 @@ const StudentCommunication = () => {
                   </div>
 
                   {/* Message Input */}
-                  <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 dark:border-slate-700">
+                  <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 ">
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
-                        className="flex-1 px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white"
+                        className="flex-1 px-4 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500  "
                       />
                       <button
                         type="submit"
@@ -290,8 +290,8 @@ const StudentCommunication = () => {
               ) : (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="text-center">
-                    <MessageCircle size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                    <p className="text-slate-500 dark:text-slate-400">Select a conversation to start chatting</p>
+                    <MessageCircle size={64} className="mx-auto text-slate-300  mb-4" />
+                    <p className="text-slate-500 ">Select a conversation to start chatting</p>
                   </div>
                 </div>
               )}
@@ -307,7 +307,7 @@ const StudentCommunication = () => {
                 placeholder="Search faculty..."
                 value={emailSearchTerm}
                 onChange={(e) => setEmailSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm"
+                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
               />
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
             </div>
@@ -315,37 +315,37 @@ const StudentCommunication = () => {
             {/* Faculty List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredFaculty.length === 0 ? (
-                <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+                <div className="lg:col-span-3 bg-white  rounded-lg border border-slate-200  p-8 text-center">
                   <User size={48} className="mx-auto text-slate-400 mb-3" />
-                  <p className="text-slate-500 dark:text-slate-400">No faculty members found</p>
+                  <p className="text-slate-500 ">No faculty members found</p>
                 </div>
               ) : (
                 filteredFaculty.map((f) => (
                   <div
                     key={f.faculty_id}
-                    className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 hover:shadow-md transition-shadow"
+                    className="bg-white  rounded-lg border border-slate-200  p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                         {f.name?.split(" ").map(n => n[0]).join("") || "F"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-slate-900 dark:text-white truncate">{f.name}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{f.department}</p>
+                        <h3 className="font-bold text-slate-900  truncate">{f.name}</h3>
+                        <p className="text-xs text-slate-500  truncate">{f.department}</p>
                       </div>
                     </div>
 
                     <div className="space-y-1 text-sm mb-3">
                       {f.subject && (
                         <div className="flex items-center gap-2">
-                          <span className="text-slate-500 dark:text-slate-400">Subject:</span>
-                          <span className="text-slate-900 dark:text-white font-medium">{f.subject}</span>
+                          <span className="text-slate-500 ">Subject:</span>
+                          <span className="text-slate-900  font-medium">{f.subject}</span>
                         </div>
                       )}
                       {f.email && (
                         <div className="flex items-center gap-2">
                           <Mail size={12} className="text-slate-400" />
-                          <span className="text-slate-700 dark:text-slate-300 text-xs truncate">{f.email}</span>
+                          <span className="text-slate-700  text-xs truncate">{f.email}</span>
                         </div>
                       )}
                     </div>
@@ -372,11 +372,11 @@ const StudentCommunication = () => {
           onClick={() => setShowCompose(false)}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 ">
+              <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                 <Mail size={20} className="text-indigo-600" />
                 Compose Email
               </h3>
@@ -390,35 +390,35 @@ const StudentCommunication = () => {
 
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">To</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">To</label>
                 <input
                   type="text"
                   readOnly
                   value={selectedFaculty?.name || ""}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm bg-slate-50"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm bg-slate-50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Subject *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Subject *</label>
                 <input
                   type="text"
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm"
                   placeholder="Enter email subject"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Message *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Message *</label>
                 <textarea
                   required
                   rows={8}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm"
                   placeholder="Type your message here..."
                 />
               </div>
@@ -434,7 +434,7 @@ const StudentCommunication = () => {
                 <button
                   type="button"
                   onClick={() => setShowCompose(false)}
-                  className="px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 rounded-md border border-slate-300  text-slate-700  font-medium text-sm hover:bg-slate-50 "
                 >
                   Cancel
                 </button>

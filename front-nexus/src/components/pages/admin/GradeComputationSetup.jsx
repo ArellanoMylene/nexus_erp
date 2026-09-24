@@ -12,6 +12,13 @@ import {
   FileText,
 } from "lucide-react";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+const FACULTY_GRADE_COMPONENTS = {
+  "Written Output": { component_type: "assignment", weight: 30 },
+  "Performance Task": { component_type: "quiz", weight: 40 },
+  "Exam (Midterm / Final)": { component_type: "exam", weight: 30 },
+};
+
 const GradeComputationSetup = () => {
   const [settings, setSettings] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -29,12 +36,12 @@ const GradeComputationSetup = () => {
     search: "",
   });
   const [formData, setFormData] = useState({
-    component_name: "",
-    component_type: "quiz",
+    component_name: "Written Output",
+    component_type: "assignment",
     course_id: "",
     section_id: "",
     period_id: "",
-    weight: "",
+    weight: 30,
     computation_method: "average",
     is_required: true,
   });
@@ -130,17 +137,27 @@ const GradeComputationSetup = () => {
     } else {
       setEditingSetting(null);
       setFormData({
-        component_name: "",
-        component_type: "quiz",
+        component_name: "Written Output",
+        component_type: "assignment",
         course_id: "",
         section_id: "",
         period_id: "",
-        weight: "",
+        weight: 30,
         computation_method: "average",
         is_required: true,
       });
     }
     setShowModal(true);
+  };
+
+  const handleComponentChange = (componentName) => {
+    const component = FACULTY_GRADE_COMPONENTS[componentName];
+    setFormData({
+      ...formData,
+      component_name: componentName,
+      component_type: component.component_type,
+      weight: component.weight,
+    });
   };
 
   const handleCloseModal = () => {
@@ -239,6 +256,9 @@ const GradeComputationSetup = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm text-slate-600">Total Weight</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Faculty standard per assessment period: Written Output 30% + Performance Task 40% + Exam 30%
+              </p>
               <div className="flex items-center gap-4 mt-2">
                 <p
                   className={`text-2xl font-bold ${
@@ -576,18 +596,18 @@ const GradeComputationSetup = () => {
                     <label className="block text-xs font-medium text-slate-700 mb-1">
                       Component Name *
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.component_name}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          component_name: e.target.value,
-                        })
-                      }
+                      onChange={(e) => handleComponentChange(e.target.value)}
                       className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                       required
-                    />
+                    >
+                      {Object.keys(FACULTY_GRADE_COMPONENTS).map((componentName) => (
+                        <option key={componentName} value={componentName}>
+                          {componentName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
@@ -596,13 +616,8 @@ const GradeComputationSetup = () => {
                     </label>
                     <select
                       value={formData.component_type}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          component_type: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      disabled
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md bg-slate-100 text-slate-600 cursor-not-allowed"
                       required
                     >
                       <option value="quiz">Quiz</option>
@@ -723,10 +738,8 @@ const GradeComputationSetup = () => {
                       type="number"
                       step="0.01"
                       value={formData.weight}
-                      onChange={(e) =>
-                        setFormData({ ...formData, weight: e.target.value })
-                      }
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      readOnly
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md bg-slate-100 text-slate-600 cursor-not-allowed"
                       required
                     />
                   </div>

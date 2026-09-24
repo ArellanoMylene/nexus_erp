@@ -173,30 +173,30 @@ const GeneralSettingsNew = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen dark:bg-slate-900 p-3 sm:p-4 flex items-center justify-center">
+      <div className="min-h-screen  p-3 sm:p-4 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">Loading settings...</p>
+          <p className="text-slate-600  mt-2">Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen dark:bg-slate-900 p-3 sm:p-4">
+    <div className="min-h-screen  p-3 sm:p-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
-          <Settings className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+        <div className="p-2 bg-blue-500/10  rounded-lg">
+          <Settings className="h-6 w-6 text-blue-600 " />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">System Settings</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Configure system-wide settings and preferences</p>
+          <h1 className="text-2xl font-bold text-slate-800 ">System Settings</h1>
+          <p className="text-sm text-slate-600 ">Configure system-wide settings and preferences</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  mb-6">
         <div className="flex overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -206,8 +206,8 @@ const GeneralSettingsNew = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-4 font-medium whitespace-nowrap transition-colors border-b-2 ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                    ? "border-blue-600 text-blue-600 "
+                    : "border-transparent text-slate-600  hover:text-slate-900 "
                 }`}
               >
                 <Icon className="h-5 w-5" />
@@ -220,107 +220,107 @@ const GeneralSettingsNew = () => {
 
       {/* General & Branding Tab */}
       {activeTab === "general" && (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">General System Information & Branding</h2>
+        <div className="bg-white  rounded-lg shadow-sm border border-slate-200  p-6">
+          <h2 className="text-lg font-semibold text-slate-800  mb-4">General System Information & Branding</h2>
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   System Name *
                 </label>
                 <input
                   type="text"
                   value={formData.system_name}
                   onChange={(e) => handleInputChange("system_name", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="Nexus ERP"
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">The official name of your institution or system</p>
+                <p className="text-xs text-slate-500  mt-1">The official name of your institution or system</p>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   System Tagline
                 </label>
                 <input
                   type="text"
                   value={formData.system_tagline}
                   onChange={(e) => handleInputChange("system_tagline", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="Excellence in Education Management"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   System Description
                 </label>
                 <textarea
                   value={formData.system_description}
                   onChange={(e) => handleInputChange("system_description", e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="Brief description of your institution..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   System Logo Path
                 </label>
                 <input
                   type="text"
                   value={formData.system_logo}
                   onChange={(e) => handleInputChange("system_logo", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="/assets/logo.png"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Contact Email
                 </label>
                 <input
                   type="email"
                   value={formData.contact_email}
                   onChange={(e) => handleInputChange("contact_email", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="info@institution.edu"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Contact Phone
                 </label>
                 <input
                   type="tel"
                   value={formData.contact_phone}
                   onChange={(e) => handleInputChange("contact_phone", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="+63 123 456 7890"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Institution Address
                 </label>
                 <textarea
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   placeholder="Street Address, City, Province, ZIP Code"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 ">
               <button
                 onClick={() => fetchSettings()}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
               >
                 <RefreshCw className="h-4 w-4" />
                 Reset
@@ -340,51 +340,51 @@ const GeneralSettingsNew = () => {
 
       {/* Regional Settings Tab */}
       {activeTab === "regional" && (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Regional & Display Settings</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">Configure timezone, formats, currency, and language preferences</p>
+        <div className="bg-white  rounded-lg shadow-sm border border-slate-200  p-6">
+          <h2 className="text-lg font-semibold text-slate-800  mb-4">Regional & Display Settings</h2>
+          <p className="text-sm text-slate-600  mb-6">Configure timezone, formats, currency, and language preferences</p>
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Timezone *
                 </label>
                 <select
                   value={formData.timezone}
                   onChange={(e) => handleInputChange("timezone", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 >
                   {timezones.map((tz) => (
                     <option key={tz} value={tz}>{tz}</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">System-wide timezone for all dates and times</p>
+                <p className="text-xs text-slate-500  mt-1">System-wide timezone for all dates and times</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Date Format *
                 </label>
                 <select
                   value={formData.date_format}
                   onChange={(e) => handleInputChange("date_format", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 >
                   {dateFormats.map((format) => (
                     <option key={format} value={format}>{format}</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">How dates are displayed throughout the system</p>
+                <p className="text-xs text-slate-500  mt-1">How dates are displayed throughout the system</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Time Format *
                 </label>
                 <select
                   value={formData.time_format}
                   onChange={(e) => handleInputChange("time_format", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 >
                   <option value="12h">12-hour (AM/PM)</option>
                   <option value="24h">24-hour (Military)</option>
@@ -392,42 +392,42 @@ const GeneralSettingsNew = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   Currency *
                 </label>
                 <select
                   value={formData.currency}
                   onChange={(e) => handleInputChange("currency", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 >
                   {currencies.map((cur) => (
                     <option key={cur} value={cur}>{cur}</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Default currency for financial transactions</p>
+                <p className="text-xs text-slate-500  mt-1">Default currency for financial transactions</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700  mb-2">
                   System Language *
                 </label>
                 <select
                   value={formData.language}
                   onChange={(e) => handleInputChange("language", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 >
                   {languages.map((lang) => (
                     <option key={lang.value} value={lang.value}>{lang.label}</option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Primary language for the interface</p>
+                <p className="text-xs text-slate-500  mt-1">Primary language for the interface</p>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 ">
               <button
                 onClick={() => fetchSettings()}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
               >
                 <RefreshCw className="h-4 w-4" />
                 Reset
@@ -447,11 +447,11 @@ const GeneralSettingsNew = () => {
 
       {/* Notifications Settings Tab */}
       {activeTab === "notifications" && (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Notification Settings</h2>
+        <div className="bg-white  rounded-lg shadow-sm border border-slate-200  p-6">
+          <h2 className="text-lg font-semibold text-slate-800  mb-4">Notification Settings</h2>
           <div className="space-y-6">
             <div className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <label className="flex items-center gap-3 cursor-pointer p-4 rounded-lg border border-slate-200  hover:bg-slate-50 ">
                 <input
                   type="checkbox"
                   checked={formData.email_notifications === "true"}
@@ -459,12 +459,12 @@ const GeneralSettingsNew = () => {
                   className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1">
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Email Notifications</span>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Send notifications via email</p>
+                  <span className="text-sm font-medium text-slate-700 ">Email Notifications</span>
+                  <p className="text-xs text-slate-500 ">Send notifications via email</p>
                 </div>
               </label>
 
-              <label className="flex items-center gap-3 cursor-pointer p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <label className="flex items-center gap-3 cursor-pointer p-4 rounded-lg border border-slate-200  hover:bg-slate-50 ">
                 <input
                   type="checkbox"
                   checked={formData.sms_notifications === "true"}
@@ -472,32 +472,32 @@ const GeneralSettingsNew = () => {
                   className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1">
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">SMS Notifications</span>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Send notifications via SMS</p>
+                  <span className="text-sm font-medium text-slate-700 ">SMS Notifications</span>
+                  <p className="text-xs text-slate-500 ">Send notifications via SMS</p>
                 </div>
               </label>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700  mb-2">
                 Notification Retention (days)
               </label>
               <input
                 type="number"
                 value={formData.notification_retention_days}
                 onChange={(e) => handleInputChange("notification_retention_days", e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                 placeholder="90"
               />
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-xs text-slate-500  mt-1">
                 Notifications older than this will be automatically deleted
               </p>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 ">
               <button
                 onClick={() => fetchSettings()}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
               >
                 <RefreshCw className="h-4 w-4" />
                 Reset
@@ -517,11 +517,11 @@ const GeneralSettingsNew = () => {
 
       {/* System Maintenance Tab */}
       {activeTab === "maintenance" && (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">System Maintenance & Backup</h2>
+        <div className="bg-white  rounded-lg shadow-sm border border-slate-200  p-6">
+          <h2 className="text-lg font-semibold text-slate-800  mb-4">System Maintenance & Backup</h2>
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="p-4 rounded-lg border-2 border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10">
+              <div className="p-4 rounded-lg border-2 border-red-200  bg-red-50 ">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -530,8 +530,8 @@ const GeneralSettingsNew = () => {
                     className="mt-0.5 w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500"
                   />
                   <div className="flex-1">
-                    <span className="text-sm font-semibold text-red-800 dark:text-red-300">Maintenance Mode</span>
-                    <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                    <span className="text-sm font-semibold text-red-800 ">Maintenance Mode</span>
+                    <p className="text-xs text-red-700  mt-1">
                       When enabled, the system will be temporarily unavailable to users. Only administrators can access the system.
                     </p>
                   </div>
@@ -539,21 +539,21 @@ const GeneralSettingsNew = () => {
                 
                 {formData.maintenance_mode === "true" && (
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label className="block text-sm font-medium text-slate-700  mb-2">
                       Maintenance Message
                     </label>
                     <textarea
                       value={formData.maintenance_message}
                       onChange={(e) => handleInputChange("maintenance_message", e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                       placeholder="System is undergoing maintenance. We'll be back shortly."
                     />
                   </div>
                 )}
               </div>
 
-              <div className="p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div className="p-4 rounded-lg border border-slate-200 ">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -562,8 +562,8 @@ const GeneralSettingsNew = () => {
                     className="mt-0.5 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                   />
                   <div className="flex-1">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Automatic Database Backups</span>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                    <span className="text-sm font-semibold text-slate-700 ">Automatic Database Backups</span>
+                    <p className="text-xs text-slate-600  mt-1">
                       Enable automated database backups to protect your data
                     </p>
                   </div>
@@ -574,13 +574,13 @@ const GeneralSettingsNew = () => {
             {formData.backup_enabled === "true" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-slate-700  mb-2">
                     Backup Frequency
                   </label>
                   <select
                     value={formData.backup_frequency}
                     onChange={(e) => handleInputChange("backup_frequency", e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   >
                     <option value="hourly">Hourly</option>
                     <option value="daily">Daily (Recommended)</option>
@@ -590,7 +590,7 @@ const GeneralSettingsNew = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-slate-700  mb-2">
                     Backup Retention (days)
                   </label>
                   <input
@@ -599,20 +599,20 @@ const GeneralSettingsNew = () => {
                     onChange={(e) => handleInputChange("backup_retention_days", e.target.value)}
                     min="7"
                     max="365"
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                     placeholder="30"
                   />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500  mt-1">
                     How long to keep backup files (7-365 days)
                   </p>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 ">
               <button
                 onClick={() => fetchSettings()}
-                className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
               >
                 <RefreshCw className="h-4 w-4" />
                 Reset

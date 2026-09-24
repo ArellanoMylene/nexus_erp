@@ -1,6 +1,7 @@
 // UserManagement.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import axios from "axios";
+import Select from "react-select";
 import {
   Users,
   UserPlus,
@@ -143,17 +144,43 @@ const TextInput = ({
   onChange,
   type = "text",
   required = false,
+  label = "",
+  disabled = false,
   className = "",
 }) => (
-  <input
-    type={type}
-    name={name}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    required={required}
-    className={`w-full p-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm ${className}`}
-  />
+  <div className="w-full">
+    {label && <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>}
+    <input
+      type={type}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      disabled={disabled}
+      className={`w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500 ${className}`}
+    />
+  </div>
+);
+
+const ReactSelectInput = ({ name, placeholder, value, onChange, options, label = "", isDisabled = false }) => (
+  <div>
+    {label && <label className="block text-xs font-medium text-slate-700 mb-1.5">{label}</label>}
+    <Select
+      name={name}
+      options={options}
+      value={options.find((option) => option.value === value) || null}
+      onChange={(option) => onChange({ target: { name, value: option?.value || "" } })}
+      placeholder={placeholder || `Select ${name}`}
+      isClearable={false}
+      isDisabled={isDisabled}
+      className="text-sm"
+      styles={{
+        control: (base) => ({ ...base, minHeight: "38px", borderColor: "rgb(203 213 225)", borderRadius: "0.5rem", fontSize: "14px" }),
+        option: (base, state) => ({ ...base, backgroundColor: state.isSelected ? "rgb(79 70 229)" : state.isFocused ? "rgb(229 231 235)" : "white", color: state.isSelected ? "white" : "rgb(15 23 42)", fontSize: "14px" }),
+      }}
+    />
+  </div>
 );
 
 const SelectInput = ({
@@ -162,23 +189,27 @@ const SelectInput = ({
   value,
   onChange,
   children,
+  label = "",
   className = "",
   required = false,
   ...props
 }) => (
-  <select
-    name={name}
-    value={value}
-    onChange={onChange}
-    required={required}
-    className={`w-full p-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm appearance-none bg-white ${className}`}
-    {...props}
-  >
-    <option value="" disabled>
-      {placeholder || `Select ${name}`}
-    </option>
-    {children}
-  </select>
+  <div className="w-full">
+    {label && <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>}
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className={`w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 ${className}`}
+      {...props}
+    >
+      <option value="" disabled>
+        {placeholder || `Select ${name}`}
+      </option>
+      {children}
+    </select>
+  </div>
 );
 
 const TextAreaInput = ({
@@ -186,15 +217,25 @@ const TextAreaInput = ({
   placeholder,
   value,
   onChange,
+  label = "",
   className = "",
 }) => (
-  <textarea
-    name={name}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    className={`w-full p-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm h-12 ${className}`}
-  />
+  <div className="w-full">
+    {label && <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>}
+    <textarea
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      className={`w-full min-h-20 px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out shadow-sm text-sm ${className}`}
+    />
+  </div>
+);
+
+const SectionDivider = ({ title }) => (
+  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider pb-2 border-b border-slate-200 mt-1 mb-3">
+    {title}
+  </p>
 );
 
 /* -------------------------
@@ -208,19 +249,19 @@ const Modal = ({ isOpen, onClose, title, children, size = "lg" }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div
-        className={`bg-white rounded-xl shadow-2xl w-full ${widthClass} max-h-[90vh] overflow-y-auto transform transition-transform duration-200 scale-100`}
+        className={`bg-white rounded-lg shadow-xl w-full ${widthClass} max-h-[90vh] flex flex-col border border-slate-200 transform transition-transform duration-200 scale-100`}
       >
-        <div className="sticky top-0 bg-white border-b p-2.5 flex justify-between items-center z-10 rounded-t-xl">
-          <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+        <div className="sticky top-0 bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10 rounded-t-lg">
+          <h3 className="text-xl font-bold text-slate-800">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100 transition"
+            className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition"
             aria-label="Close modal"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-3">{children}</div>
+        <div className="p-6 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
@@ -389,15 +430,16 @@ function EmployeeRecords() {
   // data
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]); // Added departments state
-  const [programs, setPrograms] = useState([]); // Added programs state
   const [rbac, setRbac] = useState(INITIAL_RBAC_STATE);
 
   // modals & form state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-  const [selectedRole, setSelectedRole] = useState("Student");
-  const [formData, setFormData] = useState(getInitialFormState("Student"));
+  const [selectedRole, setSelectedRole] = useState("Staff");
+  const [formData, setFormData] = useState(getInitialFormState("Staff"));
+  const [nextEmployeeId, setNextEmployeeId] = useState("");
+  const [activeFormTab, setActiveFormTab] = useState("personal");
 
   // view modal
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -436,21 +478,6 @@ function EmployeeRecords() {
     }
   };
 
-  const fetchPrograms = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/programs`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      setPrograms(response.data);
-    } catch (error) {
-      console.error("Error fetching programs:", error);
-    }
-  };
-
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -469,7 +496,6 @@ function EmployeeRecords() {
   useEffect(() => {
     fetchUsers();
     fetchDepartments();
-    fetchPrograms();
   }, []);
 
   /* -------------------------
@@ -477,10 +503,13 @@ function EmployeeRecords() {
      ------------------------- */
   // effect to keep form role in sync
   useEffect(() => {
-    if (!isEditing) {
-      setFormData(getInitialFormState(selectedRole));
+    if (!isEditing && selectedRole !== "Student") {
+      setFormData((previous) => ({
+        ...getInitialFormState(selectedRole),
+        employeeId: nextEmployeeId || previous.employeeId || "",
+      }));
     }
-  }, [selectedRole, isEditing]);
+  }, [selectedRole, isEditing, nextEmployeeId]);
 
   function getInitialFormState(role) {
     let specificFields = {};
@@ -516,8 +545,9 @@ function EmployeeRecords() {
     setIsFormModalOpen(false);
     setIsEditing(false);
     setCurrentId(null);
-    setFormData(getInitialFormState("Student"));
-    setSelectedRole("Student");
+    setFormData(getInitialFormState("Staff"));
+    setSelectedRole("Staff");
+    setActiveFormTab("personal");
     setCollapsed({
       account: false,
       student: false,
@@ -536,22 +566,15 @@ function EmployeeRecords() {
   const handleRoleChange = (e) => {
     const newRole = e.target.value;
     setSelectedRole(newRole);
+    setFormData({
+      ...getInitialFormState(newRole),
+      employeeId: nextEmployeeId,
+    });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // image upload (base64 preview)
-  const handleProfileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormData((prev) => ({ ...prev, profilePicture: reader.result }));
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
@@ -575,59 +598,36 @@ function EmployeeRecords() {
           return;
         }
 
-        // Check required fields for employee
-        if (selectedRole !== "Student") {
           const requiredFields = [
             "email",
             "firstName",
             "lastName",
             "employeeId",
+            "department",
+            "positionTitle",
           ];
           const missing = requiredFields.filter(
-            (field) => !submitData[field] || submitData[field].trim() === "",
+            (field) => !submitData[field] || String(submitData[field]).trim() === "",
           );
           if (missing.length) {
             alert(`Please fill required fields: ${missing.join(", ")}`);
             return;
-          }
         }
 
-        // STUDENT ACCOUNT CREATION
-        if (selectedRole === "Student") {
-          response = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/api/users/student`,
-            submitData,
-          );
-        }
-
-        // EMPLOYEE / ADMIN / FACULTY / STAFF CREATION
-        else {
           response = await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/users/employee`,
             submitData,
           );
-        }
       }
 
       // -------- EDIT MODE --------
       else {
         const userId = currentId;
 
-        // STUDENT UPDATE
-        if (selectedRole === "Student") {
-          response = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/users/student/${userId}`,
-            submitData,
-          );
-        }
-
-        // EMPLOYEE / ADMIN / FACULTY / STAFF UPDATE
-        else {
-          response = await axios.put(
-            `${import.meta.env.VITE_API_BASE_URL}/api/users/employee/${userId}`,
-            submitData,
-          );
-        }
+        response = await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/api/users/employee/${userId}`,
+          submitData,
+        );
       }
 
       // Handle success
@@ -647,8 +647,20 @@ function EmployeeRecords() {
 
   const handleAddNew = () => {
     setIsEditing(false);
-    setFormData(getInitialFormState("Student"));
-    setSelectedRole("Student");
+    setSelectedRole("Staff");
+    setFormData(getInitialFormState("Staff"));
+    setActiveFormTab("personal");
+    const token = localStorage.getItem("token");
+    axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/api/users/employee/next-id`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    ).then((response) => {
+      const employeeId = response.data.employeeId || "";
+      setNextEmployeeId(employeeId);
+      setFormData((previous) => ({ ...previous, employeeId }));
+    }).catch((error) => {
+      console.error("Failed to fetch next employee ID:", error);
+    });
     setIsFormModalOpen(true);
   };
 
@@ -656,6 +668,7 @@ function EmployeeRecords() {
     setIsEditing(true);
     setCurrentId(user.user_id);
     setSelectedRole(user.role);
+    setActiveFormTab("personal");
     setFormData({
       ...getInitialFormState(user.role),
       email: user.email || "",
@@ -947,133 +960,31 @@ function EmployeeRecords() {
   );
 
   const renderCommonFields = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      <div className="col-span-full flex items-center justify-between">
-        <SectionTitle icon={Users} title="Account & Personal Information" />
-        <button
-          type="button"
-          onClick={() => setCollapsed((s) => ({ ...s, account: !s.account }))}
-          className="text-xs text-gray-500"
-        >
-          {collapsed.account ? (
-            <ChevronUp className="inline w-4 h-4" />
-          ) : (
-            <ChevronDown className="inline w-4 h-4" />
-          )}
-        </button>
+    <div className="space-y-5">
+      <div>
+        <SectionDivider title="Role & account" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ReactSelectInput name="role" label="User role *" placeholder="Select role" value={selectedRole} onChange={handleRoleChange} isDisabled={isEditing} options={["Admin", "Faculty", "Staff", "HR", "Accounting"].map((role) => ({ value: role, label: role }))} />
+          <TextInput type="email" name="email" label="Email address *" value={formData.email} onChange={handleInputChange} required />
+          <TextInput type="password" name="password" label={isEditing ? "Password (leave blank to keep)" : "Password *"} value={formData.password} onChange={handleInputChange} required={!isEditing} />
+          <TextInput type="password" name="confirmPassword" label={isEditing ? "Confirm password (leave blank to keep)" : "Confirm password *"} value={formData.confirmPassword} onChange={handleInputChange} required={!isEditing} />
+        </div>
       </div>
-
-      {!collapsed.account && (
-        <>
-          <TextInput
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
-          <TextInput
-            type="password"
-            name="password"
-            placeholder="Password (Leave blank to keep old password)"
-            value={formData.password}
-            onChange={handleInputChange}
-            required={!isEditing}
-          />
-          <TextInput
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            required={!isEditing}
-          />
-          <TextInput
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleInputChange}
-            required
-          />
-          <TextInput
-            name="middleName"
-            placeholder="Middle Name"
-            value={formData.middleName}
-            onChange={handleInputChange}
-          />
-          <TextInput
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleInputChange}
-            required
-          />
-          <TextInput
-            name="suffix"
-            placeholder="Suffix (Jr, Sr)"
-            value={formData.suffix}
-            onChange={handleInputChange}
-          />
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-500 mb-1 ml-1">
-              Date of Birth
-            </label>
-            {/* fixed label */}
-            <TextInput
-              type="date"
-              name="dateOfBirth"
-              placeholder=""
-              value={formData.dateOfBirth}
-              onChange={handleInputChange}
-            />
+      <div>
+        <SectionDivider title="Personal information" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <TextInput name="firstName" label="First name *" value={formData.firstName} onChange={handleInputChange} required />
+          <TextInput name="middleName" label="Middle name" value={formData.middleName} onChange={handleInputChange} />
+          <TextInput name="lastName" label="Last name *" value={formData.lastName} onChange={handleInputChange} required />
+          <TextInput name="suffix" label="Suffix (Jr., Sr.)" value={formData.suffix} onChange={handleInputChange} />
+          <TextInput type="date" name="dateOfBirth" label="Date of birth" value={formData.dateOfBirth} onChange={handleInputChange} />
+          <ReactSelectInput name="gender" label="Gender" placeholder="Select gender" value={formData.gender} onChange={handleInputChange} options={["Male", "Female", "Non-Binary", "Prefer not to say"].map((value) => ({ value, label: value }))} />
+          <TextInput type="tel" name="phone" label="Phone number" value={formData.phone} onChange={handleInputChange} />
+          <div className="md:col-span-2">
+            <TextAreaInput name="permanentAddress" label="Permanent address" value={formData.permanentAddress} onChange={handleInputChange} />
           </div>
-
-          <SelectInput
-            name="gender"
-            value={formData.gender}
-            onChange={handleInputChange}
-          >
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </SelectInput>
-
-          <TextInput
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleInputChange}
-          />
-
-          <TextAreaInput
-            name="permanentAddress"
-            placeholder="Permanent Address"
-            value={formData.permanentAddress}
-            onChange={handleInputChange}
-            className="lg:col-span-3"
-          />
-
-          {/* Profile picture upload */}
-          <div className="lg:col-span-3 flex items-center gap-3">
-            <label className="text-xs text-gray-600">Profile Picture</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfileUpload}
-              className="text-sm"
-            />
-            {formData.profilePicture && (
-              <img
-                src={formData.profilePicture}
-                alt="preview"
-                className="h-10 w-10 rounded-full object-cover border"
-              />
-            )}
-          </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 
@@ -1190,90 +1101,30 @@ function EmployeeRecords() {
   );
  */
   const renderEmployeeFields = () => (
-    <div className="p-3 mt-4 rounded-xl bg-gray-50 border border-gray-200 shadow-inner">
-      <div className="flex items-center justify-between">
-        <SectionTitle
-          icon={Briefcase}
-          title="Employment Details"
-          color="text-gray-800"
-        />
-        <button
-          type="button"
-          onClick={() => setCollapsed((s) => ({ ...s, employee: !s.employee }))}
-          className="text-xs text-gray-600"
-        >
-          {collapsed.employee ? (
-            <ChevronUp className="inline w-4 h-4" />
-          ) : (
-            <ChevronDown className="inline w-4 h-4" />
+    <div className="space-y-5">
+      <div>
+        <SectionDivider title="Employment details" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <TextInput name="employeeId" label="Employee ID" value={formData.employeeId} onChange={handleInputChange} required disabled={!isEditing && !!formData.employeeId} />
+          <ReactSelectInput name="department" label="Department *" placeholder="Select department" value={formData.department} onChange={handleInputChange} options={departments.map((dept) => ({ value: dept.name, label: dept.name }))} />
+          <TextInput name="positionTitle" label="Position title *" placeholder="e.g., Professor, Instructor" value={formData.positionTitle} onChange={handleInputChange} required />
+          <TextInput type="date" name="dateHired" label="Date hired" value={formData.dateHired} onChange={handleInputChange} />
+          <ReactSelectInput name="status" label="Employment status" value={formData.status} onChange={handleInputChange} options={[{ value: "Active", label: "Active" }, { value: "Leave", label: "On Leave" }, { value: "Terminated", label: "Terminated" }]} />
+          {selectedRole === "Admin" && (
+            <ReactSelectInput name="accessLevel" label="Access level" value={formData.accessLevel} onChange={handleInputChange} options={[{ value: "Standard Admin", label: "Standard Admin" }, { value: "Super Admin", label: "Super Admin" }]} />
           )}
-        </button>
+        </div>
       </div>
-
-      {!collapsed.employee && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {/* Only show employeeId for roles that require it */}
-          {["Admin", "Faculty", "Staff", "HR", "Accounting"].includes(
-            selectedRole,
-          ) && (
-            <TextInput
-              name="employeeId"
-              placeholder="Employee ID"
-              value={formData.employeeId}
-              onChange={handleInputChange}
-              required
-            />
-          )}
-          <SelectInput
-            name="department"
-            value={formData.department}
-            onChange={handleInputChange}
-            className={selectedRole === "Student" ? "hidden" : ""}
-            required={selectedRole !== "Student"}
-          >
-            <option value="" disabled>
-              Select Department
-            </option>
-            {departments.map((dept) => (
-              <option key={dept.id} value={dept.name}>
-                {dept.name}
-              </option>
-            ))}
-          </SelectInput>
-          <TextInput
-            name="positionTitle"
-            placeholder="Position Title"
-            value={formData.positionTitle}
-            onChange={handleInputChange}
-            required={selectedRole !== "Student"}
-          />
-
-          <div className="flex flex-col">
-            <label className="text-xs text-gray-500 -mb-1 ml-1">
-              Date Hired
-            </label>
-            <TextInput
-              type="date"
-              name="dateHired"
-              value={formData.dateHired}
-              onChange={handleInputChange}
-            />
+      {(selectedRole === "Faculty" || selectedRole === "Admin") && (
+        <div>
+          <SectionDivider title="Academic credentials" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <TextInput name="specialization" label="Specialization" value={formData.specialization} onChange={handleInputChange} placeholder="e.g., Software Engineering" />
+            <SelectInput name="educationalAttainment" label="Educational attainment" value={formData.educationalAttainment} onChange={handleInputChange}>
+              <option value="">Select...</option><option value="Bachelor's Degree">Bachelor's Degree</option><option value="Master's Degree">Master's Degree</option><option value="Doctorate">Doctorate</option><option value="PhD">PhD</option>
+            </SelectInput>
+            <TextInput name="licenseNumber" label="License number (PRC)" value={formData.licenseNumber} onChange={handleInputChange} />
           </div>
-
-          <SelectInput
-            name="status"
-            value={formData.status}
-            onChange={handleInputChange}
-          >
-            <option value="Active">Active</option>
-            <option value="Leave">On Leave</option>
-            <option value="Terminated">Terminated</option>
-          </SelectInput>
-
-          {["Admin", "Faculty", "Staff"].includes(selectedRole) &&
-            (selectedRole === "Admin"
-              ? renderAdminExtras()
-              : renderFacultyExtras())}
         </div>
       )}
     </div>
@@ -1608,54 +1459,49 @@ function EmployeeRecords() {
       <Modal
         isOpen={isFormModalOpen}
         onClose={closeFormModal}
-        title={isEditing ? "Edit User Record" : "Create New User Account"}
+        title={isEditing ? "Edit user record" : "Create new user account"}
         size="lg"
       >
         <form onSubmit={handleSubmit}>
-          <div className="mb-4 p-2 bg-gray-50 rounded-xl border border-gray-200">
-            <label className="block text-gray-700 font-bold mb-1 text-sm">
-              Define User Role
-            </label>
-            <SelectInput
-              name="role"
-              placeholder="Select Role"
-              value={selectedRole}
-              onChange={handleRoleChange}
-              className="md:w-1/3 bg-white"
-              required
-              disabled={isEditing}
-            >
-              <option value="Admin">Admin</option>
-              <option value="Faculty">Faculty</option>
-              <option value="Staff">Staff</option>
-              <option value="HR">HR</option>
-              <option value="Accounting">Accounting</option>
-            </SelectInput>
-            <p className="text-xs text-gray-500 mt-2">
-              The role determines the specific fields required below. Role
-              cannot be changed while editing.
-            </p>
+          <div className="flex border-b border-slate-200 mb-5">
+            {[
+              { id: "personal", label: "Personal info" },
+              { id: "role", label: "Role details" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveFormTab(tab.id)}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeFormTab === tab.id
+                    ? "border-indigo-600 text-indigo-600"
+                    : "border-transparent text-slate-500 hover:text-indigo-600"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
-          {renderCommonFields()}
-          {/*   {selectedRole === "Student" && renderStudentFields()} */}
-          {["Admin", "Faculty", "Staff", "HR", "Accounting"].includes(
-            selectedRole,
-          ) && renderEmployeeFields()}
+          {activeFormTab === "personal" && (
+            renderCommonFields()
+          )}
 
-          <div className="flex justify-end space-x-3 mt-4 pt-3 border-t border-gray-200">
+          {activeFormTab === "role" && renderEmployeeFields()}
+
+          <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-slate-200">
             <button
               type="button"
               onClick={closeFormModal}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm"
+              className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 text-sm font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition shadow text-sm"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition shadow text-sm font-medium"
             >
-              {isEditing ? "Save Changes" : "Create Account"}
+              {isEditing ? "Save changes" : "Create account"}
             </button>
           </div>
         </form>

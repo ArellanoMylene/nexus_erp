@@ -285,19 +285,19 @@ const GradeEntryApproval = () => {
   const getApprovalBadge = (status) => {
     const statusColors = {
       pending:
-        "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400",
+        "bg-yellow-100  text-yellow-800 ",
       approved:
-        "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400",
-      rejected: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400",
+        "bg-green-100  text-green-800 ",
+      rejected: "bg-red-100  text-red-800 ",
       revision_needed:
-        "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400",
+        "bg-orange-100  text-orange-800 ",
     };
 
     return (
       <span
         className={`px-2 py-0.5 text-xs font-medium rounded-full ${
           statusColors[status] ||
-          "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300"
+          "bg-slate-100  text-slate-800 "
         }`}
       >
         {status.replace("_", " ")}
@@ -306,37 +306,37 @@ const GradeEntryApproval = () => {
   };
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <FileText size={24} className="text-indigo-600" />
             Grade Entry Approval
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">
               Pending Approval
             </p>
-            <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+            <p className="text-2xl font-bold text-yellow-600 ">
               {
                 gradeEntries.filter((e) => e.approval_status === "pending")
                   .length
               }
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">
               Approved Today
             </p>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-2xl font-bold text-green-600 ">
               {
                 gradeEntries.filter((e) => {
                   const approvedDate = e.approved_at
@@ -350,22 +350,22 @@ const GradeEntryApproval = () => {
               }
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">
               Rejected
             </p>
-            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <p className="text-2xl font-bold text-red-600 ">
               {
                 gradeEntries.filter((e) => e.approval_status === "rejected")
                   .length
               }
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">
               Total Entries
             </p>
-            <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+            <p className="text-2xl font-bold text-indigo-600 ">
               {gradeEntries.length}
             </p>
           </div>
@@ -382,7 +382,7 @@ const GradeEntryApproval = () => {
               onChange={(e) =>
                 setFilters({ ...filters, search: e.target.value })
               }
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -397,7 +397,7 @@ const GradeEntryApproval = () => {
               onChange={(e) =>
                 setFilters({ ...filters, approval_status: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="">All Status</option>
               <option value="pending">Pending</option>
@@ -412,7 +412,7 @@ const GradeEntryApproval = () => {
               onChange={(e) =>
                 setFilters({ ...filters, course_id: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-32"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-32"
             />
             <input
               type="text"
@@ -421,17 +421,17 @@ const GradeEntryApproval = () => {
               onChange={(e) =>
                 setFilters({ ...filters, period_id: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-32"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-32"
             />
             <button
               onClick={handleFilter}
-              className="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors text-sm font-medium shadow-sm"
+              className="px-4 py-2 bg-indigo-600  text-white rounded-md hover:bg-indigo-700  transition-colors text-sm font-medium shadow-sm"
             >
               Apply Filters
             </button>
             <button
               onClick={() => handleOpenModal()}
-              className="px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 transition-colors text-sm font-medium shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-green-600  text-white rounded-md hover:bg-green-700  transition-colors text-sm font-medium shadow-sm flex items-center gap-2"
             >
               <Plus size={16} />
               Create Grade Entry
@@ -441,13 +441,13 @@ const GradeEntryApproval = () => {
 
         {/* Grade Entries Table */}
         <div>
-          <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-slate-100">
+          <h2 className="text-xl font-bold mb-4 text-slate-800 ">
             Grade Entries for Approval
           </h2>
-          <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <div className="overflow-x-auto rounded border border-slate-200 ">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">Student</th>
                   <th className="px-4 py-2.5">Course</th>
                   <th className="px-4 py-2.5">Component</th>
@@ -458,7 +458,7 @@ const GradeEntryApproval = () => {
                   <th className="px-4 py-2.5 w-1/12 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {(() => {
                   if (loading) {
                     return (
@@ -509,7 +509,7 @@ const GradeEntryApproval = () => {
                   return paginatedData.map((entry) => (
                     <tr
                       key={entry.entry_id}
-                      className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                      className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                     >
                       <td className="px-4 py-2 font-medium">
                         {entry.student_first_name} {entry.student_last_name}
@@ -535,14 +535,14 @@ const GradeEntryApproval = () => {
                           <>
                             <button
                               onClick={() => handleApprove(entry.entry_id)}
-                              className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                              className="text-green-600  hover:text-green-800  transition-colors p-1 rounded-full hover:bg-slate-200 "
                               title="Approve"
                             >
                               <CheckCircle size={14} />
                             </button>
                             <button
                               onClick={() => handleReject(entry.entry_id)}
-                              className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                              className="text-red-600  hover:text-red-800  transition-colors p-1 rounded-full hover:bg-slate-200 "
                               title="Reject"
                             >
                               <XCircle size={14} />
@@ -558,7 +558,7 @@ const GradeEntryApproval = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
             <span className="text-xs sm:text-sm">
               Page <span className="font-semibold">{currentPage}</span> of{" "}
               <span className="font-semibold">
@@ -601,11 +601,11 @@ const GradeEntryApproval = () => {
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
               >
                 <ChevronLeft
                   size={16}
-                  className="text-slate-600 dark:text-slate-400"
+                  className="text-slate-600 "
                 />
               </button>
               {(() => {
@@ -632,7 +632,7 @@ const GradeEntryApproval = () => {
                     className={`px-3 py-1.5 text-xs rounded border transition-colors ${
                       currentPage === i + 1
                         ? "bg-indigo-600 text-white border-indigo-600"
-                        : "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                        : "border-slate-300  text-slate-700  hover:bg-slate-100 "
                     }`}
                   >
                     {i + 1}
@@ -676,11 +676,11 @@ const GradeEntryApproval = () => {
                     Math.ceil(filtered.length / itemsPerPage) || 1;
                   return currentPage === totalPages;
                 })()}
-                className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
               >
                 <ChevronRight
                   size={16}
-                  className="text-slate-600 dark:text-slate-400"
+                  className="text-slate-600 "
                 />
               </button>
             </div>
@@ -694,17 +694,17 @@ const GradeEntryApproval = () => {
             onClick={handleCloseModal}
           >
             <div
-              className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-4xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+              className="bg-white  rounded-lg shadow-2xl w-full max-w-4xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
-              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   {editingEntry ? "Edit" : "Add"} Grade Entry
                 </h3>
                 <button
                   onClick={handleCloseModal}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
                 >
                   <Plus size={18} className="rotate-45" />
                 </button>
@@ -714,7 +714,7 @@ const GradeEntryApproval = () => {
               <form onSubmit={handleSubmit} className="p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Student ID *
                     </label>
                     <Select
@@ -748,7 +748,7 @@ const GradeEntryApproval = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Course ID *
                     </label>
                     <Select
@@ -782,7 +782,7 @@ const GradeEntryApproval = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Period ID *
                     </label>
                     <Select
@@ -816,7 +816,7 @@ const GradeEntryApproval = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Component ID *
                     </label>
                     <Select
@@ -850,7 +850,7 @@ const GradeEntryApproval = () => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Raw Score *
                     </label>
                     <input
@@ -860,13 +860,13 @@ const GradeEntryApproval = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, raw_score: e.target.value })
                       }
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Max Score *
                     </label>
                     <input
@@ -876,18 +876,18 @@ const GradeEntryApproval = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, max_score: e.target.value })
                       }
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                       required
                     />
                   </div>
                 </div>
 
                 {/* Modal Footer */}
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    transition-colors border border-slate-300 "
                   >
                     Cancel
                   </button>

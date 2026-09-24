@@ -23,9 +23,9 @@ const GradesModel = {
           c.units,
           ap.school_year AS period_name,
           ap.semester AS year,
-          ROUND(SUM(CASE WHEN ge.label = 'prelim'  AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS prelim_grade,
-          ROUND(SUM(CASE WHEN ge.label = 'midterm' AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS midterm_grade,
-          ROUND(SUM(CASE WHEN ge.label = 'finals'  AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS finals_grade,
+          ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%prelim%'  AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS prelim_grade,
+          ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%midterm%' AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS midterm_grade,
+          ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%final%'   AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS finals_grade,
           COUNT(*) AS total_entries,
           SUM(CASE WHEN ge.approval_status = 'approved' THEN 1 ELSE 0 END) AS approved_entries
         FROM grade_entries ge

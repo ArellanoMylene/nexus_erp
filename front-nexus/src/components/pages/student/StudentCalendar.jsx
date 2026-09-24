@@ -124,35 +124,35 @@ const StudentCalendar = () => {
   const getExamTypeColor = (type) => {
     const colors = {
       midterm:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        "bg-blue-100 text-blue-700  ",
       final:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-      quiz: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        "bg-purple-100 text-purple-700  ",
+      quiz: "bg-green-100 text-green-700  ",
       prelim:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        "bg-yellow-100 text-yellow-700  ",
     };
     return (
       colors[type] ||
-      "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400"
+      "bg-slate-100 text-slate-700  "
     );
   };
 
   const getEventTypeColor = (type) => {
     const colors = {
       academic:
-        "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
+        "bg-indigo-100 text-indigo-700  ",
       cultural:
-        "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
+        "bg-pink-100 text-pink-700  ",
       sports:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        "bg-green-100 text-green-700  ",
       social:
-        "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+        "bg-orange-100 text-orange-700  ",
       orientation:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        "bg-blue-100 text-blue-700  ",
     };
     return (
       colors[type] ||
-      "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400"
+      "bg-slate-100 text-slate-700  "
     );
   };
 
@@ -304,21 +304,21 @@ const StudentCalendar = () => {
   ];
 
   return (
-   <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+   <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <CalendarIcon size={24} className="text-indigo-600" />
             Academic Calendar
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Exams & Events
           </span>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -327,8 +327,8 @@ const StudentCalendar = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    ? "border-indigo-600 text-indigo-600  bg-indigo-50/50 "
+                    : "border-transparent text-slate-600  hover:text-slate-900  hover:bg-slate-50 "
                 }`}
               >
                 <Icon size={16} />
@@ -340,7 +340,7 @@ const StudentCalendar = () => {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
+          <div className="bg-red-50  border border-red-200  rounded-lg p-4 text-red-700 ">
             <p className="font-semibold">Error Loading Calendar</p>
             <p className="text-sm">{error}</p>
           </div>
@@ -348,11 +348,11 @@ const StudentCalendar = () => {
 
         {/* Loading State */}
         {loading && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+          <div className="bg-white  rounded-lg border border-slate-200  p-8 text-center">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
             </div>
-            <p className="text-slate-600 dark:text-slate-400 mt-3">
+            <p className="text-slate-600  mt-3">
               Loading calendar...
             </p>
           </div>
@@ -360,11 +360,11 @@ const StudentCalendar = () => {
 
         {/* Exam Schedule Tab */}
         {!loading && activeTab === "exams" && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden">
             {exams.length === 0 ? (
               <div className="p-8 text-center">
                 <FileText size={48} className="mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   No upcoming exams scheduled
                 </p>
               </div>
@@ -372,60 +372,60 @@ const StudentCalendar = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                    <tr className="border-b border-slate-200  bg-slate-50 ">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Date
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Subject
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Time
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Room
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Section
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Proctor
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Type
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  <tbody className="divide-y divide-slate-200 ">
                     {exams.map((exam) => (
                       <tr
                         key={exam.exam_id}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                        className="hover:bg-slate-50  transition-colors"
                       >
-                        <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white">
+                        <td className="px-4 py-3 text-sm font-medium text-slate-900 ">
                           {new Date(exam.exam_date).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3">
                           <div>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                            <p className="text-sm font-semibold text-slate-900 ">
                               {exam.subject_name}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-xs text-slate-500 ">
                               {exam.title}
                             </p>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           {formatExamTimeRange(
                             exam.start_time,
                             exam.end_time,
                             exam.exam_duration,
                           )}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           <div className="flex items-center gap-1">
                             <MapPin
                               size={14}
@@ -434,10 +434,10 @@ const StudentCalendar = () => {
                             {exam.room}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           {exam.section || "N/A"}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           {exam.proctor_name || "TBA"}
                         </td>
                         <td className="px-4 py-3">
@@ -453,7 +453,7 @@ const StudentCalendar = () => {
                             exam.exam_date,
                           ) !== "past" ? (
                             <div>
-                              <span className="text-indigo-600 dark:text-indigo-400 font-medium text-xs">
+                              <span className="text-indigo-600  font-medium text-xs">
                                 {getEventTimingStatus(
                                   exam.exam_date,
                                   exam.exam_date,
@@ -461,7 +461,7 @@ const StudentCalendar = () => {
                                   ? "Ongoing"
                                   : "Upcoming"}
                               </span>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                              <p className="text-xs text-slate-500 ">
                                 {exam.daysRemaining !== undefined &&
                                 exam.daysRemaining !== null
                                   ? `${Math.max(0, exam.daysRemaining)}d left`
@@ -469,7 +469,7 @@ const StudentCalendar = () => {
                               </p>
                             </div>
                           ) : (
-                            <span className="text-slate-500 dark:text-slate-400 text-xs">
+                            <span className="text-slate-500  text-xs">
                               Past
                             </span>
                           )}
@@ -485,14 +485,14 @@ const StudentCalendar = () => {
 
         {/* School Events Tab */}
         {!loading && activeTab === "events" && (
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden">
             {events.length === 0 ? (
               <div className="p-8 text-center">
                 <CalendarIcon
                   size={48}
                   className="mx-auto text-slate-400 mb-3"
                 />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   No upcoming events
                 </p>
               </div>
@@ -500,53 +500,53 @@ const StudentCalendar = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                    <tr className="border-b border-slate-200  bg-slate-50 ">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Date
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Event Title
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Time
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Location
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Audience
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Type
                       </th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  <tbody className="divide-y divide-slate-200 ">
                     {events.map((event) => (
                       <tr
                         key={event.event_id}
-                        className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                        className="hover:bg-slate-50  transition-colors"
                       >
-                        <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                        <td className="px-4 py-3 text-sm font-medium text-slate-900  whitespace-nowrap">
                           {formatEventDateRange(event.event_date, event.end_date)}
                         </td>
                         <td className="px-4 py-3">
                           <div>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                            <p className="text-sm font-semibold text-slate-900 ">
                               {event.title}
                             </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                            <p className="text-xs text-slate-500  line-clamp-1">
                               {event.description}
                             </p>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           {formatEventTime(event.start_time, event.end_time)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           {event.location ? (
                             <div className="flex items-center gap-1">
                               <MapPin
@@ -559,7 +559,7 @@ const StudentCalendar = () => {
                             "TBA"
                           )}
                         </td>
-                        <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                        <td className="px-4 py-3 text-sm text-slate-600 ">
                           <div className="flex items-center gap-1">
                             <Users
                               size={14}
@@ -581,7 +581,7 @@ const StudentCalendar = () => {
                             event.end_date,
                           ) !== "past" ? (
                             <div>
-                              <span className="text-indigo-600 dark:text-indigo-400 font-medium text-xs">
+                              <span className="text-indigo-600  font-medium text-xs">
                                 {getEventTimingStatus(
                                   event.event_date,
                                   event.end_date,
@@ -589,7 +589,7 @@ const StudentCalendar = () => {
                                   ? "Ongoing"
                                   : "Upcoming"}
                               </span>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                              <p className="text-xs text-slate-500 ">
                                 {event.daysRemaining !== undefined &&
                                 event.daysRemaining !== null
                                   ? `${Math.max(0, event.daysRemaining)}d left`
@@ -597,7 +597,7 @@ const StudentCalendar = () => {
                               </p>
                             </div>
                           ) : (
-                            <span className="text-slate-500 dark:text-slate-400 text-xs">
+                            <span className="text-slate-500  text-xs">
                               Past
                             </span>
                           )}

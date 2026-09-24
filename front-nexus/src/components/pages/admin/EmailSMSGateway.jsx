@@ -164,16 +164,16 @@ const EmailSMSGateway = () => {
   const activeGateways = gateways.filter((g) => g.is_active);
 
   return (
-    <div className="min-h-screen dark:bg-slate-900 p-3 sm:p-4">
+    <div className="min-h-screen  p-3 sm:p-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg">
-            <Mail className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          <div className="p-2 bg-purple-500/10  rounded-lg">
+            <Mail className="h-6 w-6 text-purple-600 " />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Email & SMS Gateway</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Configure communication gateways</p>
+            <h1 className="text-2xl font-bold text-slate-800 ">Email & SMS Gateway</h1>
+            <p className="text-sm text-slate-600 ">Configure communication gateways</p>
           </div>
         </div>
         <button
@@ -190,38 +190,38 @@ const EmailSMSGateway = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Gateways</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{gateways.length}</p>
+              <p className="text-sm text-slate-600 ">Total Gateways</p>
+              <p className="text-2xl font-bold text-slate-800  mt-1">{gateways.length}</p>
             </div>
-            <BarChart3 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+            <BarChart3 className="h-8 w-8 text-purple-600 " />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Email Gateways</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{emailGateways.length}</p>
+              <p className="text-sm text-slate-600 ">Email Gateways</p>
+              <p className="text-2xl font-bold text-slate-800  mt-1">{emailGateways.length}</p>
             </div>
             <Mail className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">SMS Gateways</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{smsGateways.length}</p>
+              <p className="text-sm text-slate-600 ">SMS Gateways</p>
+              <p className="text-2xl font-bold text-slate-800  mt-1">{smsGateways.length}</p>
             </div>
             <MessageSquare className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Active Gateways</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{activeGateways.length}</p>
+              <p className="text-sm text-slate-600 ">Active Gateways</p>
+              <p className="text-2xl font-bold text-slate-800  mt-1">{activeGateways.length}</p>
             </div>
             <CheckCircle className="h-8 w-8 text-green-500" />
           </div>
@@ -229,7 +229,7 @@ const EmailSMSGateway = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-slate-200 dark:border-slate-700">
+      <div className="flex gap-2 mb-6 border-b border-slate-200 ">
         <button
           onClick={() => {
             setActiveTab("email");
@@ -237,8 +237,8 @@ const EmailSMSGateway = () => {
           }}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === "email"
-              ? "text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              ? "text-purple-600  border-b-2 border-purple-600 "
+              : "text-slate-600  hover:text-slate-800 "
           }`}
         >
           <div className="flex items-center gap-2">
@@ -253,8 +253,8 @@ const EmailSMSGateway = () => {
           }}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === "sms"
-              ? "text-purple-600 dark:text-purple-400 border-b-2 border-purple-600 dark:border-purple-400"
-              : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              ? "text-purple-600  border-b-2 border-purple-600 "
+              : "text-slate-600  hover:text-slate-800 "
           }`}
         >
           <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ const EmailSMSGateway = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  mb-6">
         <div className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
@@ -275,7 +275,7 @@ const EmailSMSGateway = () => {
                 placeholder="Search gateways..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
               />
             </div>
           </div>
@@ -283,59 +283,59 @@ const EmailSMSGateway = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  overflow-hidden">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-              <p className="text-slate-600 dark:text-slate-400 mt-2">Loading gateways...</p>
+              <p className="text-slate-600  mt-2">Loading gateways...</p>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
                 <tr>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Gateway Name
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Provider
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Default
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Daily Limit
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+              <tbody className="bg-white  divide-y divide-slate-200 ">
                 {currentData.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-4 text-center text-slate-500 dark:text-slate-400">
+                    <td colSpan="6" className="px-6 py-4 text-center text-slate-500 ">
                       No gateways found
                     </td>
                   </tr>
                 ) : (
                   currentData.map((gateway) => (
-                    <tr key={gateway.gateway_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                      <td className="px-6 py-2 text-sm font-medium text-slate-900 dark:text-white">
+                    <tr key={gateway.gateway_id} className="hover:bg-slate-50 ">
+                      <td className="px-6 py-2 text-sm font-medium text-slate-900 ">
                         {gateway.gateway_name}
                       </td>
-                      <td className="px-6 py-2 text-sm text-slate-600 dark:text-slate-300">
+                      <td className="px-6 py-2 text-sm text-slate-600 ">
                         {gateway.provider}
                       </td>
                       <td className="px-6 py-2 text-sm">
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${
                             gateway.is_active
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                              ? "bg-green-100 text-green-800  "
+                              : "bg-red-100 text-red-800  "
                           }`}
                         >
                           {gateway.is_active ? "Active" : "Inactive"}
@@ -343,32 +343,32 @@ const EmailSMSGateway = () => {
                       </td>
                       <td className="px-6 py-2 text-sm">
                         {gateway.is_default && (
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800  ">
                             Default
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-2 text-sm text-slate-600 dark:text-slate-300">
+                      <td className="px-6 py-2 text-sm text-slate-600 ">
                         {gateway.daily_limit || "N/A"}
                       </td>
                       <td className="px-6 py-2 text-sm">
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleTest(gateway.gateway_id)}
-                            className="p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
+                            className="p-1 text-green-600 hover:bg-green-50  rounded"
                             title="Test Connection"
                           >
                             <Send className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleEdit(gateway)}
-                            className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                            className="p-1 text-blue-600 hover:bg-blue-50  rounded"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(gateway.gateway_id)}
-                            className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                            className="p-1 text-red-600 hover:bg-red-50  rounded"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -384,7 +384,7 @@ const EmailSMSGateway = () => {
       </div>
 
       {/* Pagination */}
-      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600 dark:text-slate-400">
+      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600 ">
         <div>
           Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
         </div>
@@ -392,7 +392,7 @@ const EmailSMSGateway = () => {
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border border-slate-300  rounded hover:bg-slate-50  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -402,7 +402,7 @@ const EmailSMSGateway = () => {
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border border-slate-300  rounded hover:bg-slate-50  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -412,10 +412,10 @@ const EmailSMSGateway = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white  rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+                <h2 className="text-xl font-bold text-slate-800 ">
                   {selectedGateway ? "Edit Gateway" : "Add Gateway"}
                 </h2>
                 <button
@@ -423,7 +423,7 @@ const EmailSMSGateway = () => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  className="text-slate-400 hover:text-slate-600 "
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -431,7 +431,7 @@ const EmailSMSGateway = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-sm font-medium text-slate-700  mb-1">
                     Gateway Name *
                   </label>
                   <input
@@ -439,20 +439,20 @@ const EmailSMSGateway = () => {
                     value={formData.gateway_name}
                     onChange={(e) => setFormData({ ...formData, gateway_name: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700  mb-1">
                       Gateway Type *
                     </label>
                     <select
                       value={formData.gateway_type}
                       onChange={(e) => setFormData({ ...formData, gateway_type: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                     >
                       <option value="email">Email</option>
                       <option value="sms">SMS</option>
@@ -460,14 +460,14 @@ const EmailSMSGateway = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700  mb-1">
                       Provider *
                     </label>
                     <select
                       value={formData.provider}
                       onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
                       required
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                     >
                       <option value="">Select Provider</option>
                       {(formData.gateway_type === "email" ? emailProviders : smsProviders).map((provider) => (
@@ -484,7 +484,7 @@ const EmailSMSGateway = () => {
                   <>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-slate-700  mb-1">
                           SMTP Host
                         </label>
                         <input
@@ -496,11 +496,11 @@ const EmailSMSGateway = () => {
                               configuration: { ...formData.configuration, host: e.target.value },
                             })
                           }
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-slate-700  mb-1">
                           Port
                         </label>
                         <input
@@ -512,13 +512,13 @@ const EmailSMSGateway = () => {
                               configuration: { ...formData.configuration, port: parseInt(e.target.value) },
                             })
                           }
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-slate-700  mb-1">
                           Email/Username
                         </label>
                         <input
@@ -533,11 +533,11 @@ const EmailSMSGateway = () => {
                               },
                             })
                           }
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                        <label className="block text-sm font-medium text-slate-700  mb-1">
                           Password
                         </label>
                         <input
@@ -552,7 +552,7 @@ const EmailSMSGateway = () => {
                               },
                             })
                           }
-                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                          className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                         />
                       </div>
                     </div>
@@ -560,7 +560,7 @@ const EmailSMSGateway = () => {
                 ) : (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-medium text-slate-700  mb-1">
                         Account SID
                       </label>
                       <input
@@ -572,11 +572,11 @@ const EmailSMSGateway = () => {
                             configuration: { ...formData.configuration, accountSid: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-medium text-slate-700  mb-1">
                         Auth Token
                       </label>
                       <input
@@ -588,11 +588,11 @@ const EmailSMSGateway = () => {
                             configuration: { ...formData.configuration, authToken: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-medium text-slate-700  mb-1">
                         From Number
                       </label>
                       <input
@@ -604,7 +604,7 @@ const EmailSMSGateway = () => {
                             configuration: { ...formData.configuration, fromNumber: e.target.value },
                           })
                         }
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                        className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                       />
                     </div>
                   </>
@@ -612,25 +612,25 @@ const EmailSMSGateway = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700  mb-1">
                       Daily Limit
                     </label>
                     <input
                       type="number"
                       value={formData.daily_limit}
                       onChange={(e) => setFormData({ ...formData, daily_limit: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700  mb-1">
                       Monthly Limit
                     </label>
                     <input
                       type="number"
                       value={formData.monthly_limit}
                       onChange={(e) => setFormData({ ...formData, monthly_limit: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-purple-500  "
                     />
                   </div>
                 </div>
@@ -643,7 +643,7 @@ const EmailSMSGateway = () => {
                       onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                       className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                     />
-                    <span className="text-sm text-slate-700 dark:text-slate-300">Active</span>
+                    <span className="text-sm text-slate-700 ">Active</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -652,7 +652,7 @@ const EmailSMSGateway = () => {
                       onChange={(e) => setFormData({ ...formData, is_default: e.target.checked })}
                       className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                     />
-                    <span className="text-sm text-slate-700 dark:text-slate-300">Set as Default</span>
+                    <span className="text-sm text-slate-700 ">Set as Default</span>
                   </label>
                 </div>
 
@@ -670,7 +670,7 @@ const EmailSMSGateway = () => {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                    className="px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
                   >
                     Cancel
                   </button>

@@ -81,7 +81,7 @@ const PORT = process.env.PORT || 5000;
 // CORS 
 app.use(
   cors({
-    origin: "https://nexusbacocommunitycollege.com/", // Adjust this to your frontend's origin
+    origin: "https://nexusbacocommunitycollege.com/", // Adjust this to your frontend's origin https://nexusbacocommunitycollege.com/
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     exposedHeaders: ["Authorization"],

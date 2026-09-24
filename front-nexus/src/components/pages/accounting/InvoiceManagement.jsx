@@ -234,63 +234,63 @@ const InvoiceManagement = () => {
   const paginatedData = filteredInvoices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   // ── shared input style ───────────────────────────────────────────────────
-  const inputCls = "w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500";
+  const inputCls = "w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500";
 
   return (
     <div className="p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-            <FileText className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2 bg-indigo-50  rounded-lg">
+            <FileText className="w-6 h-6 text-indigo-600 " />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Invoice Management</h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Create and manage student invoices</p>
+            <h1 className="text-2xl font-bold text-slate-900 ">Invoice Management</h1>
+            <p className="text-sm text-slate-500 ">Create and manage student invoices</p>
           </div>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-300">
-          Data Integrity: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Online</span>
+        <div className="text-sm text-slate-600 ">
+          Data Integrity: <span className="text-emerald-600  font-semibold">Online</span>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: "Total Billed",        value: summary.total_billed   || 0, color: "text-indigo-600 dark:text-indigo-400" },
-          { label: "Total Paid",          value: summary.total_paid     || 0, color: "text-emerald-600 dark:text-emerald-400" },
-          { label: "Outstanding Balance", value: summary.total_balance  || 0, color: "text-red-600 dark:text-red-400" },
+          { label: "Total Billed",        value: summary.total_billed   || 0, color: "text-indigo-600 " },
+          { label: "Total Paid",          value: summary.total_paid     || 0, color: "text-emerald-600 " },
+          { label: "Outstanding Balance", value: summary.total_balance  || 0, color: "text-red-600 " },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">{label}</p>
+          <div key={label} className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+            <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">{label}</p>
             <p className={`text-2xl font-bold mt-1 ${color}`}>₱{parseFloat(value).toLocaleString()}</p>
           </div>
         ))}
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Invoices</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{summary.total_invoices || 0}</p>
+        <div className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+          <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">Total Invoices</p>
+          <p className="text-2xl font-bold text-slate-900  mt-1">{summary.total_invoices || 0}</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 mb-6 p-4">
+      <div className="bg-white  rounded-lg shadow-md border border-slate-200  mb-6 p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input type="text" placeholder="Search student, invoice..." value={filters.search}
               onChange={(e) => { setFilters({ ...filters, search: e.target.value }); setCurrentPage(1); }}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+              className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
           </div>
           <div className="flex gap-2 flex-wrap">
             <select value={filters.status}
               onChange={(e) => { setFilters({ ...filters, status: e.target.value }); setCurrentPage(1); }}
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white">
+              className="px-3 py-2 text-sm border border-slate-300  rounded-md  ">
               <option value="">All Status</option>
               {["Pending","Partially Paid","Paid","Overdue"].map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
             <select value={filters.academic_period_id}
               onChange={(e) => { setFilters({ ...filters, academic_period_id: e.target.value }); setCurrentPage(1); }}
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white">
+              className="px-3 py-2 text-sm border border-slate-300  rounded-md  ">
               <option value="">All Periods</option>
               {periods.map((p) => <option key={p.period_id} value={p.period_id}>{p.school_year} - {p.semester}</option>)}
             </select>
@@ -307,46 +307,46 @@ const InvoiceManagement = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-          <thead className="bg-slate-50 dark:bg-slate-700">
+      <div className="bg-white  rounded-lg shadow-md border border-slate-200  overflow-hidden">
+        <table className="min-w-full divide-y divide-slate-200 ">
+          <thead className="bg-slate-50 ">
             <tr>
               {["Invoice #","Student / Staff","Date","Total","Paid","Balance","Status","Actions"].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">{h}</th>
+                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700">
+          <tbody className="bg-white  divide-y divide-slate-100 ">
             {paginatedData.length === 0 ? (
-              <tr><td colSpan="8" className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No invoices found.</td></tr>
+              <tr><td colSpan="8" className="px-4 py-8 text-center text-sm text-slate-500 ">No invoices found.</td></tr>
             ) : paginatedData.map((inv) => {
               const isStaff = inv.notes?.startsWith("[STAFF INVOICE]");
               return (
-                <tr key={inv.invoice_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                  <td className="px-4 py-2 font-mono text-sm text-slate-900 dark:text-white whitespace-nowrap">
+                <tr key={inv.invoice_id} className="hover:bg-slate-50  transition-colors">
+                  <td className="px-4 py-2 font-mono text-sm text-slate-900  whitespace-nowrap">
                     {inv.invoice_number}
                     {isStaff && <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-700 rounded">STAFF</span>}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
-                    <div className="font-medium text-sm text-slate-900 dark:text-white">{inv.student_name}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{inv.student_number}</div>
+                    <div className="font-medium text-sm text-slate-900 ">{inv.student_name}</div>
+                    <div className="text-xs text-slate-500 ">{inv.student_number}</div>
                   </td>
-                  <td className="px-4 py-2 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">{new Date(inv.invoice_date).toLocaleDateString()}</td>
-                  <td className="px-4 py-2 font-semibold text-sm text-slate-900 dark:text-white whitespace-nowrap">₱{parseFloat(inv.total_amount).toLocaleString()}</td>
-                  <td className="px-4 py-2 text-sm text-emerald-600 dark:text-emerald-400 whitespace-nowrap">₱{parseFloat(inv.amount_paid || 0).toLocaleString()}</td>
-                  <td className="px-4 py-2 font-semibold text-sm text-red-600 dark:text-red-400 whitespace-nowrap">₱{parseFloat(inv.balance || 0).toLocaleString()}</td>
+                  <td className="px-4 py-2 text-sm text-slate-700  whitespace-nowrap">{new Date(inv.invoice_date).toLocaleDateString()}</td>
+                  <td className="px-4 py-2 font-semibold text-sm text-slate-900  whitespace-nowrap">₱{parseFloat(inv.total_amount).toLocaleString()}</td>
+                  <td className="px-4 py-2 text-sm text-emerald-600  whitespace-nowrap">₱{parseFloat(inv.amount_paid || 0).toLocaleString()}</td>
+                  <td className="px-4 py-2 font-semibold text-sm text-red-600  whitespace-nowrap">₱{parseFloat(inv.balance || 0).toLocaleString()}</td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      inv.status === "Paid"           ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                      : inv.status === "Partially Paid" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                      : inv.status === "Overdue"      ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                      : "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300"
+                      inv.status === "Paid"           ? "bg-emerald-100 text-emerald-800  "
+                      : inv.status === "Partially Paid" ? "bg-amber-100 text-amber-800  "
+                      : inv.status === "Overdue"      ? "bg-red-100 text-red-800  "
+                      : "bg-slate-100 text-slate-800  "
                     }`}>{inv.status}</span>
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div className="flex gap-2">
-                      <button onClick={() => handleEdit(inv)} className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" title="Edit"><Edit size={18} /></button>
-                      <button onClick={() => handleDelete(inv.invoice_id)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" title="Delete"><Trash2 size={18} /></button>
+                      <button onClick={() => handleEdit(inv)} className="text-indigo-600 hover:text-indigo-800  " title="Edit"><Edit size={18} /></button>
+                      <button onClick={() => handleDelete(inv.invoice_id)} className="text-red-600 hover:text-red-800  " title="Delete"><Trash2 size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -357,23 +357,23 @@ const InvoiceManagement = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
         <span className="text-xs sm:text-sm">
           Page <span className="font-semibold">{currentPage}</span> of <span className="font-semibold">{totalPages}</span> | Total: {filteredInvoices.length}
         </span>
         <div className="flex gap-1 mt-2 sm:mt-0">
           <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 hover:bg-slate-100 dark:hover:bg-slate-700">
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 hover:bg-slate-100 ">
             <ChevronLeft size={16} />
           </button>
           {[...Array(totalPages)].map((_, i) => (
             <button key={i + 1} onClick={() => setCurrentPage(i + 1)}
               className={`px-3 py-1.5 text-xs rounded border transition-colors ${
-                currentPage === i + 1 ? "bg-indigo-600 text-white border-indigo-600" : "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                currentPage === i + 1 ? "bg-indigo-600 text-white border-indigo-600" : "border-slate-300  text-slate-700  hover:bg-slate-100 "
               }`}>{i + 1}</button>
           ))}
           <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 hover:bg-slate-100 dark:hover:bg-slate-700">
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 hover:bg-slate-100 ">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -382,12 +382,12 @@ const InvoiceManagement = () => {
       {/* ── Student Invoice Modal ─────────────────────────────────────────── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-4xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-4xl border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 {formData.invoice_id ? "Edit" : "Create"} Invoice
               </h3>
-              <button onClick={() => { setShowModal(false); resetForm(); }} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+              <button onClick={() => { setShowModal(false); resetForm(); }} className="p-1 text-slate-400 hover:text-slate-600 ">
                 <Plus size={18} className="rotate-45" />
               </button>
             </div>
@@ -395,7 +395,7 @@ const InvoiceManagement = () => {
               {/* Student + Period */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Student *</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Student *</label>
                   <select name="student_id" value={formData.student_id} onChange={handleInputChange} required className={inputCls}>
                     <option value="">Select Student</option>
                     {students.map((s) => (
@@ -406,18 +406,18 @@ const InvoiceManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Academic Period *</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Academic Period *</label>
                   <select name="academic_period_id" value={formData.academic_period_id} onChange={handleInputChange} required className={inputCls}>
                     <option value="">Select Period</option>
                     {periods.map((p) => <option key={p.period_id} value={p.period_id}>{p.school_year} - {p.semester}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Invoice Date *</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Invoice Date *</label>
                   <input type="date" name="invoice_date" value={formData.invoice_date} onChange={handleInputChange} required className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Due Date</label>
                   <input type="date" name="due_date" value={formData.due_date} onChange={handleInputChange} className={inputCls} />
                 </div>
               </div>
@@ -428,7 +428,7 @@ const InvoiceManagement = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {ALL_FEE_FIELDS.map((f) => (
                     <div key={f.name}>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">{f.label}</label>
+                      <label className="block text-xs font-medium text-slate-700  mb-1">{f.label}</label>
                       <input type="number" name={f.name} value={formData[f.name]} onChange={handleInputChange} step="0.01" min="0" className={inputCls} />
                     </div>
                   ))}
@@ -440,37 +440,37 @@ const InvoiceManagement = () => {
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-200 pb-1">Discounts</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Discount Amount</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Discount Amount</label>
                     <input type="number" name="discount_amount" value={formData.discount_amount} onChange={handleInputChange} step="0.01" min="0" className={inputCls} />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Scholarship Amount</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Scholarship Amount</label>
                     <input type="number" name="scholarship_amount" value={formData.scholarship_amount} onChange={handleInputChange} step="0.01" min="0" className={inputCls} />
                   </div>
                 </div>
               </div>
 
               {/* Totals */}
-              <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800">
+              <div className="bg-indigo-50  p-4 rounded-lg border border-indigo-200 ">
                 <div className="flex justify-between mb-2 text-sm">
-                  <span className="text-slate-700 dark:text-slate-300">Subtotal:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">₱{calculateSubtotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span className="text-slate-700 ">Subtotal:</span>
+                  <span className="font-semibold text-slate-900 ">₱{calculateSubtotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
                 <div className="flex justify-between mb-2 text-sm">
-                  <span className="text-slate-700 dark:text-slate-300">Total Discounts:</span>
-                  <span className="text-red-600 dark:text-red-400">
+                  <span className="text-slate-700 ">Total Discounts:</span>
+                  <span className="text-red-600 ">
                     -₱{(parseFloat(formData.discount_amount || 0) + parseFloat(formData.scholarship_amount || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between items-center border-t border-indigo-200 dark:border-indigo-800 pt-2">
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Total:</span>
-                  <span className="text-xl font-bold text-indigo-600 dark:text-indigo-400">₱{calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <div className="flex justify-between items-center border-t border-indigo-200  pt-2">
+                  <span className="text-sm font-semibold text-slate-700 ">Total:</span>
+                  <span className="text-xl font-bold text-indigo-600 ">₱{calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button type="button" onClick={() => { setShowModal(false); resetForm(); }}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600">
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300   border border-slate-300 ">
                   Cancel
                 </button>
                 <button type="submit" className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-md shadow-indigo-500/30">
@@ -485,22 +485,22 @@ const InvoiceManagement = () => {
       {/* ── Staff Invoice Modal ───────────────────────────────────────────── */}
       {showStaffModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50" onClick={() => setShowStaffModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-amber-50 dark:bg-amber-900/20 rounded-t-lg z-10">
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-lg border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-amber-50  rounded-t-lg z-10">
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-amber-600 dark:text-amber-400" />
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Staff / Faculty Invoice</h3>
+                <Users size={18} className="text-amber-600 " />
+                <h3 className="text-lg font-bold text-slate-900 ">Staff / Faculty Invoice</h3>
               </div>
-              <button onClick={() => { setShowStaffModal(false); resetStaffForm(); }} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+              <button onClick={() => { setShowStaffModal(false); resetStaffForm(); }} className="p-1 text-slate-400 hover:text-slate-600 ">
                 <Plus size={18} className="rotate-45" />
               </button>
             </div>
             <form onSubmit={handleStaffSubmit} className="p-4 space-y-3">
-              <p className="text-xs text-slate-500 dark:text-slate-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded px-3 py-2">
+              <p className="text-xs text-slate-500  bg-amber-50  border border-amber-200  rounded px-3 py-2">
                 This invoice will also be recorded as an <strong>Income transaction</strong> automatically.
               </p>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Staff / Faculty Member *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Staff / Faculty Member *</label>
                 <select name="user_id" value={staffFormData.user_id} onChange={handleStaffInputChange} required
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")}>
                   <option value="">Select Member</option>
@@ -516,7 +516,7 @@ const InvoiceManagement = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Academic Period</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Academic Period</label>
                 <select name="academic_period_id" value={staffFormData.academic_period_id} onChange={handleStaffInputChange}
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")}>
                   <option value="">None / Not Applicable</option>
@@ -524,42 +524,42 @@ const InvoiceManagement = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Fee / Charge Label *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Fee / Charge Label *</label>
                 <input type="text" name="fee_label" value={staffFormData.fee_label} onChange={handleStaffInputChange} required
                   placeholder="e.g. ID Replacement Fee, Training Fee..."
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")} />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Amount *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Amount *</label>
                 <input type="number" name="amount" value={staffFormData.amount} onChange={handleStaffInputChange} step="0.01" required min="0.01"
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Invoice Date *</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Invoice Date *</label>
                   <input type="date" name="invoice_date" value={staffFormData.invoice_date} onChange={handleStaffInputChange} required
                     className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+                  <label className="block text-xs font-medium text-slate-700  mb-1">Due Date</label>
                   <input type="date" name="due_date" value={staffFormData.due_date} onChange={handleStaffInputChange}
                     className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Notes</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Notes</label>
                 <textarea name="notes" value={staffFormData.notes} onChange={handleStaffInputChange} rows="2"
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")} />
               </div>
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex justify-between items-center">
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Total Amount:</span>
-                <span className="text-xl font-bold text-amber-600 dark:text-amber-400">
+              <div className="bg-amber-50  border border-amber-200  rounded-lg p-3 flex justify-between items-center">
+                <span className="text-sm font-semibold text-slate-700 ">Total Amount:</span>
+                <span className="text-xl font-bold text-amber-600 ">
                   ₱{parseFloat(staffFormData.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button type="button" onClick={() => { setShowStaffModal(false); resetStaffForm(); }}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600">
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300   border border-slate-300 ">
                   Cancel
                 </button>
                 <button type="submit" className="px-3 py-1.5 text-sm bg-amber-600 text-white rounded-md hover:bg-amber-700 shadow-md shadow-amber-500/30">

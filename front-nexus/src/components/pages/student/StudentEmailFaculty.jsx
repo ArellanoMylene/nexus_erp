@@ -67,10 +67,10 @@ const StudentEmailFaculty = () => {
   );
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <Mail size={24} className="text-indigo-600" />
             Email Faculty
           </h2>
@@ -83,7 +83,7 @@ const StudentEmailFaculty = () => {
             placeholder="Search faculty..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm"
+            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
           />
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
         </div>
@@ -91,37 +91,37 @@ const StudentEmailFaculty = () => {
         {/* Faculty List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredFaculty.length === 0 ? (
-            <div className="lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+            <div className="lg:col-span-3 bg-white  rounded-lg border border-slate-200  p-8 text-center">
               <User size={48} className="mx-auto text-slate-400 mb-3" />
-              <p className="text-slate-500 dark:text-slate-400">No faculty members found</p>
+              <p className="text-slate-500 ">No faculty members found</p>
             </div>
           ) : (
             filteredFaculty.map((f) => (
               <div
                 key={f.faculty_id}
-                className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 hover:shadow-md transition-shadow"
+                className="bg-white  rounded-lg border border-slate-200  p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {f.name?.split(" ").map(n => n[0]).join("") || "F"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-slate-900 dark:text-white truncate">{f.name}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{f.department}</p>
+                    <h3 className="font-bold text-slate-900  truncate">{f.name}</h3>
+                    <p className="text-xs text-slate-500  truncate">{f.department}</p>
                   </div>
                 </div>
 
                 <div className="space-y-1 text-sm mb-3">
                   {f.subject && (
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-500 dark:text-slate-400">Subject:</span>
-                      <span className="text-slate-900 dark:text-white font-medium">{f.subject}</span>
+                      <span className="text-slate-500 ">Subject:</span>
+                      <span className="text-slate-900  font-medium">{f.subject}</span>
                     </div>
                   )}
                   {f.email && (
                     <div className="flex items-center gap-2">
                       <Mail size={12} className="text-slate-400" />
-                      <span className="text-slate-700 dark:text-slate-300 text-xs truncate">{f.email}</span>
+                      <span className="text-slate-700  text-xs truncate">{f.email}</span>
                     </div>
                   )}
                 </div>
@@ -146,11 +146,11 @@ const StudentEmailFaculty = () => {
           onClick={() => setShowCompose(false)}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 ">
+              <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                 <Mail size={20} className="text-indigo-600" />
                 Compose Email
               </h3>
@@ -164,35 +164,35 @@ const StudentEmailFaculty = () => {
 
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">To</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">To</label>
                 <input
                   type="text"
                   readOnly
                   value={selectedFaculty?.name || ""}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm bg-slate-50"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm bg-slate-50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Subject *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Subject *</label>
                 <input
                   type="text"
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm"
                   placeholder="Enter email subject"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Message *</label>
+                <label className="block text-xs font-medium text-slate-700  mb-1">Message *</label>
                 <textarea
                   required
                   rows={8}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-slate-300    text-sm"
                   placeholder="Type your message here..."
                 />
               </div>
@@ -208,7 +208,7 @@ const StudentEmailFaculty = () => {
                 <button
                   type="button"
                   onClick={() => setShowCompose(false)}
-                  className="px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700"
+                  className="px-4 py-2 rounded-md border border-slate-300  text-slate-700  font-medium text-sm hover:bg-slate-50 "
                 >
                   Cancel
                 </button>

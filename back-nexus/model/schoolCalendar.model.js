@@ -1,8 +1,7 @@
 import db from "../config/db.js";
 
 const SchoolCalendarModel = {
-  getAllCalendarEvents: (filters = {}) => {
-    return new Promise((resolve, reject) => {
+  getAllCalendarEvents: async (filters = {}) => {
       let query = `
         SELECT sc.*, 
                CONCAT(u.first_name, ' ', u.last_name) as creator_name
@@ -49,11 +48,8 @@ const SchoolCalendarModel = {
 
       query += " ORDER BY sc.start_date ASC";
 
-      db.query(query, params, (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      });
-    });
+      const [results] = await db.query(query, params);
+      return results;
   },
 
   getCalendarEventById: (id) => {

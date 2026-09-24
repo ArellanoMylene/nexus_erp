@@ -173,42 +173,42 @@ const PaymentGateway = () => {
   };
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <CreditCard size={24} className="text-indigo-600" />
             Payment Gateway
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">Total Processed</p>
-            <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">Total Processed</p>
+            <p className="text-2xl font-bold text-indigo-600 ">
               ₱{parseFloat(summary.total_amount || 0).toLocaleString()}
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">Successful</p>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">Successful</p>
+            <p className="text-2xl font-bold text-green-600 ">
               ₱{parseFloat(summary.successful_amount || 0).toLocaleString()}
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">Failed</p>
-            <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">Failed</p>
+            <p className="text-2xl font-bold text-red-600 ">
               ₱{parseFloat(summary.failed_amount || 0).toLocaleString()}
             </p>
           </div>
-          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400">Transactions</p>
-            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+          <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
+            <p className="text-sm text-slate-600 ">Transactions</p>
+            <p className="text-2xl font-bold text-slate-800 ">
               {summary.total_transactions || 0}
             </p>
           </div>
@@ -217,8 +217,8 @@ const PaymentGateway = () => {
         {/* Gateway Configurations */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-              <Settings className="text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-xl font-bold text-slate-800  flex items-center gap-2">
+              <Settings className="text-indigo-600 " />
               Gateway Configurations
             </h2>
             <button
@@ -236,23 +236,23 @@ const PaymentGateway = () => {
             {gateways.map((gateway) => (
               <div
                 key={gateway.gateway_id}
-                className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
+                className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200  hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2">
-                    <CreditCard className="text-indigo-600 dark:text-indigo-400" size={24} />
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{gateway.gateway_name}</h3>
+                    <CreditCard className="text-indigo-600 " size={24} />
+                    <h3 className="font-bold text-lg text-slate-800 ">{gateway.gateway_name}</h3>
                   </div>
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleEditGateway(gateway)}
-                      className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                      className="text-indigo-600  hover:text-indigo-800  transition-colors"
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDeleteGateway(gateway.gateway_id)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                      className="text-red-600  hover:text-red-800  transition-colors"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -260,37 +260,37 @@ const PaymentGateway = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Status:</span>
+                    <span className="text-sm text-slate-600 ">Status:</span>
                     <span
                       className={`px-2 py-1 text-xs rounded-full font-medium ${gateway.is_active
-                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300"
+                        ? "bg-green-100  text-green-800 "
+                        : "bg-slate-100  text-slate-800 "
                         }`}
                     >
                       {gateway.is_active ? "Active" : "Inactive"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Mode:</span>
+                    <span className="text-sm text-slate-600 ">Mode:</span>
                     <span
                       className={`px-2 py-1 text-xs rounded-full font-medium ${gateway.is_test_mode
-                        ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                        : "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400"
+                        ? "bg-yellow-100  text-yellow-800 "
+                        : "bg-indigo-100  text-indigo-800 "
                         }`}
                     >
                       {gateway.is_test_mode ? "Test" : "Live"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400">Transaction Fee:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-100">
+                    <span className="text-slate-600 ">Transaction Fee:</span>
+                    <span className="font-semibold text-slate-800 ">
                       {gateway.transaction_fee_percentage}% + ₱
                       {parseFloat(gateway.fixed_transaction_fee).toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400">Merchant ID:</span>
-                    <span className="font-mono text-xs truncate max-w-[150px] text-slate-800 dark:text-slate-100">
+                    <span className="text-slate-600 ">Merchant ID:</span>
+                    <span className="font-mono text-xs truncate max-w-[150px] text-slate-800 ">
                       {gateway.merchant_id || "N/A"}
                     </span>
                   </div>
@@ -312,7 +312,7 @@ const PaymentGateway = () => {
                 setFilters({ ...filters, search: e.target.value });
                 setCurrentPage(1);
               }}
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -328,7 +328,7 @@ const PaymentGateway = () => {
                 setFilters({ ...filters, gateway_name: e.target.value });
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="">All Gateways</option>
               {gatewayProviders.map((provider) => (
@@ -343,7 +343,7 @@ const PaymentGateway = () => {
                 setFilters({ ...filters, transaction_status: e.target.value });
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-32"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-32"
             >
               <option value="">All Status</option>
               {transactionStatuses.map((status) => (
@@ -360,7 +360,7 @@ const PaymentGateway = () => {
                 setCurrentPage(1);
               }}
               placeholder="Start Date"
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-36"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-36"
             />
             <input
               type="date"
@@ -370,18 +370,18 @@ const PaymentGateway = () => {
                 setCurrentPage(1);
               }}
               placeholder="End Date"
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-36"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-36"
             />
           </div>
         </div>
 
         {/* Transactions Table */}
         <div>
-          <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-slate-100">Transaction History</h2>
-          <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <h2 className="text-xl font-bold mb-4 text-slate-800 ">Transaction History</h2>
+          <div className="overflow-x-auto rounded border border-slate-200 ">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">
                     Transaction ID
                   </th>
@@ -405,7 +405,7 @@ const PaymentGateway = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {(() => {
                   const searchTerm = filters.search.toLowerCase();
                   const filtered = transactions.filter((transaction) => {
@@ -434,7 +434,7 @@ const PaymentGateway = () => {
                   }
 
                   return paginatedData.map((transaction) => (
-                    <tr key={transaction.transaction_id} className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150">
+                    <tr key={transaction.transaction_id} className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150">
                       <td className="px-4 py-2 whitespace-nowrap font-mono text-xs">
                         {transaction.gateway_transaction_id}
                       </td>
@@ -443,14 +443,14 @@ const PaymentGateway = () => {
                           <div className="font-medium text-sm">
                             {transaction.student_name}
                           </div>
-                          <div className="text-sm text-slate-500 dark:text-slate-400">
+                          <div className="text-sm text-slate-500 ">
                             {transaction.student_number}
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <CreditCard size={16} className="text-indigo-600 dark:text-indigo-400" />
+                          <CreditCard size={16} className="text-indigo-600 " />
                           <span className="text-sm">{transaction.gateway_name}</span>
                         </div>
                       </td>
@@ -463,23 +463,23 @@ const PaymentGateway = () => {
                       <td className="px-4 py-2 whitespace-nowrap">
                         <div className="flex items-center gap-1">
                           {transaction.transaction_status === "Success" && (
-                            <CheckCircle size={16} className="text-green-600 dark:text-green-400" />
+                            <CheckCircle size={16} className="text-green-600 " />
                           )}
                           {transaction.transaction_status === "Failed" && (
-                            <XCircle size={16} className="text-red-600 dark:text-red-400" />
+                            <XCircle size={16} className="text-red-600 " />
                           )}
                           {(transaction.transaction_status === "Pending" ||
                             transaction.transaction_status === "Processing") && (
-                              <Clock size={16} className="text-yellow-600 dark:text-yellow-400" />
+                              <Clock size={16} className="text-yellow-600 " />
                             )}
                           <span
                             className={`px-2 py-1 text-xs rounded-full font-medium ${transaction.transaction_status === "Success"
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                              ? "bg-green-100  text-green-800 "
                               : transaction.transaction_status === "Failed"
-                                ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
+                                ? "bg-red-100  text-red-800 "
                                 : transaction.transaction_status === "Refunded"
-                                  ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400"
-                                  : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
+                                  ? "bg-purple-100  text-purple-800 "
+                                  : "bg-yellow-100  text-yellow-800 "
                               }`}
                           >
                             {transaction.transaction_status}
@@ -492,7 +492,7 @@ const PaymentGateway = () => {
                             onClick={() =>
                               handleVerifyTransaction(transaction.transaction_id)
                             }
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm transition-colors"
+                            className="text-indigo-600  hover:text-indigo-800  text-sm transition-colors"
                           >
                             Verify
                           </button>
@@ -507,7 +507,7 @@ const PaymentGateway = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
           <span className="text-xs sm:text-sm">
             Page <span className="font-semibold">{currentPage}</span> of{" "}
             <span className="font-semibold">{(() => {
@@ -539,9 +539,9 @@ const PaymentGateway = () => {
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
-              <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+              <ChevronLeft size={16} className="text-slate-600 " />
             </button>
             {(() => {
               const searchTerm = filters.search.toLowerCase();
@@ -561,7 +561,7 @@ const PaymentGateway = () => {
                   onClick={() => setCurrentPage(i + 1)}
                   className={`px-3 py-1.5 text-xs rounded border transition-colors ${currentPage === i + 1
                     ? "bg-indigo-600 text-white border-indigo-600"
-                    : "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    : "border-slate-300  text-slate-700  hover:bg-slate-100 "
                     }`}
                 >
                   {i + 1}
@@ -595,9 +595,9 @@ const PaymentGateway = () => {
                 const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
                 return currentPage === totalPages;
               })()}
-              className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
-              <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+              <ChevronRight size={16} className="text-slate-600 " />
             </button>
           </div>
         </div>
@@ -613,13 +613,13 @@ const PaymentGateway = () => {
           }}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-xl border border-slate-200 dark:border-slate-700"
+            className="bg-white  rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-xl border border-slate-200 "
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600 px-6 py-4 rounded-t-lg">
+            <div className="sticky top-0 bg-slate-50  border-b border-slate-200  px-6 py-4 rounded-t-lg">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+                <h2 className="text-xl font-bold text-slate-800 ">
                   {gatewayForm.gateway_id ? "Edit" : "Add"} Gateway Configuration
                 </h2>
                 <button
@@ -627,7 +627,7 @@ const PaymentGateway = () => {
                     setShowGatewayModal(false);
                     resetGatewayForm();
                   }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  className="text-slate-400 hover:text-slate-600  transition-colors"
                 >
                   <Plus size={24} className="rotate-45" />
                 </button>
@@ -640,7 +640,7 @@ const PaymentGateway = () => {
               <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Gateway Provider *
                     </label>
                     <select
@@ -652,7 +652,7 @@ const PaymentGateway = () => {
                         })
                       }
                       required
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     >
                       {gatewayProviders.map((provider) => (
                         <option key={provider} value={provider}>
@@ -662,7 +662,7 @@ const PaymentGateway = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Merchant ID
                     </label>
                     <input
@@ -674,13 +674,13 @@ const PaymentGateway = () => {
                           merchant_id: e.target.value,
                         })
                       }
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-700  mb-1.5">
                     API Key *
                   </label>
                   <input
@@ -693,12 +693,12 @@ const PaymentGateway = () => {
                       })
                     }
                     required
-                    className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-700  mb-1.5">
                     API Secret *
                   </label>
                   <input
@@ -711,13 +711,13 @@ const PaymentGateway = () => {
                       })
                     }
                     required
-                    className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Fee Percentage (%)
                     </label>
                     <input
@@ -730,11 +730,11 @@ const PaymentGateway = () => {
                         })
                       }
                       step="0.01"
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Fixed Fee (₱)
                     </label>
                     <input
@@ -747,13 +747,13 @@ const PaymentGateway = () => {
                         })
                       }
                       step="0.01"
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label className="block text-xs font-medium text-slate-700  mb-1.5">
                     Webhook URL
                   </label>
                   <input
@@ -765,13 +765,13 @@ const PaymentGateway = () => {
                         webhook_url: e.target.value,
                       })
                     }
-                    className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Success URL
                     </label>
                     <input
@@ -783,11 +783,11 @@ const PaymentGateway = () => {
                           success_url: e.target.value,
                         })
                       }
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label className="block text-xs font-medium text-slate-700  mb-1.5">
                       Cancel URL
                     </label>
                     <input
@@ -799,7 +799,7 @@ const PaymentGateway = () => {
                           cancel_url: e.target.value,
                         })
                       }
-                      className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                      className="w-full border border-slate-300  rounded-lg px-3 py-2 text-sm bg-white  text-slate-900  focus:outline-none focus:ring-2 focus:ring-indigo-500 "
                     />
                   </div>
                 </div>
@@ -815,11 +815,11 @@ const PaymentGateway = () => {
                         is_active: e.target.checked,
                       })
                     }
-                    className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="rounded border-slate-300  text-indigo-600 focus:ring-indigo-500 "
                   />
                   <label
                     htmlFor="is_active"
-                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                    className="text-sm font-medium text-slate-700 "
                   >
                     Gateway Active
                   </label>
@@ -836,11 +836,11 @@ const PaymentGateway = () => {
                         is_test_mode: e.target.checked,
                       })
                     }
-                    className="rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="rounded border-slate-300  text-indigo-600 focus:ring-indigo-500 "
                   />
                   <label
                     htmlFor="is_test_mode"
-                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                    className="text-sm font-medium text-slate-700 "
                   >
                     Enable Test Mode
                   </label>
@@ -848,7 +848,7 @@ const PaymentGateway = () => {
               </div>
 
               {/* Sticky Footer */}
-              <div className="sticky bottom-0 bg-slate-50 dark:bg-slate-700 border-t border-slate-200 dark:border-slate-600 px-6 py-4 rounded-b-lg">
+              <div className="sticky bottom-0 bg-slate-50  border-t border-slate-200  px-6 py-4 rounded-b-lg">
                 <div className="flex gap-3 justify-end">
                   <button
                     type="button"
@@ -856,13 +856,13 @@ const PaymentGateway = () => {
                       setShowGatewayModal(false);
                       resetGatewayForm();
                     }}
-                    className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors text-sm font-medium"
+                    className="px-4 py-2 border border-slate-300  rounded-lg text-slate-700  hover:bg-slate-100  transition-colors text-sm font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700  transition-colors text-sm font-medium"
                   >
                     Save Configuration
                   </button>

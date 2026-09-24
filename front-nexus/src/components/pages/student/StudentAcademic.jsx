@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../../api/axios";
 import { GraduationCap, TrendingUp, Award, ChevronDown, ChevronUp, FileText, Download, Printer, CheckCircle, BookOpen, Search, Users, AlertCircle, Info, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -42,7 +42,12 @@ const StudentAcademic = () => {
   const fetchGrades = async () => {
     try {
       const userId = localStorage.getItem("userId");
-      const response = await axios.get(`${API_BASE}/api/grades?student_user_id=${userId}`);
+      if (!userId) {
+        console.warn("No logged-in user found; skipping grades request.");
+        return;
+      }
+
+      const response = await api.get(`/api/grades?student_user_id=${encodeURIComponent(userId)}`);
       const gradesData = response.data || [];
       const grouped = gradesData.reduce((acc, grade) => {
         const key = `${grade.academic_year || 'Current'} - ${grade.semester || 'Semester'}`;
@@ -200,10 +205,10 @@ const StudentAcademic = () => {
 
   const getGradeColor = (grade) => {
     const numGrade = parseFloat(grade);
-    if (numGrade >= 90) return "text-green-600 dark:text-green-400";
-    if (numGrade >= 80) return "text-blue-600 dark:text-blue-400";
-    if (numGrade >= 75) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
+    if (numGrade >= 90) return "text-green-600 ";
+    if (numGrade >= 80) return "text-blue-600 ";
+    if (numGrade >= 75) return "text-yellow-600 ";
+    return "text-red-600 ";
   };
 
   const tabs = [
@@ -228,11 +233,11 @@ const StudentAcademic = () => {
   );
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <GraduationCap size={24} className="text-indigo-600" />
             Academic Records
           </h2>
@@ -275,7 +280,7 @@ const StudentAcademic = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -283,8 +288,8 @@ const StudentAcademic = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300"
+                    ? "border-indigo-600 text-indigo-600 "
+                    : "border-transparent text-slate-600  hover:text-slate-900 "
                   }`}
               >
                 <Icon size={16} />
@@ -301,8 +306,8 @@ const StudentAcademic = () => {
             {/* Enrollment Status Banner */}
             {enrollmentStatus && (
               <div className={`rounded-lg p-4 border ${enrollmentStatus.isOpen
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                  : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                  ? 'bg-green-50  border-green-200 '
+                  : 'bg-amber-50  border-amber-200 '
                 }`}>
                 <div className="flex items-start gap-3">
                   {enrollmentStatus.isOpen ? (
@@ -311,23 +316,23 @@ const StudentAcademic = () => {
                     <AlertCircle size={20} className="text-amber-600 mt-0.5" />
                   )}
                   <div className="flex-1">
-                    <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                    <h4 className="font-bold text-slate-900  mb-1">
                       {enrollmentStatus.isOpen ? 'Enrollment Period Active' : 'Enrollment Period Closed'}
                     </h4>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <p className="text-sm text-slate-700 ">
                       {enrollmentStatus.message || 'Check with the registrar for enrollment schedules'}
                     </p>
                     {enrollmentStatus.deadline && (
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      <p className="text-xs text-slate-600  mt-1">
                         Deadline: {new Date(enrollmentStatus.deadline).toLocaleDateString()}
                       </p>
                     )}
                     {enrollmentStatus.maxUnits && (
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <span className="text-sm font-medium text-slate-700 ">
                           Units: {enrolledSubjects.reduce((sum, s) => sum + (s.units || 0), 0)} / {enrollmentStatus.maxUnits}
                         </span>
-                        <div className="flex-1 max-w-xs bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                        <div className="flex-1 max-w-xs bg-slate-200  rounded-full h-2">
                           <div
                             className="bg-indigo-600 h-2 rounded-full transition-all"
                             style={{
@@ -359,23 +364,23 @@ const StudentAcademic = () => {
             </div>
 
             {/* Enrolled Subjects */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Currently Enrolled</h3>
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-3">Currently Enrolled</h3>
               {enrolledSubjects.length === 0 ? (
-                <p className="text-center text-slate-500 dark:text-slate-400 py-8">No subjects enrolled yet</p>
+                <p className="text-center text-slate-500  py-8">No subjects enrolled yet</p>
               ) : (
                 <div className="space-y-2">
                   {enrolledSubjects.map((subject) => (
                     <div
                       key={subject.enrollment_id}
-                      className="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-slate-700"
+                      className="flex items-center justify-between p-3 rounded-md bg-slate-50 "
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
                           <CheckCircle size={18} className="text-green-600" />
                           <div>
-                            <h4 className="font-bold text-slate-900 dark:text-white">{subject.subject_name}</h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <h4 className="font-bold text-slate-900 ">{subject.subject_name}</h4>
+                            <p className="text-xs text-slate-500 ">
                               {subject.subject_code} • {subject.units} units • {subject.schedule}
                             </p>
                           </div>
@@ -394,15 +399,15 @@ const StudentAcademic = () => {
             </div>
 
             {/* Available Subjects */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Available Subjects</h3>
+                <h3 className="text-lg font-bold text-slate-900 ">Available Subjects</h3>
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   {/* Filters */}
                   <select
                     value={filterYear}
                     onChange={(e) => setFilterYear(e.target.value)}
-                    className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+                    className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
                   >
                     <option value="">All Year Levels</option>
                     <option value="1">1st Year</option>
@@ -413,7 +418,7 @@ const StudentAcademic = () => {
                   <select
                     value={filterSemester}
                     onChange={(e) => setFilterSemester(e.target.value)}
-                    className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+                    className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
                   >
                     <option value="">All Semesters</option>
                     <option value="1">1st Semester</option>
@@ -426,7 +431,7 @@ const StudentAcademic = () => {
                       placeholder="Search subjects..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+                      className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
                     />
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                   </div>
@@ -435,50 +440,50 @@ const StudentAcademic = () => {
 
               <div className="space-y-2">
                 {currentSubjects.length === 0 ? (
-                  <p className="text-center text-slate-500 dark:text-slate-400 py-8">No available subjects found</p>
+                  <p className="text-center text-slate-500  py-8">No available subjects found</p>
                 ) : (
                   currentSubjects.map((subject) => (
                     <div
                       key={subject.subject_id}
-                      className="flex items-center justify-between p-3 rounded-md border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700"
+                      className="flex items-center justify-between p-3 rounded-md border border-slate-200  hover:bg-slate-50 "
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-bold text-slate-900 dark:text-white">{subject.subject_name}</h4>
+                          <h4 className="font-bold text-slate-900 ">{subject.subject_name}</h4>
                           {subject.prerequisites && subject.prerequisites.length > 0 && (
-                            <span className="flex items-center gap-1 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded">
+                            <span className="flex items-center gap-1 text-xs bg-amber-100  text-amber-700  px-2 py-0.5 rounded">
                               <Info size={12} />
                               Has Prerequisites
                             </span>
                           )}
                           {subject.enrolled >= subject.capacity && (
-                            <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-0.5 rounded">
+                            <span className="text-xs bg-red-100  text-red-700  px-2 py-0.5 rounded">
                               Full
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 ">
                           {subject.subject_code} • {subject.units} units • {subject.schedule}
                         </p>
                         <div className="flex items-center gap-3 mt-1 text-xs">
-                          <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+                          <span className="flex items-center gap-1 text-slate-600 ">
                             <Users size={12} />
                             {subject.enrolled}/{subject.capacity}
                           </span>
-                          <span className="text-slate-600 dark:text-slate-400">{subject.instructor}</span>
+                          <span className="text-slate-600 ">{subject.instructor}</span>
                           {subject.year_level && (
-                            <span className="text-slate-600 dark:text-slate-400">
+                            <span className="text-slate-600 ">
                               Year {subject.year_level}
                             </span>
                           )}
                           {subject.semester && (
-                            <span className="text-slate-600 dark:text-slate-400">
+                            <span className="text-slate-600 ">
                               Sem {subject.semester}
                             </span>
                           )}
                         </div>
                         {subject.prerequisites && subject.prerequisites.length > 0 && (
-                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                          <p className="text-xs text-amber-600  mt-1">
                             Prerequisites: {subject.prerequisites.join(', ')}
                           </p>
                         )}
@@ -497,15 +502,15 @@ const StudentAcademic = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200 ">
+                  <p className="text-sm text-slate-600 ">
                     Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredSubjects.length)} of {filteredSubjects.length}
                   </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="p-2 rounded-md border border-slate-300 dark:border-slate-600 disabled:opacity-50"
+                      className="p-2 rounded-md border border-slate-300  disabled:opacity-50"
                     >
                       <ChevronLeft size={16} />
                     </button>
@@ -515,7 +520,7 @@ const StudentAcademic = () => {
                         onClick={() => setCurrentPage(page)}
                         className={`px-3 py-1 rounded-md ${currentPage === page
                             ? "bg-indigo-600 text-white"
-                            : "border border-slate-300 dark:border-slate-600"
+                            : "border border-slate-300 "
                           }`}
                       >
                         {page}
@@ -524,7 +529,7 @@ const StudentAcademic = () => {
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-md border border-slate-300 dark:border-slate-600 disabled:opacity-50"
+                      className="p-2 rounded-md border border-slate-300  disabled:opacity-50"
                     >
                       <ChevronRight size={16} />
                     </button>
@@ -555,16 +560,16 @@ const StudentAcademic = () => {
             {/* Grades by Semester */}
             <div className="space-y-3">
               {Object.entries(grades).map(([semester, semesterGrades]) => (
-                <div key={semester} className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div key={semester} className="bg-white  rounded-lg border border-slate-200 ">
                   <button
                     onClick={() => setExpandedSemesters({ ...expandedSemesters, [semester]: !expandedSemesters[semester] })}
-                    className="w-full flex justify-between items-center p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                    className="w-full flex justify-between items-center p-4 hover:bg-slate-50  transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <GraduationCap size={20} className="text-indigo-600" />
                       <div className="text-left">
-                        <h3 className="font-bold text-slate-900 dark:text-white">{semester}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <h3 className="font-bold text-slate-900 ">{semester}</h3>
+                        <p className="text-xs text-slate-500 ">
                           {semesterGrades.length} subjects
                         </p>
                       </div>
@@ -576,23 +581,23 @@ const StudentAcademic = () => {
                     <div className="p-4 pt-0">
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                          <thead className="bg-slate-50 dark:bg-slate-700/50">
+                          <thead className="bg-slate-50 ">
                             <tr>
-                              <th className="text-left p-2 font-semibold text-slate-700 dark:text-slate-300">Subject Code</th>
-                              <th className="text-left p-2 font-semibold text-slate-700 dark:text-slate-300">Subject Name</th>
-                              <th className="text-center p-2 font-semibold text-slate-700 dark:text-slate-300">Units</th>
-                              <th className="text-center p-2 font-semibold text-slate-700 dark:text-slate-300">Midterm</th>
-                              <th className="text-center p-2 font-semibold text-slate-700 dark:text-slate-300">Final</th>
-                              <th className="text-center p-2 font-semibold text-slate-700 dark:text-slate-300">Grade</th>
-                              <th className="text-center p-2 font-semibold text-slate-700 dark:text-slate-300">Remarks</th>
+                              <th className="text-left p-2 font-semibold text-slate-700 ">Subject Code</th>
+                              <th className="text-left p-2 font-semibold text-slate-700 ">Subject Name</th>
+                              <th className="text-center p-2 font-semibold text-slate-700 ">Units</th>
+                              <th className="text-center p-2 font-semibold text-slate-700 ">Midterm</th>
+                              <th className="text-center p-2 font-semibold text-slate-700 ">Final</th>
+                              <th className="text-center p-2 font-semibold text-slate-700 ">Grade</th>
+                              <th className="text-center p-2 font-semibold text-slate-700 ">Remarks</th>
                             </tr>
                           </thead>
                           <tbody>
                             {semesterGrades.map((grade, index) => (
-                              <tr key={index} className="border-t border-slate-200 dark:border-slate-700">
-                                <td className="p-2 text-slate-900 dark:text-white font-medium">{grade.subject_code}</td>
-                                <td className="p-2 text-slate-900 dark:text-white">{grade.subject_name}</td>
-                                <td className="p-2 text-center text-slate-900 dark:text-white">{grade.units}</td>
+                              <tr key={index} className="border-t border-slate-200 ">
+                                <td className="p-2 text-slate-900  font-medium">{grade.subject_code}</td>
+                                <td className="p-2 text-slate-900 ">{grade.subject_name}</td>
+                                <td className="p-2 text-center text-slate-900 ">{grade.units}</td>
                                 <td className={`p-2 text-center font-semibold ${getGradeColor(grade.midterm_grade)}`}>
                                   {grade.midterm_grade || "-"}
                                 </td>
@@ -604,8 +609,8 @@ const StudentAcademic = () => {
                                 </td>
                                 <td className="p-2 text-center">
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${grade.remarks === "Passed"
-                                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                      : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                      ? "bg-green-100 text-green-700  "
+                                      : "bg-red-100 text-red-700  "
                                     }`}>
                                     {grade.remarks || "Pending"}
                                   </span>
@@ -625,44 +630,44 @@ const StudentAcademic = () => {
           // Report Card Tab
           <div className="space-y-4">
             {/* Student Info Card */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+            <div className="bg-white  rounded-lg border border-slate-200  p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Student Information</h3>
+                  <h3 className="text-lg font-bold text-slate-900  mb-3">Student Information</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Student ID:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.student_id || "2024-00001"}</span>
+                      <span className="text-slate-600 ">Student ID:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.student_id || "2024-00001"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Name:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.student_name || "John Doe"}</span>
+                      <span className="text-slate-600 ">Name:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.student_name || "John Doe"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Program:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.program || "BS Computer Science"}</span>
+                      <span className="text-slate-600 ">Program:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.program || "BS Computer Science"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Year Level:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.year_level || "2nd Year"}</span>
+                      <span className="text-slate-600 ">Year Level:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.year_level || "2nd Year"}</span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Academic Period</h3>
+                  <h3 className="text-lg font-bold text-slate-900  mb-3">Academic Period</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Academic Year:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.academic_year || "2023-2024"}</span>
+                      <span className="text-slate-600 ">Academic Year:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.academic_year || "2023-2024"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Semester:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{reportCard?.semester || "1st Semester"}</span>
+                      <span className="text-slate-600 ">Semester:</span>
+                      <span className="font-semibold text-slate-900 ">{reportCard?.semester || "1st Semester"}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600 dark:text-slate-400">Date Issued:</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">
+                      <span className="text-slate-600 ">Date Issued:</span>
+                      <span className="font-semibold text-slate-900 ">
                         {reportCard?.issue_date ? new Date(reportCard.issue_date).toLocaleDateString() : new Date().toLocaleDateString()}
                       </span>
                     </div>
@@ -692,27 +697,27 @@ const StudentAcademic = () => {
             </div>
 
             {/* Grades Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Academic Performance</h3>
+            <div className="bg-white  rounded-lg border border-slate-200  p-6">
+              <h3 className="text-lg font-bold text-slate-900  mb-4">Academic Performance</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 dark:bg-slate-700/50">
+                  <thead className="bg-slate-50 ">
                     <tr>
-                      <th className="text-left p-3 font-semibold text-slate-700 dark:text-slate-300">Subject Code</th>
-                      <th className="text-left p-3 font-semibold text-slate-700 dark:text-slate-300">Subject Description</th>
-                      <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-300">Units</th>
-                      <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-300">Midterm</th>
-                      <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-300">Finals</th>
-                      <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-300">Final Grade</th>
-                      <th className="text-center p-3 font-semibold text-slate-700 dark:text-slate-300">Remarks</th>
+                      <th className="text-left p-3 font-semibold text-slate-700 ">Subject Code</th>
+                      <th className="text-left p-3 font-semibold text-slate-700 ">Subject Description</th>
+                      <th className="text-center p-3 font-semibold text-slate-700 ">Units</th>
+                      <th className="text-center p-3 font-semibold text-slate-700 ">Midterm</th>
+                      <th className="text-center p-3 font-semibold text-slate-700 ">Finals</th>
+                      <th className="text-center p-3 font-semibold text-slate-700 ">Final Grade</th>
+                      <th className="text-center p-3 font-semibold text-slate-700 ">Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
                     {reportCard?.grades?.map((grade, index) => (
-                      <tr key={index} className="border-t border-slate-200 dark:border-slate-700">
-                        <td className="p-3 text-slate-900 dark:text-white font-medium">{grade.subject_code}</td>
-                        <td className="p-3 text-slate-900 dark:text-white">{grade.subject_name}</td>
-                        <td className="p-3 text-center text-slate-900 dark:text-white">{grade.units}</td>
+                      <tr key={index} className="border-t border-slate-200 ">
+                        <td className="p-3 text-slate-900  font-medium">{grade.subject_code}</td>
+                        <td className="p-3 text-slate-900 ">{grade.subject_name}</td>
+                        <td className="p-3 text-center text-slate-900 ">{grade.units}</td>
                         <td className={`p-3 text-center font-semibold ${getGradeColor(grade.midterm)}`}>
                           {grade.midterm || "-"}
                         </td>
@@ -724,8 +729,8 @@ const StudentAcademic = () => {
                         </td>
                         <td className="p-3 text-center">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${grade.remarks === "Passed"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              ? "bg-green-100 text-green-700  "
+                              : "bg-red-100 text-red-700  "
                             }`}>
                             {grade.remarks}
                           </span>
@@ -733,7 +738,7 @@ const StudentAcademic = () => {
                       </tr>
                     )) || (
                         <tr>
-                          <td colSpan="7" className="p-8 text-center text-slate-500 dark:text-slate-400">
+                          <td colSpan="7" className="p-8 text-center text-slate-500 ">
                             No grades available yet
                           </td>
                         </tr>
@@ -744,21 +749,21 @@ const StudentAcademic = () => {
             </div>
 
             {/* Signature Section */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+            <div className="bg-white  rounded-lg border border-slate-200  p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div className="space-y-2">
-                  <div className="border-t-2 border-slate-900 dark:border-slate-300 pt-2 mt-12">
-                    <p className="font-semibold text-slate-900 dark:text-white">Adviser</p>
+                  <div className="border-t-2 border-slate-900  pt-2 mt-12">
+                    <p className="font-semibold text-slate-900 ">Adviser</p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="border-t-2 border-slate-900 dark:border-slate-300 pt-2 mt-12">
-                    <p className="font-semibold text-slate-900 dark:text-white">Registrar</p>
+                  <div className="border-t-2 border-slate-900  pt-2 mt-12">
+                    <p className="font-semibold text-slate-900 ">Registrar</p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <div className="border-t-2 border-slate-900 dark:border-slate-300 pt-2 mt-12">
-                    <p className="font-semibold text-slate-900 dark:text-white">Dean</p>
+                  <div className="border-t-2 border-slate-900  pt-2 mt-12">
+                    <p className="font-semibold text-slate-900 ">Dean</p>
                   </div>
                 </div>
               </div>
@@ -769,52 +774,52 @@ const StudentAcademic = () => {
         {/* Confirmation Modal */}
         {showConfirmModal && selectedSubject && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6 shadow-xl">
+            <div className="bg-white  rounded-lg max-w-md w-full p-6 shadow-xl">
               <div className="flex items-start gap-3 mb-4">
-                <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-full p-2">
+                <div className="bg-indigo-100  rounded-full p-2">
                   <FileText size={24} className="text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-bold text-slate-900  mb-1">
                     Confirm Enrollment
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-600 ">
                     Review the subject details before enrolling
                   </p>
                 </div>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 space-y-2">
+              <div className="bg-slate-50  rounded-lg p-4 mb-4 space-y-2">
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Subject Name</p>
-                  <p className="font-bold text-slate-900 dark:text-white">{selectedSubject.subject_name}</p>
+                  <p className="text-xs text-slate-500 ">Subject Name</p>
+                  <p className="font-bold text-slate-900 ">{selectedSubject.subject_name}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Subject Code</p>
-                    <p className="font-medium text-slate-900 dark:text-white">{selectedSubject.subject_code}</p>
+                    <p className="text-xs text-slate-500 ">Subject Code</p>
+                    <p className="font-medium text-slate-900 ">{selectedSubject.subject_code}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Units</p>
-                    <p className="font-medium text-slate-900 dark:text-white">{selectedSubject.units}</p>
+                    <p className="text-xs text-slate-500 ">Units</p>
+                    <p className="font-medium text-slate-900 ">{selectedSubject.units}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Schedule</p>
-                  <p className="font-medium text-slate-900 dark:text-white">{selectedSubject.schedule}</p>
+                  <p className="text-xs text-slate-500 ">Schedule</p>
+                  <p className="font-medium text-slate-900 ">{selectedSubject.schedule}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Instructor</p>
-                  <p className="font-medium text-slate-900 dark:text-white">{selectedSubject.instructor}</p>
+                  <p className="text-xs text-slate-500 ">Instructor</p>
+                  <p className="font-medium text-slate-900 ">{selectedSubject.instructor}</p>
                 </div>
                 {selectedSubject.prerequisites && selectedSubject.prerequisites.length > 0 && (
-                  <div className="border-t border-slate-200 dark:border-slate-600 pt-2 mt-2">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Prerequisites Required</p>
+                  <div className="border-t border-slate-200  pt-2 mt-2">
+                    <p className="text-xs text-slate-500  mb-1">Prerequisites Required</p>
                     <div className="flex flex-wrap gap-1">
                       {selectedSubject.prerequisites.map((prereq, index) => (
                         <span
                           key={index}
-                          className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded"
+                          className="text-xs bg-amber-100  text-amber-700  px-2 py-1 rounded"
                         >
                           {prereq}
                         </span>
@@ -825,10 +830,10 @@ const StudentAcademic = () => {
               </div>
 
               {enrollmentStatus && !enrollmentStatus.isOpen && (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+                <div className="bg-amber-50  border border-amber-200  rounded-lg p-3 mb-4">
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-amber-600" />
-                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                    <p className="text-xs text-amber-700 ">
                       Enrollment period is currently closed. Contact the registrar for assistance.
                     </p>
                   </div>
@@ -841,7 +846,7 @@ const StudentAcademic = () => {
                     setShowConfirmModal(false);
                     setSelectedSubject(null);
                   }}
-                  className="flex-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white px-4 py-2 rounded-md font-medium transition-colors"
+                  className="flex-1 bg-slate-200 hover:bg-slate-300   text-slate-900  px-4 py-2 rounded-md font-medium transition-colors"
                 >
                   Cancel
                 </button>

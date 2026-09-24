@@ -931,7 +931,7 @@ const GradeEncoding = () => {
           } else {
             const payload = {
               student_id: student.userId, course_id: Number(selectedCourse), period_id: Number(activePeriodId),
-              component_name: "Midterm Exam", component_type: "exam",
+              component_name: `${PERIOD_LABELS[period]} Exam`, component_type: "exam",
               raw_score: midterm,
               // Use the header max score for the exam
               max_score: headerMaxScores.midtermExam ?? 100,

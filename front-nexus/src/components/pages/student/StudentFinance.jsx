@@ -437,19 +437,19 @@ const StudentFinance = () => {
   const getStatusColor = (status) => {
     const colors = {
       // Invoice statuses
-      Paid: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      Paid: "bg-green-100 text-green-700  ",
       "Partially Paid":
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        "bg-yellow-100 text-yellow-700  ",
       Pending:
-        "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-      Overdue: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+        "bg-orange-100 text-orange-700  ",
+      Overdue: "bg-red-100 text-red-700  ",
       Cancelled:
-        "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+        "bg-gray-100 text-gray-700  ",
       // Payment statuses
       Verified:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        "bg-green-100 text-green-700  ",
       Cleared:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        "bg-blue-100 text-blue-700  ",
     };
     return colors[status] || colors.Pending;
   };
@@ -476,21 +476,21 @@ const StudentFinance = () => {
   ];
 
   return (
-  <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+  <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <DollarSign size={24} className="text-indigo-600" />
             Student Finance
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Academic Year 2025-2026
           </span>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -499,8 +499,8 @@ const StudentFinance = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    ? "border-indigo-600 text-indigo-600  bg-indigo-50/50 "
+                    : "border-transparent text-slate-600  hover:text-slate-900  hover:bg-slate-50 "
                 }`}
               >
                 <Icon size={16} />
@@ -592,7 +592,7 @@ const StudentFinance = () => {
                 placeholder={`Search ${activeTab === "receipts" ? "receipts" : "payments"}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
               />
               <Search
                 className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -606,7 +606,7 @@ const StudentFinance = () => {
                 <select
                   value={semesterFilter}
                   onChange={(e) => setSemesterFilter(e.target.value)}
-                  className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+                  className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
                 >
                   <option value="all">All Semesters</option>
                   <option value="1st Semester">1st Semester</option>
@@ -617,7 +617,7 @@ const StudentFinance = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+                className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
               >
                 <option value="all">All Status</option>
                 <option value="paid">Paid</option>
@@ -642,7 +642,7 @@ const StudentFinance = () => {
         {activeTab === "balance" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Payment Schedule
               </h3>
               <button
@@ -653,10 +653,10 @@ const StudentFinance = () => {
                 Make Payment
               </button>
             </div>
-            <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-              <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                <thead className="bg-slate-100 dark:bg-slate-700/70">
-                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <div className="overflow-x-auto rounded border border-slate-200 ">
+              <table className="min-w-full divide-y divide-slate-200 ">
+                <thead className="bg-slate-100 ">
+                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                     <th className="px-4 py-2.5">Due Date</th>
                     <th className="px-4 py-2.5">Description</th>
                     <th className="px-4 py-2.5">Amount</th>
@@ -665,12 +665,12 @@ const StudentFinance = () => {
                     <th className="px-4 py-2.5">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                <tbody className="divide-y divide-slate-100  bg-white ">
                   {paymentSchedule.length === 0 ? (
                     <tr>
                       <td
                         colSpan="6"
-                        className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
+                        className="px-4 py-8 text-center text-slate-500 "
                       >
                         No payment schedule found
                       </td>
@@ -679,7 +679,7 @@ const StudentFinance = () => {
                     paymentSchedule.map((schedule) => (
                       <tr
                         key={schedule.schedule_id}
-                        className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                        className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                       >
                         <td className="px-4 py-2">
                           <div className="flex items-center gap-2">
@@ -723,10 +723,10 @@ const StudentFinance = () => {
 
         {/* Receipts Tab */}
         {activeTab === "receipts" && (
-          <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <div className="overflow-x-auto rounded border border-slate-200 ">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">Receipt #</th>
                   <th className="px-4 py-2.5">Date</th>
                   <th className="px-4 py-2.5">Description</th>
@@ -736,12 +736,12 @@ const StudentFinance = () => {
                   <th className="px-4 py-2.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {currentReceipts.length === 0 ? (
                   <tr>
                     <td
                       colSpan="7"
-                      className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
+                      className="px-4 py-8 text-center text-slate-500 "
                     >
                       No receipts found
                     </td>
@@ -750,9 +750,9 @@ const StudentFinance = () => {
                   currentReceipts.map((receipt) => (
                     <tr
                       key={receipt.receipt_id}
-                      className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                      className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                     >
-                      <td className="px-4 py-2 font-mono font-semibold text-indigo-600 dark:text-indigo-400">
+                      <td className="px-4 py-2 font-mono font-semibold text-indigo-600 ">
                         {receipt.receipt_number}
                       </td>
                       <td className="px-4 py-2">
@@ -761,18 +761,18 @@ const StudentFinance = () => {
                       <td className="px-4 py-2">
                         <div className="font-medium">{receipt.description}</div>
                         {receipt.semester && (
-                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                          <div className="text-xs text-slate-500 ">
                             {receipt.semester}
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700  ">
                           {getPaymentMethodIcon(receipt.payment_method)}
                           {receipt.payment_method.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="px-4 py-2 font-bold text-green-600 dark:text-green-400">
+                      <td className="px-4 py-2 font-bold text-green-600 ">
                         ₱{parseFloat(receipt.amount).toLocaleString()}
                       </td>
                       <td className="px-4 py-2">
@@ -787,7 +787,7 @@ const StudentFinance = () => {
                           <button
                             onClick={() => handleViewReceipt(receipt)}
                             title="View Receipt"
-                            className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                            className="text-indigo-600 hover:text-indigo-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                           >
                             <Eye size={14} />
                           </button>
@@ -796,14 +796,14 @@ const StudentFinance = () => {
                               handleDownloadReceipt(receipt.receipt_id)
                             }
                             title="Download PDF"
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                            className="text-blue-600 hover:text-blue-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                           >
                             <Download size={14} />
                           </button>
                           <button
                             onClick={() => handlePrintReceipt(receipt)}
                             title="Print Receipt"
-                            className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                            className="text-green-600 hover:text-green-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                           >
                             <Printer size={14} />
                           </button>
@@ -819,10 +819,10 @@ const StudentFinance = () => {
 
         {/* Payment History Tab */}
         {activeTab === "history" && (
-          <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <div className="overflow-x-auto rounded border border-slate-200 ">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">Payment Date</th>
                   <th className="px-4 py-2.5">Reference #</th>
                   <th className="px-4 py-2.5">Payment Method</th>
@@ -832,12 +832,12 @@ const StudentFinance = () => {
                   <th className="px-4 py-2.5">Notes</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {currentPayments.length === 0 ? (
                   <tr>
                     <td
                       colSpan="7"
-                      className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
+                      className="px-4 py-8 text-center text-slate-500 "
                     >
                       No payment history found
                     </td>
@@ -846,7 +846,7 @@ const StudentFinance = () => {
                   currentPayments.map((payment) => (
                     <tr
                       key={payment.payment_id}
-                      className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                      className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                     >
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-2">
@@ -858,12 +858,12 @@ const StudentFinance = () => {
                         {payment.reference_number || "N/A"}
                       </td>
                       <td className="px-4 py-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700  ">
                           {getPaymentMethodIcon(payment.payment_method)}
                           {payment.payment_method.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="px-4 py-2 font-bold text-green-600 dark:text-green-400">
+                      <td className="px-4 py-2 font-bold text-green-600 ">
                         ₱{parseFloat(payment.amount).toLocaleString()}
                       </td>
                       <td className="px-4 py-2">
@@ -877,7 +877,7 @@ const StudentFinance = () => {
                         {payment.processed_by || "Self-Service"}
                       </td>
                       <td className="px-4 py-2">
-                        <div className="max-w-xs truncate text-xs text-slate-500 dark:text-slate-400">
+                        <div className="max-w-xs truncate text-xs text-slate-500 ">
                           {payment.notes || "-"}
                         </div>
                       </td>
@@ -894,79 +894,79 @@ const StudentFinance = () => {
           <div className="space-y-4">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="bg-white  rounded-lg border border-slate-200  p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                    <p className="text-xs font-medium text-slate-500  uppercase">
                       Total Payments
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                    <p className="text-2xl font-bold text-slate-900  mt-1">
                       {summary.total_payments}
                     </p>
                   </div>
-                  <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
+                  <div className="bg-indigo-100  p-3 rounded-lg">
                     <Receipt
-                      className="text-indigo-600 dark:text-indigo-400"
+                      className="text-indigo-600 "
                       size={24}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="bg-white  rounded-lg border border-slate-200  p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                    <p className="text-xs font-medium text-slate-500  uppercase">
                       Total Amount Paid
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                    <p className="text-2xl font-bold text-slate-900  mt-1">
                       ₱
                       {parseFloat(
                         summary.total_amount_paid || 0,
                       ).toLocaleString()}
                     </p>
                   </div>
-                  <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
+                  <div className="bg-green-100  p-3 rounded-lg">
                     <TrendingUp
-                      className="text-green-600 dark:text-green-400"
+                      className="text-green-600 "
                       size={24}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="bg-white  rounded-lg border border-slate-200  p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                    <p className="text-xs font-medium text-slate-500  uppercase">
                       Outstanding Balance
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                    <p className="text-2xl font-bold text-slate-900  mt-1">
                       ₱
                       {parseFloat(
                         summary.outstanding_balance || 0,
                       ).toLocaleString()}
                     </p>
                   </div>
-                  <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
+                  <div className="bg-red-100  p-3 rounded-lg">
                     <AlertCircle
-                      className="text-red-600 dark:text-red-400"
+                      className="text-red-600 "
                       size={24}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="bg-white  rounded-lg border border-slate-200  p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">
+                    <p className="text-xs font-medium text-slate-500  uppercase">
                       Payment Progress
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                    <p className="text-2xl font-bold text-slate-900  mt-1">
                       {summary.payment_progress}%
                     </p>
                   </div>
-                  <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
+                  <div className="bg-blue-100  p-3 rounded-lg">
                     <BarChart3
-                      className="text-blue-600 dark:text-blue-400"
+                      className="text-blue-600 "
                       size={24}
                     />
                   </div>
@@ -975,13 +975,13 @@ const StudentFinance = () => {
             </div>
 
             {/* Payment Progress Bar */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-4">
                 Payment Progress
               </h3>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600 dark:text-slate-400">
+                  <span className="text-slate-600 ">
                     ₱
                     {parseFloat(
                       summary.total_amount_paid || 0,
@@ -989,11 +989,11 @@ const StudentFinance = () => {
                     of ₱
                     {parseFloat(summary.total_tuition || 0).toLocaleString()}
                   </span>
-                  <span className="font-bold text-slate-900 dark:text-white">
+                  <span className="font-bold text-slate-900 ">
                     {summary.payment_progress}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-4">
+                <div className="w-full bg-slate-200  rounded-full h-4">
                   <div
                     className="bg-gradient-to-r from-indigo-500 to-indigo-600 h-4 rounded-full transition-all flex items-center justify-end pr-2"
                     style={{ width: `${summary.payment_progress}%` }}
@@ -1007,8 +1007,8 @@ const StudentFinance = () => {
             </div>
 
             {/* Payment Methods Distribution */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
                 <BarChart3 size={20} className="text-indigo-600" />
                 Payment Methods
               </h3>
@@ -1019,20 +1019,20 @@ const StudentFinance = () => {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 capitalize min-w-[120px]">
+                      <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-700  capitalize min-w-[120px]">
                         {getPaymentMethodIcon(method.payment_method)}
                         {method.payment_method.replace("_", " ")}
                       </span>
-                      <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                      <div className="flex-1 bg-slate-200  rounded-full h-2">
                         <div
-                          className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all"
+                          className="bg-indigo-600  h-2 rounded-full transition-all"
                           style={{
                             width: `${(method.total_amount / summary.total_amount_paid) * 100}%`,
                           }}
                         />
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-slate-900 dark:text-white ml-3">
+                    <span className="text-sm font-bold text-slate-900  ml-3">
                       ₱{parseFloat(method.total_amount).toLocaleString()}
                     </span>
                   </div>
@@ -1044,7 +1044,7 @@ const StudentFinance = () => {
 
         {/* Pagination */}
         {(activeTab === "receipts" || activeTab === "history") && (
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
             <span className="text-xs sm:text-sm">
               Page <span className="font-semibold">{currentPage}</span> of{" "}
               <span className="font-semibold">
@@ -1061,11 +1061,11 @@ const StudentFinance = () => {
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+                className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+              <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
                 {currentPage}
               </span>
               <button
@@ -1083,7 +1083,7 @@ const StudentFinance = () => {
                   currentPage ===
                   (activeTab === "receipts" ? totalPages : totalPagesPayments)
                 }
-                className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+                className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
               >
                 <ChevronRight size={16} />
               </button>
@@ -1099,11 +1099,11 @@ const StudentFinance = () => {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 {modalType === "payment" && (
                   <>
                     <CreditCard className="inline w-5 h-5 text-indigo-600 mr-2" />
@@ -1119,7 +1119,7 @@ const StudentFinance = () => {
               </h3>
               <button
                 onClick={handleCloseModal}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 rounded-full p-1 transition-all"
+                className="text-slate-400 hover:text-slate-600  hover:bg-slate-200/50  rounded-full p-1 transition-all"
               >
                 <Plus className="w-5 h-5 rotate-45" />
               </button>
@@ -1129,7 +1129,7 @@ const StudentFinance = () => {
             {modalType === "payment" && (
               <form onSubmit={handleSubmit} className="p-4 space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Invoice *
                   </label>
                   <select
@@ -1147,7 +1147,7 @@ const StudentFinance = () => {
                           : formData.amount,
                       });
                     }}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   >
                     <option value="">Select invoice…</option>
                     {paymentSchedule
@@ -1172,7 +1172,7 @@ const StudentFinance = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Amount *
                   </label>
                   <input
@@ -1183,13 +1183,13 @@ const StudentFinance = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, amount: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                     placeholder="0.00"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Payment Method *
                     </label>
                     <select
@@ -1201,7 +1201,7 @@ const StudentFinance = () => {
                           payment_method: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                      className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                     >
                       <option value="cash">Cash</option>
                       <option value="credit_card">Credit Card</option>
@@ -1211,7 +1211,7 @@ const StudentFinance = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Payment Date *
                     </label>
                     <input
@@ -1224,12 +1224,12 @@ const StudentFinance = () => {
                           payment_date: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                      className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Reference Number
                   </label>
                   <input
@@ -1241,12 +1241,12 @@ const StudentFinance = () => {
                         reference_number: e.target.value,
                       })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                     placeholder="Transaction or check number"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Notes
                   </label>
                   <textarea
@@ -1255,21 +1255,21 @@ const StudentFinance = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, notes: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all resize-none"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all resize-none"
                     placeholder="Additional payment details"
                   />
                 </div>
-                <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 ">
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600 transition-all text-sm shadow-sm"
+                    className="px-4 py-2 bg-white  border border-slate-300  text-slate-700  rounded-md hover:bg-slate-50  transition-all text-sm shadow-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-md transition-all text-sm shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700   text-white rounded-md transition-all text-sm shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
                   >
                     Submit Payment
                   </button>
@@ -1280,13 +1280,13 @@ const StudentFinance = () => {
             {/* Receipt View */}
             {modalType === "receipt" && selectedItem && (
               <div className="p-6 space-y-4">
-                <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+                <div className="bg-slate-50  border border-slate-200  rounded-lg p-6">
                   {/* Receipt Header */}
                   <div className="text-center mb-6">
-                    <h4 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+                    <h4 className="text-2xl font-bold text-slate-900  mb-1">
                       Official Receipt
                     </h4>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm text-slate-500 ">
                       Receipt No: {selectedItem.receipt_number}
                     </p>
                   </div>
@@ -1294,33 +1294,33 @@ const StudentFinance = () => {
                   {/* Receipt Details */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">
+                      <p className="text-xs font-medium text-slate-500  uppercase mb-1">
                         Date
                       </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      <p className="text-sm font-semibold text-slate-900 ">
                         {new Date(
                           selectedItem.payment_date,
                         ).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">
+                      <p className="text-xs font-medium text-slate-500  uppercase mb-1">
                         Payment Method
                       </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white capitalize">
+                      <p className="text-sm font-semibold text-slate-900  capitalize">
                         {selectedItem.payment_method.replace("_", " ")}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">
+                      <p className="text-xs font-medium text-slate-500  uppercase mb-1">
                         Description
                       </p>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      <p className="text-sm font-semibold text-slate-900 ">
                         {selectedItem.description}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">
+                      <p className="text-xs font-medium text-slate-500  uppercase mb-1">
                         Status
                       </p>
                       <span
@@ -1334,19 +1334,19 @@ const StudentFinance = () => {
                   </div>
 
                   {/* Amount */}
-                  <div className="border-t border-b border-slate-300 dark:border-slate-600 py-4 my-4">
+                  <div className="border-t border-b border-slate-300  py-4 my-4">
                     <div className="flex justify-between items-center">
-                      <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
+                      <p className="text-lg font-medium text-slate-700 ">
                         Amount Paid
                       </p>
-                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                      <p className="text-3xl font-bold text-green-600 ">
                         ₱{parseFloat(selectedItem.amount).toLocaleString()}
                       </p>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="text-center text-xs text-slate-500 dark:text-slate-400">
+                  <div className="text-center text-xs text-slate-500 ">
                     <p>
                       This is an official receipt issued by the institution.
                     </p>
@@ -1354,7 +1354,7 @@ const StudentFinance = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 ">
                   <button
                     onClick={() =>
                       handleDownloadReceipt(selectedItem.receipt_id)

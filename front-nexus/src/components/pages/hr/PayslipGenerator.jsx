@@ -520,28 +520,28 @@ const resolveDepartment = (user) => {
   );
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
 
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <DollarSign size={24} className="text-indigo-600" />
             Payslip Generator
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Manage payroll periods and payslips
           </span>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-slate-300 dark:border-slate-700 overflow-x-auto">
+        <div className="flex gap-1 border-b border-slate-300  overflow-x-auto">
           <button
             onClick={() => setActiveTab("setups")}
             className={`flex items-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all duration-300 whitespace-nowrap border-b-2 ${
               activeTab === "setups"
-                ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800"
-                : "border-transparent text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300"
+                ? "border-indigo-600 text-indigo-600  bg-white "
+                : "border-transparent text-slate-600  hover:text-indigo-600  hover:border-indigo-300"
             }`}
           >
             <FileText size={16} /> Payroll Periods
@@ -550,8 +550,8 @@ const resolveDepartment = (user) => {
             onClick={() => setActiveTab("payslips")}
             className={`flex items-center gap-1.5 px-3 py-2 text-sm font-semibold transition-all duration-300 whitespace-nowrap border-b-2 ${
               activeTab === "payslips"
-                ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-800"
-                : "border-transparent text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300"
+                ? "border-indigo-600 text-indigo-600  bg-white "
+                : "border-transparent text-slate-600  hover:text-indigo-600  hover:border-indigo-300"
             }`}
           >
             <DollarSign size={16} /> Payslips
@@ -568,7 +568,7 @@ const resolveDepartment = (user) => {
                   placeholder="Search payroll periods..."
                   value={setupSearch}
                   onChange={(e) => { setSetupSearch(e.target.value); setSetupCurrentPage(1); }}
-                  className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm shadow-inner"
+                  className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm shadow-inner"
                 />
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               </div>
@@ -580,10 +580,10 @@ const resolveDepartment = (user) => {
               </button>
             </div>
 
-            <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-              <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                <thead className="bg-slate-100 dark:bg-slate-700/70">
-                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <div className="overflow-x-auto rounded border border-slate-200 ">
+              <table className="min-w-full divide-y divide-slate-200 ">
+                <thead className="bg-slate-100 ">
+                  <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                     <th className="px-4 py-2.5">Period Type</th>
                     <th className="px-4 py-2.5">Start Date</th>
                     <th className="px-4 py-2.5">End Date</th>
@@ -592,12 +592,12 @@ const resolveDepartment = (user) => {
                     <th className="px-4 py-2.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                <tbody className="divide-y divide-slate-100  bg-white ">
                   {displayedSetups.length > 0 ? displayedSetups.map((setup) => (
                     <tr
                       key={setup.payroll_setup_id}
-                      className={`text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150 cursor-pointer ${
-                        selectedSetup === setup.payroll_setup_id ? "bg-indigo-50 dark:bg-slate-700/70" : ""
+                      className={`text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150 cursor-pointer ${
+                        selectedSetup === setup.payroll_setup_id ? "bg-indigo-50 " : ""
                       }`}
                       onClick={() => { setSelectedSetup(setup.payroll_setup_id); setActiveTab("payslips"); }}
                     >
@@ -607,20 +607,20 @@ const resolveDepartment = (user) => {
                       <td className="px-4 py-2">{new Date(setup.pay_date).toLocaleDateString()}</td>
                       <td className="px-4 py-2">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          setup.status === "Completed" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                          : setup.status === "Processing" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                          : setup.status === "Draft" ? "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-                          : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                          setup.status === "Completed" ? "bg-green-100 text-green-700  "
+                          : setup.status === "Processing" ? "bg-blue-100 text-blue-700  "
+                          : setup.status === "Draft" ? "bg-slate-100 text-slate-700  "
+                          : "bg-red-100 text-red-700  "
                         }`}>
                           {setup.status}
                         </span>
                       </td>
                       <td className="px-4 py-2 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex gap-2 justify-end">
-                          <button onClick={() => handleEditSetup(setup)} className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Edit">
+                          <button onClick={() => handleEditSetup(setup)} className="text-indigo-600 hover:text-indigo-800   p-1 rounded-full hover:bg-slate-200 " title="Edit">
                             <Edit size={14} />
                           </button>
-                          <button onClick={() => handleDeleteSetup(setup.payroll_setup_id)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Delete">
+                          <button onClick={() => handleDeleteSetup(setup.payroll_setup_id)} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
                             <Trash2 size={14} />
                           </button>
                         </div>
@@ -638,7 +638,7 @@ const resolveDepartment = (user) => {
             </div>
 
             {/* Setup Pagination */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
               <span className="text-xs sm:text-sm">
                 Showing <span className="font-semibold">{Math.min((setupCurrentPage - 1) * itemsPerPage + 1, filteredSetups.length)}</span> to{" "}
                 <span className="font-semibold">{Math.min(setupCurrentPage * itemsPerPage, filteredSetups.length)}</span> of{" "}
@@ -646,12 +646,12 @@ const resolveDepartment = (user) => {
               </span>
               <div className="flex gap-1 items-center mt-2 sm:mt-0">
                 <button onClick={() => setSetupCurrentPage((p) => Math.max(p - 1, 1))} disabled={setupCurrentPage === 1}
-                  className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600">
+                  className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 ">
                   <ChevronLeft size={18} />
                 </button>
-                <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">{setupCurrentPage}</span>
+                <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">{setupCurrentPage}</span>
                 <button onClick={() => setSetupCurrentPage((p) => Math.min(p + 1, setupTotalPages))} disabled={setupCurrentPage === setupTotalPages || setupTotalPages === 0}
-                  className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600">
+                  className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 ">
                   <ChevronRight size={18} />
                 </button>
               </div>
@@ -664,11 +664,11 @@ const resolveDepartment = (user) => {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Payroll Period:</label>
+                <label className="text-sm font-medium text-slate-700 ">Payroll Period:</label>
                 <select
                   value={selectedSetup || ""}
                   onChange={(e) => setSelectedSetup(e.target.value)}
-                  className="border border-slate-300 dark:border-slate-600 rounded-md px-3 py-2 text-sm dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 min-w-[280px]"
+                  className="border border-slate-300  rounded-md px-3 py-2 text-sm   focus:ring-indigo-500 focus:border-indigo-500 min-w-[280px]"
                 >
                   <option value="">Select a period</option>
                   {payrollSetups.map((setup) => (
@@ -687,7 +687,7 @@ const resolveDepartment = (user) => {
                       placeholder="Search payslips..."
                       value={payslipSearch}
                       onChange={(e) => { setPayslipSearch(e.target.value); setPayslipCurrentPage(1); }}
-                      className="pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm shadow-inner w-48"
+                      className="pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm shadow-inner w-48"
                     />
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                   </div>
@@ -711,10 +711,10 @@ const resolveDepartment = (user) => {
 
             {selectedSetup ? (
               <>
-                <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-                  <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                    <thead className="bg-slate-100 dark:bg-slate-700/70">
-                      <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <div className="overflow-x-auto rounded border border-slate-200 ">
+                  <table className="min-w-full divide-y divide-slate-200 ">
+                    <thead className="bg-slate-100 ">
+                      <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                         <th className="px-4 py-2.5">Payslip #</th>
                         <th className="px-4 py-2.5">Employee</th>
                         <th className="px-4 py-2.5 text-right">Gross Pay</th>
@@ -723,29 +723,29 @@ const resolveDepartment = (user) => {
                         <th className="px-4 py-2.5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                    <tbody className="divide-y divide-slate-100  bg-white ">
                       {displayedPayslips.length > 0 ? displayedPayslips.map((payslip) => (
-                        <tr key={payslip.payslip_id} className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150">
+                        <tr key={payslip.payslip_id} className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150">
                           <td className="px-4 py-2 font-mono text-sm">{payslip.payslip_number}</td>
                           <td className="px-4 py-2">
                             <div className="font-medium">{payslip.first_name} {payslip.last_name}</div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{payslip.employee_number}</div>
+                            <div className="text-xs text-slate-500  font-mono">{payslip.employee_number}</div>
                           </td>
-                          <td className="px-4 py-2 text-right font-semibold text-green-600 dark:text-green-400">
+                          <td className="px-4 py-2 text-right font-semibold text-green-600 ">
                             ₱{parseFloat(payslip.gross_pay || 0).toLocaleString()}
                           </td>
-                          <td className="px-4 py-2 text-right font-semibold text-red-600 dark:text-red-400">
+                          <td className="px-4 py-2 text-right font-semibold text-red-600 ">
                             ₱{parseFloat(payslip.total_deductions || 0).toLocaleString()}
                           </td>
-                          <td className="px-4 py-2 text-right font-bold text-indigo-600 dark:text-indigo-400">
+                          <td className="px-4 py-2 text-right font-bold text-indigo-600 ">
                             ₱{parseFloat(payslip.net_pay || 0).toLocaleString()}
                           </td>
                           <td className="px-4 py-2 text-right">
                             <div className="flex gap-2 justify-end">
-                              <button onClick={() => handleEditPayslip(payslip)} className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Edit">
+                              <button onClick={() => handleEditPayslip(payslip)} className="text-indigo-600 hover:text-indigo-800   p-1 rounded-full hover:bg-slate-200 " title="Edit">
                                 <Edit size={14} />
                               </button>
-                              <button onClick={() => handleDeletePayslip(payslip.payslip_id)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Delete">
+                              <button onClick={() => handleDeletePayslip(payslip.payslip_id)} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
                                 <Trash2 size={14} />
                               </button>
                             </div>
@@ -763,7 +763,7 @@ const resolveDepartment = (user) => {
                 </div>
 
                 {/* Payslip Pagination */}
-                <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+                <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
                   <span className="text-xs sm:text-sm">
                     Showing <span className="font-semibold">{Math.min((payslipCurrentPage - 1) * itemsPerPage + 1, filteredPayslips.length)}</span> to{" "}
                     <span className="font-semibold">{Math.min(payslipCurrentPage * itemsPerPage, filteredPayslips.length)}</span> of{" "}
@@ -771,22 +771,22 @@ const resolveDepartment = (user) => {
                   </span>
                   <div className="flex gap-1 items-center mt-2 sm:mt-0">
                     <button onClick={() => setPayslipCurrentPage((p) => Math.max(p - 1, 1))} disabled={payslipCurrentPage === 1}
-                      className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600">
+                      className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 ">
                       <ChevronLeft size={18} />
                     </button>
-                    <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">{payslipCurrentPage}</span>
+                    <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">{payslipCurrentPage}</span>
                     <button onClick={() => setPayslipCurrentPage((p) => Math.min(p + 1, payslipTotalPages))} disabled={payslipCurrentPage === payslipTotalPages || payslipTotalPages === 0}
-                      className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600">
+                      className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 ">
                       <ChevronRight size={18} />
                     </button>
                   </div>
                 </div>
               </>
             ) : (
-              <div className="p-8 text-center border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800">
+              <div className="p-8 text-center border border-slate-200  rounded-lg bg-slate-50 ">
                 <FileText size={48} className="mx-auto mb-4 text-slate-400" />
-                <p className="text-slate-500 dark:text-slate-400 mb-4">Please select a payroll period to view and manage payslips.</p>
-                <p className="text-sm text-slate-400 dark:text-slate-500">You can create a new payroll period from the "Payroll Periods" tab.</p>
+                <p className="text-slate-500  mb-4">Please select a payroll period to view and manage payslips.</p>
+                <p className="text-sm text-slate-400 ">You can create a new payroll period from the "Payroll Periods" tab.</p>
               </div>
             )}
           </div>
@@ -795,53 +795,53 @@ const resolveDepartment = (user) => {
         {/* ── Setup Modal ── */}
         {showSetupModal && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50" onClick={() => setShowSetupModal(false)}>
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{setupFormData.setup_id ? "Edit" : "Add"} Payroll Period</h3>
-                <button onClick={() => { setShowSetupModal(false); resetSetupForm(); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <div className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg">
+                <h3 className="text-lg font-bold text-slate-900 ">{setupFormData.setup_id ? "Edit" : "Add"} Payroll Period</h3>
+                <button onClick={() => { setShowSetupModal(false); resetSetupForm(); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 ">
                   <Plus size={18} className="rotate-45" />
                 </button>
               </div>
               <form onSubmit={handleSetupSubmit} className="p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Period Type *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Period Type *</label>
                     <select name="period_type" value={setupFormData.period_type} onChange={handleSetupInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500">
                       {periodTypes.map((type) => <option key={type} value={type}>{type}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Status *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Status *</label>
                     <select name="status" value={setupFormData.status} onChange={handleSetupInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500">
                       {setupStatuses.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Start Date *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Start Date *</label>
                     <input type="date" name="start_date" value={setupFormData.start_date} onChange={handleSetupInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">End Date *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">End Date *</label>
                     <input type="date" name="end_date" value={setupFormData.end_date} onChange={handleSetupInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Pay Date *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Pay Date *</label>
                     <input type="date" name="pay_date" value={setupFormData.pay_date} onChange={handleSetupInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Notes</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Notes</label>
                     <textarea name="notes" value={setupFormData.notes} onChange={handleSetupInputChange} rows="2"
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                   <button type="button" onClick={() => { setShowSetupModal(false); resetSetupForm(); }}
-                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600">
+                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    border border-slate-300 ">
                     Cancel
                   </button>
                   <button type="submit" className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-md shadow-indigo-500/30">
@@ -856,17 +856,17 @@ const resolveDepartment = (user) => {
         {/* ── Payslip Modal ── */}
         {showPayslipModal && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50 overflow-y-auto" onClick={() => setShowPayslipModal(false)}>
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-4xl my-8 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="bg-white  rounded-lg shadow-2xl w-full max-w-4xl my-8 border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   {payslipFormData.payslip_id ? "Edit" : "Generate"} Payslip
                   {!payslipFormData.payslip_id && (
-                    <span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-2 py-0.5 rounded">
+                    <span className="ml-2 text-xs font-normal text-amber-600  bg-amber-50  border border-amber-200  px-2 py-0.5 rounded">
                       Will auto-log as Expense
                     </span>
                   )}
                 </h3>
-                <button onClick={() => { setShowPayslipModal(false); resetPayslipForm(); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                <button onClick={() => { setShowPayslipModal(false); resetPayslipForm(); }} className="p-1 rounded-full text-slate-400 hover:text-slate-600 ">
                   <Plus size={18} className="rotate-45" />
                 </button>
               </div>
@@ -874,9 +874,9 @@ const resolveDepartment = (user) => {
               <form onSubmit={handlePayslipSubmit} className="p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Employee *</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Employee *</label>
                     <select name="user_selection" value={selectedUserId} onChange={handlePayslipInputChange} required
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500">
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500">
                       <option value="">Select Employee</option>
                       {eligibleEmployees.map((emp) => (
                         <option key={emp.user_id} value={emp.user_id}>
@@ -892,7 +892,7 @@ const resolveDepartment = (user) => {
 
                   {/* Earnings Section */}
                   <div className="col-span-2">
-                    <h3 className="font-semibold text-sm mb-2 text-green-600 dark:text-green-400 border-b border-green-200 dark:border-green-800 pb-1">
+                    <h3 className="font-semibold text-sm mb-2 text-green-600  border-b border-green-200  pb-1">
                       Earnings
                     </h3>
                   </div>
@@ -905,15 +905,15 @@ const resolveDepartment = (user) => {
                     { name: "bonus", label: "Bonus" },
                   ].map(({ name, label, required }) => (
                     <div key={name}>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">{label}{required ? " *" : ""}</label>
+                      <label className="block text-xs font-medium text-slate-700  mb-1">{label}{required ? " *" : ""}</label>
                       <input type="number" name={name} value={payslipFormData[name]} onChange={handlePayslipInputChange} step="0.01" required={required}
-                        className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                        className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                     </div>
                   ))}
 
                   {/* Deductions Section */}
                   <div className="col-span-2">
-                    <h3 className="font-semibold text-sm mb-2 text-red-600 dark:text-red-400 border-b border-red-200 dark:border-red-800 pb-1">
+                    <h3 className="font-semibold text-sm mb-2 text-red-600  border-b border-red-200  pb-1">
                       Deductions
                     </h3>
                   </div>
@@ -926,22 +926,22 @@ const resolveDepartment = (user) => {
                     { name: "other_deductions", label: "Other Deductions" },
                   ].map(({ name, label }) => (
                     <div key={name}>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">{label}</label>
+                      <label className="block text-xs font-medium text-slate-700  mb-1">{label}</label>
                       <input type="number" name={name} value={payslipFormData[name]} onChange={handlePayslipInputChange} step="0.01"
-                        className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                        className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                     </div>
                   ))}
 
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Notes</label>
+                    <label className="block text-xs font-medium text-slate-700  mb-1">Notes</label>
                     <textarea name="notes" value={payslipFormData.notes} onChange={handlePayslipInputChange} rows="2"
-                      className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                      className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                   <button type="button" onClick={() => { setShowPayslipModal(false); resetPayslipForm(); }}
-                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600">
+                    className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    border border-slate-300 ">
                     Cancel
                   </button>
                   <button type="submit" disabled={isAutoCreating}

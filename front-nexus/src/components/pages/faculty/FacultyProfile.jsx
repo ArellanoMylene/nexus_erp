@@ -16,9 +16,9 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5
 
 /* ── Shared style tokens ── */
 const inputCls =
-  "w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  "w-full px-3 py-2 bg-slate-50  border border-slate-300  rounded-lg text-slate-900  text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
 const readonlyCls =
-  "w-full px-3 py-2 bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed";
+  "w-full px-3 py-2 bg-slate-100  border border-slate-200  rounded-lg text-slate-500  text-sm cursor-not-allowed";
 
 /* ── Reusable display field ── */
 const Field = ({ label, value }) => (
@@ -26,7 +26,7 @@ const Field = ({ label, value }) => (
     <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">
       {label}
     </p>
-    <p className="text-sm font-semibold text-slate-800 dark:text-white">
+    <p className="text-sm font-semibold text-slate-800 ">
       {value || (
         <span className="text-slate-400 font-normal italic">Not provided</span>
       )}
@@ -36,8 +36,8 @@ const Field = ({ label, value }) => (
 
 /* ── Section card wrapper ── */
 const SectionCard = ({ title, children }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-    <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+  <div className="bg-white  rounded-xl border border-slate-200  p-5">
+    <h3 className="text-sm font-bold text-slate-500  uppercase tracking-wider mb-4">
       {title}
     </h3>
     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
@@ -49,7 +49,7 @@ const SectionCard = ({ title, children }) => (
 /* ── Modal form field wrapper ── */
 const FormField = ({ label, children, span }) => (
   <div className={span ? "col-span-2 sm:col-span-2" : ""}>
-    <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+    <label className="block text-xs font-medium text-slate-500  mb-1">
       {label}
     </label>
     {children}
@@ -288,12 +288,12 @@ const FacultyProfile = () => {
     .concat(profileData.suffix ? `, ${profileData.suffix}` : "");
 
   return (
-    <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+    <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
 
         {/* ── Header ── */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <User size={24} className="text-indigo-600" />
             My Profile
           </h2>
@@ -321,7 +321,7 @@ const FacultyProfile = () => {
 
             {/* ── Left — Avatar card ── */}
             <div className="lg:col-span-1 space-y-4">
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center text-center">
+              <div className="bg-white  rounded-xl border border-slate-200  p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold">
@@ -354,7 +354,7 @@ const FacultyProfile = () => {
                   />
                 </div>
 
-                <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                <h3 className="mt-4 text-lg font-bold text-slate-900  leading-snug">
                   {fullName || "—"}
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
@@ -365,7 +365,7 @@ const FacultyProfile = () => {
                 </span>
 
                 {/* Quick-info rows */}
-                <div className="mt-5 w-full divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                <div className="mt-5 w-full divide-y divide-slate-100  text-sm">
                   {[
                     ["Position", profileData.position],
                     ["Department", profileData.department],
@@ -379,7 +379,7 @@ const FacultyProfile = () => {
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between py-2">
                       <span className="text-slate-500">{label}</span>
-                      <span className="font-semibold text-slate-800 dark:text-white text-right max-w-[55%] truncate">
+                      <span className="font-semibold text-slate-800  text-right max-w-[55%] truncate">
                         {val || "—"}
                       </span>
                     </div>
@@ -388,28 +388,28 @@ const FacultyProfile = () => {
 
                 {/* Contact mini-list */}
                 <div className="mt-5 w-full space-y-2 text-sm text-left">
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                  <div className="flex items-center gap-2 text-slate-600 ">
                     <Mail size={14} className="text-indigo-500 shrink-0" />
                     <span className="truncate">{profileData.email || "—"}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                  <div className="flex items-center gap-2 text-slate-600 ">
                     <Phone size={14} className="text-indigo-500 shrink-0" />
                     <span>{profileData.phone || "—"}</span>
                   </div>
-                  <div className="flex items-start gap-2 text-slate-600 dark:text-slate-300">
+                  <div className="flex items-start gap-2 text-slate-600 ">
                     <MapPin size={14} className="text-indigo-500 shrink-0 mt-0.5" />
                     <span>{profileData.address || "—"}</span>
                   </div>
                 </div>
 
                 {/* Change password trigger */}
-                <div className="mt-5 w-full pt-5 border-t border-slate-100 dark:border-slate-700">
+                <div className="mt-5 w-full pt-5 border-t border-slate-100 ">
                   <button
                     onClick={() => {
                       setShowPasswordForm(true);
                       setPasswordError(null);
                     }}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300  rounded-lg text-slate-600  text-sm font-medium hover:bg-slate-50  transition-colors"
                   >
                     <Lock size={14} /> Change Password
                   </button>
@@ -469,10 +469,10 @@ const FacultyProfile = () => {
       ══════════════════════════════════════ */}
       {editing && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-white  rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200  shrink-0">
+              <h2 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                 <Edit size={18} className="text-indigo-600" /> Edit Profile
               </h2>
               <button
@@ -514,7 +514,7 @@ const FacultyProfile = () => {
                   <button
                     type="button"
                     onClick={handleImageClick}
-                    className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 border border-slate-300  rounded-lg text-slate-600  text-sm font-medium hover:bg-slate-50  transition-colors"
                   >
                     <Camera size={14} /> Upload Photo
                   </button>
@@ -676,10 +676,10 @@ const FacultyProfile = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200  shrink-0">
               <button
                 onClick={() => { setEditing(false); setSaveError(null); }}
-                className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                className="px-4 py-2 border border-slate-300  rounded-lg text-slate-600  font-medium text-sm hover:bg-slate-50  transition-colors"
               >
                 Cancel
               </button>
@@ -701,10 +701,10 @@ const FacultyProfile = () => {
       ══════════════════════════════════════ */}
       {showPasswordForm && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden">
+          <div className="bg-white  rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200  shrink-0">
+              <h2 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                 <Lock size={18} className="text-indigo-600" /> Change Password
               </h2>
               <button
@@ -733,7 +733,7 @@ const FacultyProfile = () => {
                 { label: "Confirm New Password", key: "confirmPassword" },
               ].map(({ label, key }) => (
                 <div key={key}>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  <label className="block text-xs font-medium text-slate-500  mb-1">
                     {label}
                   </label>
                   <input
@@ -766,7 +766,7 @@ const FacultyProfile = () => {
                     setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
                     setPasswordError(null);
                   }}
-                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  className="px-4 py-2 border border-slate-300  rounded-lg text-slate-600  font-medium text-sm hover:bg-slate-50  transition-colors"
                 >
                   Cancel
                 </button>

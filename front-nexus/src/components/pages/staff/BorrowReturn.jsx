@@ -211,7 +211,7 @@ const BorrowReturn = () => {
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
 
   const Pagination = ({ currentPage, totalPages, setPage, totalItems }) => (
-    <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+    <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
       <span className="text-xs sm:text-sm">
         Page <span className="font-semibold">{currentPage}</span> of{" "}
         <span className="font-semibold">{totalPages}</span> | Total Records:{" "}
@@ -221,17 +221,17 @@ const BorrowReturn = () => {
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={currentPage === 1}
-          className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+          className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
         >
           <ChevronLeft size={16} />
         </button>
-        <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+        <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
           {currentPage}
         </span>
         <button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={currentPage === totalPages || totalPages === 0}
-          className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+          className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
         >
           <ChevronRight size={16} />
         </button>
@@ -242,13 +242,13 @@ const BorrowReturn = () => {
   const getStatusBadge = (status) => {
     const badges = {
       Active:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        "bg-blue-100 text-blue-700  ",
       Returned:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      Overdue: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-      Lost: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+        "bg-green-100 text-green-700  ",
+      Overdue: "bg-red-100 text-red-700  ",
+      Lost: "bg-gray-100 text-gray-700  ",
       Damaged:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        "bg-yellow-100 text-yellow-700  ",
     };
     return badges[status] || "bg-gray-100 text-gray-700";
   };
@@ -264,49 +264,49 @@ const BorrowReturn = () => {
   }));
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <FileText size={24} className="text-indigo-600" />
             Borrow & Return
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Library Transactions
           </span>
         </div>
 
         {statistics && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm p-4">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            <div className="bg-white  rounded-md border border-slate-200  shadow-sm p-4">
+              <p className="text-xs font-medium text-slate-600 ">
                 Active Borrows
               </p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+              <p className="text-2xl font-bold text-blue-600  mt-1">
                 {statistics.active_borrows}
               </p>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm p-4">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            <div className="bg-white  rounded-md border border-slate-200  shadow-sm p-4">
+              <p className="text-xs font-medium text-slate-600 ">
                 Overdue
               </p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+              <p className="text-2xl font-bold text-red-600  mt-1">
                 {statistics.overdue_count}
               </p>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm p-4">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            <div className="bg-white  rounded-md border border-slate-200  shadow-sm p-4">
+              <p className="text-xs font-medium text-slate-600 ">
                 Total Returned
               </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
+              <p className="text-2xl font-bold text-green-600  mt-1">
                 {statistics.returned_count}
               </p>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm p-4">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            <div className="bg-white  rounded-md border border-slate-200  shadow-sm p-4">
+              <p className="text-xs font-medium text-slate-600 ">
                 Total Penalties
               </p>
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-1">
+              <p className="text-2xl font-bold text-purple-600  mt-1">
                 ₱
                 {typeof statistics.total_penalties === "number"
                   ? statistics.total_penalties.toFixed(2)
@@ -324,7 +324,7 @@ const BorrowReturn = () => {
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+                className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
               />
               <Search
                 className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -336,7 +336,7 @@ const BorrowReturn = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-800 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               >
                 <option value="">All Status</option>
                 <option value="Active">Active</option>
@@ -346,7 +346,7 @@ const BorrowReturn = () => {
 
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium border border-indigo-700 dark:border-indigo-600 shadow-md shadow-indigo-500/30 whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium border border-indigo-700  shadow-md shadow-indigo-500/30 whitespace-nowrap"
               >
                 <Plus size={14} />
                 Borrow Book
@@ -354,10 +354,10 @@ const BorrowReturn = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+          <div className="overflow-x-auto rounded border border-slate-200 ">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">Book</th>
                   <th className="px-4 py-2.5">Borrower</th>
                   <th className="px-4 py-2.5">Borrow Date</th>
@@ -368,24 +368,24 @@ const BorrowReturn = () => {
                   <th className="px-4 py-2.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {currentItems.length > 0 ? (
                   currentItems.map((transaction) => (
                     <tr
                       key={transaction.transaction_id}
-                      className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                      className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                     >
                       <td className="px-4 py-2">
                         <div className="flex items-center gap-2">
                           <BookOpen
-                            className="text-indigo-600 dark:text-indigo-400"
+                            className="text-indigo-600 "
                             size={16}
                           />
                           <div>
-                            <div className="font-semibold text-slate-900 dark:text-white">
+                            <div className="font-semibold text-slate-900 ">
                               {transaction.book_title}
                             </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                            <div className="text-xs text-slate-500 ">
                               by {transaction.book_author}
                             </div>
                           </div>
@@ -398,7 +398,7 @@ const BorrowReturn = () => {
                             <div className="font-medium">
                               {transaction.borrower_name}
                             </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                            <div className="text-xs text-slate-500 ">
                               {transaction.borrower_role}
                             </div>
                           </div>
@@ -434,7 +434,7 @@ const BorrowReturn = () => {
                       </td>
                       <td className="px-4 py-2">
                         {transaction.penalty_amount > 0 ? (
-                          <div className="text-red-600 dark:text-red-400 font-semibold">
+                          <div className="text-red-600  font-semibold">
                             ₱{transaction.penalty_amount}
                           </div>
                         ) : (
@@ -452,7 +452,7 @@ const BorrowReturn = () => {
                         {transaction.status === "Active" && (
                           <button
                             onClick={() => openReturnModal(transaction)}
-                            className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                            className="text-green-600 hover:text-green-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                             title="Return Book"
                           >
                             <CheckCircle size={14} />
@@ -465,7 +465,7 @@ const BorrowReturn = () => {
                   <tr>
                     <td
                       colSpan="8"
-                      className="p-4 text-center text-slate-500 dark:text-slate-400 italic"
+                      className="p-4 text-center text-slate-500  italic"
                     >
                       No transactions found.
                     </td>
@@ -491,16 +491,16 @@ const BorrowReturn = () => {
           onClick={closeModal}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200  max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Borrow Book
               </h3>
               <button
                 onClick={closeModal}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
@@ -509,7 +509,7 @@ const BorrowReturn = () => {
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Select Book *
                   </label>
                   <Select
@@ -522,7 +522,7 @@ const BorrowReturn = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Select Borrower *
                   </label>
                   <Select
@@ -540,7 +540,7 @@ const BorrowReturn = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Borrow Date *
                   </label>
                   <input
@@ -549,11 +549,11 @@ const BorrowReturn = () => {
                     value={formData.borrow_date}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Due Date *
                   </label>
                   <input
@@ -562,20 +562,20 @@ const BorrowReturn = () => {
                     value={formData.due_date}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Book Condition
                 </label>
                 <select
                   name="condition_out"
                   value={formData.condition_out}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 >
                   <option value="Excellent">Excellent</option>
                   <option value="Good">Good</option>
@@ -585,7 +585,7 @@ const BorrowReturn = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Remarks
                 </label>
                 <textarea
@@ -593,16 +593,16 @@ const BorrowReturn = () => {
                   value={formData.remarks}
                   onChange={handleInputChange}
                   rows="3"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-vertical"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-vertical"
                   placeholder="Additional notes..."
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    transition-colors border border-slate-300 "
                 >
                   Cancel
                 </button>
@@ -625,37 +625,37 @@ const BorrowReturn = () => {
           onClick={closeReturnModal}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 "
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Return Book
               </h3>
               <button
                 onClick={closeReturnModal}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
             </div>
 
             <form onSubmit={handleReturn} className="p-4 space-y-3">
-              <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-md border border-slate-200 dark:border-slate-600">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+              <div className="bg-slate-50  p-3 rounded-md border border-slate-200 ">
+                <p className="text-sm font-semibold text-slate-900 ">
                   Book: {currentTransaction.book_title}
                 </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <p className="text-xs text-slate-600 ">
                   Borrower: {currentTransaction.borrower_name}
                 </p>
-                <p className="text-xs text-slate-600 dark:text-slate-400">
+                <p className="text-xs text-slate-600 ">
                   Due:{" "}
                   {new Date(currentTransaction.due_date).toLocaleDateString()}
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Return Date *
                 </label>
                 <input
@@ -664,19 +664,19 @@ const BorrowReturn = () => {
                   value={returnData.return_date}
                   onChange={handleReturnInputChange}
                   required
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Book Condition on Return
                 </label>
                 <select
                   name="condition_in"
                   value={returnData.condition_in}
                   onChange={handleReturnInputChange}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 >
                   <option value="Excellent">Excellent</option>
                   <option value="Good">Good</option>
@@ -686,7 +686,7 @@ const BorrowReturn = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Remarks
                 </label>
                 <textarea
@@ -694,16 +694,16 @@ const BorrowReturn = () => {
                   value={returnData.remarks}
                   onChange={handleReturnInputChange}
                   rows="3"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-vertical"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-vertical"
                   placeholder="Return notes..."
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button
                   type="button"
                   onClick={closeReturnModal}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    transition-colors border border-slate-300 "
                 >
                   Cancel
                 </button>

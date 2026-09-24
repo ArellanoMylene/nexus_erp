@@ -118,25 +118,25 @@ const ScholarshipFundAllocation = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-            <Award className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2 bg-indigo-50  rounded-lg">
+            <Award className="w-6 h-6 text-indigo-600 " />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-slate-900 ">
               Scholarship Fund Allocation
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-500 ">
               Manage scholarship programs and student allocations
             </p>
           </div>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-300">
-          Data Integrity: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Online</span>
+        <div className="text-sm text-slate-600 ">
+          Data Integrity: <span className="text-emerald-600  font-semibold">Online</span>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  rounded-lg shadow-md border border-slate-200  mb-6">
         <div className="p-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex-1 flex gap-3">
@@ -149,7 +149,7 @@ const ScholarshipFundAllocation = () => {
                   onChange={(e) => {
                     setFilters({ ...filters, search: e.target.value });
                   }}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
             </div>
@@ -159,7 +159,7 @@ const ScholarshipFundAllocation = () => {
                 onChange={(e) => {
                   setFilters({ ...filters, scholarship_type: e.target.value });
                 }}
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               >
                 <option value="">All Types</option>
                 {scholarshipTypes.map((type) => (
@@ -173,7 +173,7 @@ const ScholarshipFundAllocation = () => {
                 onChange={(e) => {
                   setFilters({ ...filters, academic_period_id: e.target.value });
                 }}
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               >
                 <option value="">All Periods</option>
                 {periods.map((period) => (
@@ -199,20 +199,20 @@ const ScholarshipFundAllocation = () => {
 
       {/* Scholarship Programs */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
-          <Award className="text-purple-600 dark:text-purple-400" />
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-900 ">
+          <Award className="text-purple-600 " />
           Scholarship Programs
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {programs.map((program) => (
             <div
               key={program.scholarship_id}
-              className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow"
+              className="bg-white  p-4 rounded-lg shadow-md border border-slate-200  hover:shadow-lg transition-shadow"
             >
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white">
+                <h3 className="font-bold text-lg text-slate-900 ">
                   {program.scholarship_name}
-                  <div className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                  <div className="text-xs text-slate-500  font-mono mt-0.5">
                     {program.scholarship_code}
                   </div>
                 </h3>
@@ -222,55 +222,55 @@ const ScholarshipFundAllocation = () => {
                       setProgramForm(program);
                       setShowProgramModal(true);
                     }}
-                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                    className="text-indigo-600  hover:text-indigo-800  transition-colors"
                   >
                     <Edit size={16} />
                   </button>
                   <button
                     onClick={() => handleDeleteProgram(program.scholarship_id)}
-                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                    className="text-red-600  hover:text-red-800  transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
               </div>
               <div className="flex justify-between gap-1 mb-2">
-                <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 text-xs rounded-full">
+                <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800   text-xs rounded-full">
                   {program.scholarship_type}
                 </span>
                 {program.school_year && (
-                  <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 text-xs rounded-full">
+                  <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-800   text-xs rounded-full">
                     {program.school_year} {program.semester}
                   </span>
                 )}
               </div>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Budget:</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                  <span className="text-slate-600 ">Budget:</span>
+                  <span className="font-semibold text-slate-900 ">
                     ₱{parseFloat(program.total_budget || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Allocated:</span>
-                  <span className="text-indigo-600 dark:text-indigo-400">
+                  <span className="text-slate-600 ">Allocated:</span>
+                  <span className="text-indigo-600 ">
                     ₱
                     {parseFloat(program.allocated_amount || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600 dark:text-slate-400">Available:</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="text-slate-600 ">Available:</span>
+                  <span className="text-emerald-600  font-semibold">
                     ₱
                     {parseFloat(program.available_amount || 0).toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                <div className="flex justify-between items-center pt-2 border-t border-slate-200 ">
+                  <span className="text-slate-600  flex items-center gap-1">
                     <Users size={14} />
                     Beneficiaries:
                   </span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                  <span className="font-semibold text-slate-900 ">
                     {program.total_recipients || 0}
                   </span>
                 </div>
@@ -290,12 +290,12 @@ const ScholarshipFundAllocation = () => {
           }}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
+            className="bg-white  rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-slate-50 dark:bg-slate-700 px-6 py-4 border-b border-slate-200 dark:border-slate-600 rounded-t-lg flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+            <div className="sticky top-0 bg-slate-50  px-6 py-4 border-b border-slate-200  rounded-t-lg flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-slate-800 ">
                 {programForm.scholarship_id ? "Edit" : "Create"} Scholarship Program
               </h2>
               <button
@@ -303,7 +303,7 @@ const ScholarshipFundAllocation = () => {
                   setShowProgramModal(false);
                   resetProgramForm();
                 }}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className="text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={24} className="rotate-45" />
               </button>
@@ -314,7 +314,7 @@ const ScholarshipFundAllocation = () => {
               <div className="flex-1 overflow-y-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Scholarship Name *
                     </label>
                     <input
@@ -327,11 +327,11 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Scholarship Code *
                     </label>
                     <input
@@ -345,11 +345,11 @@ const ScholarshipFundAllocation = () => {
                       }
                       required
                       placeholder="e.g. MERIT-2024"
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Type *
                     </label>
                     <select
@@ -368,7 +368,7 @@ const ScholarshipFundAllocation = () => {
                         });
                       }}
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       {scholarshipTypes.map((type) => (
                         <option key={type} value={type}>
@@ -378,7 +378,7 @@ const ScholarshipFundAllocation = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Academic Period *
                     </label>
                     <select
@@ -390,7 +390,7 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="">Select Period</option>
                       {periods.map((period) => (
@@ -401,7 +401,7 @@ const ScholarshipFundAllocation = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Discount Type *
                     </label>
                     <select
@@ -413,14 +413,14 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="Percentage">Percentage</option>
                       <option value="Fixed Amount">Fixed Amount</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Discount Value {programForm.discount_type === 'Percentage' ? '(%)' : ''}
                     </label>
                     <input
@@ -433,11 +433,11 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       disabled={programForm.scholarship_type === 'Full'}
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Funding Source *
                     </label>
                     <input
@@ -450,11 +450,11 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Total Budget *
                     </label>
                     <input
@@ -468,11 +468,11 @@ const ScholarshipFundAllocation = () => {
                       }
                       step="0.01"
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Max Beneficiaries
                     </label>
                     <input
@@ -484,12 +484,12 @@ const ScholarshipFundAllocation = () => {
                           max_beneficiaries: e.target.value,
                         })
                       }
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2 col-span-1">
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-slate-700  mb-1">
                         Required GPA
                       </label>
                       <input
@@ -502,11 +502,11 @@ const ScholarshipFundAllocation = () => {
                           })
                         }
                         step="0.01"
-                        className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-slate-700  mb-1">
                         Income Level
                       </label>
                       <input
@@ -519,12 +519,12 @@ const ScholarshipFundAllocation = () => {
                           })
                         }
                         step="0.01"
-                        className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
                     </div>
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Eligibility Criteria
                     </label>
                     <textarea
@@ -536,11 +536,11 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       rows="2"
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Description
                     </label>
                     <textarea
@@ -552,21 +552,21 @@ const ScholarshipFundAllocation = () => {
                         })
                       }
                       rows="2"
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Sticky Footer */}
-              <div className="sticky bottom-0 bg-white dark:bg-slate-800 px-6 py-4 border-t border-slate-200 dark:border-slate-600 rounded-b-lg flex gap-3 justify-end">
+              <div className="sticky bottom-0 bg-white  px-6 py-4 border-t border-slate-200  rounded-b-lg flex gap-3 justify-end">
                 <button
                   type="button"
                   onClick={() => {
                     setShowProgramModal(false);
                     resetProgramForm();
                   }}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-700  bg-white  border border-slate-300  rounded-lg hover:bg-slate-50  transition-colors"
                 >
                   Cancel
                 </button>

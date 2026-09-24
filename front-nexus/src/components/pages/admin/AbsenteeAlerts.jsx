@@ -62,20 +62,20 @@ const AbsenteeAlerts = () => {
 
   const getPriorityColor = (priority) => {
     const colors = {
-      critical: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-      high: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-      medium: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-      low: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      critical: "bg-red-100 text-red-700  ",
+      high: "bg-orange-100 text-orange-700  ",
+      medium: "bg-yellow-100 text-yellow-700  ",
+      low: "bg-blue-100 text-blue-700  ",
     };
     return colors[priority] || colors.low;
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-      acknowledged: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-      resolved: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      dismissed: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
+      pending: "bg-yellow-100 text-yellow-700  ",
+      acknowledged: "bg-blue-100 text-blue-700  ",
+      resolved: "bg-green-100 text-green-700  ",
+      dismissed: "bg-slate-100 text-slate-700  ",
     };
     return colors[status] || colors.pending;
   };
@@ -83,11 +83,11 @@ const AbsenteeAlerts = () => {
   const getAlertTypeIcon = (type) => {
     switch (type) {
       case "consecutive_absence":
-        return <AlertTriangle className="text-red-500 dark:text-red-400" size={16} />;
+        return <AlertTriangle className="text-red-500 " size={16} />;
       case "excessive_absence":
-        return <XCircle className="text-orange-500 dark:text-orange-400" size={16} />;
+        return <XCircle className="text-orange-500 " size={16} />;
       default:
-        return <Bell className="text-slate-500 dark:text-slate-400" size={16} />;
+        return <Bell className="text-slate-500 " size={16} />;
     }
   };
 
@@ -116,62 +116,62 @@ const AbsenteeAlerts = () => {
   }, [searchTerm, statusFilter, priorityFilter, userTypeFilter]);
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <Bell size={24} className="text-indigo-600" />
             Absentee Alerts
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Total Alerts</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">156</p>
+                <p className="text-xs font-medium text-slate-500  uppercase">Total Alerts</p>
+                <p className="text-2xl font-bold text-slate-900  mt-1">156</p>
               </div>
-              <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
-                <Bell className="text-indigo-600 dark:text-indigo-400" size={24} />
+              <div className="bg-indigo-100  p-3 rounded-lg">
+                <Bell className="text-indigo-600 " size={24} />
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Pending</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">48</p>
+                <p className="text-xs font-medium text-slate-500  uppercase">Pending</p>
+                <p className="text-2xl font-bold text-slate-900  mt-1">48</p>
               </div>
-              <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-lg">
-                <AlertTriangle className="text-yellow-600 dark:text-yellow-400" size={24} />
+              <div className="bg-yellow-100  p-3 rounded-lg">
+                <AlertTriangle className="text-yellow-600 " size={24} />
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Critical</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">12</p>
+                <p className="text-xs font-medium text-slate-500  uppercase">Critical</p>
+                <p className="text-2xl font-bold text-slate-900  mt-1">12</p>
               </div>
-              <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg">
-                <XCircle className="text-red-600 dark:text-red-400" size={24} />
+              <div className="bg-red-100  p-3 rounded-lg">
+                <XCircle className="text-red-600 " size={24} />
               </div>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Resolved</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">96</p>
+                <p className="text-xs font-medium text-slate-500  uppercase">Resolved</p>
+                <p className="text-2xl font-bold text-slate-900  mt-1">96</p>
               </div>
-              <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-                <CheckCircle className="text-green-600 dark:text-green-400" size={24} />
+              <div className="bg-green-100  p-3 rounded-lg">
+                <CheckCircle className="text-green-600 " size={24} />
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ const AbsenteeAlerts = () => {
               placeholder="Search alerts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -199,7 +199,7 @@ const AbsenteeAlerts = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -210,7 +210,7 @@ const AbsenteeAlerts = () => {
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="all">All Priority</option>
               <option value="critical">Critical</option>
@@ -221,7 +221,7 @@ const AbsenteeAlerts = () => {
             <select
               value={userTypeFilter}
               onChange={(e) => setUserTypeFilter(e.target.value)}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="all">All Users</option>
               <option value="student">Student</option>
@@ -238,10 +238,10 @@ const AbsenteeAlerts = () => {
         </div>
 
         {/* Alerts Table */}
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Type</th>
                 <th className="px-4 py-2.5">User</th>
                 <th className="px-4 py-2.5">User Type</th>
@@ -253,10 +253,10 @@ const AbsenteeAlerts = () => {
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {currentAlerts.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="9" className="px-4 py-8 text-center text-slate-500 ">
                     No alerts found
                   </td>
                 </tr>
@@ -264,7 +264,7 @@ const AbsenteeAlerts = () => {
                 currentAlerts.map((alert) => (
                   <tr
                     key={alert.alert_id}
-                    className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                    className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                   >
                     <td className="px-4 py-2">{getAlertTypeIcon(alert.alert_type)}</td>
                     <td className="px-4 py-2 font-semibold">{alert.user_name}</td>
@@ -291,14 +291,14 @@ const AbsenteeAlerts = () => {
                         {alert.status === "pending" && (
                           <button
                             onClick={() => handleAcknowledge(alert.alert_id)}
-                            className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs font-medium transition-colors px-2 py-1 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                            className="text-indigo-600 hover:text-indigo-800   text-xs font-medium transition-colors px-2 py-1 rounded hover:bg-indigo-50 "
                           >
                             Acknowledge
                           </button>
                         )}
                         <button
                           title="View Details"
-                          className="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-slate-600 hover:text-slate-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Eye size={14} />
                         </button>
@@ -312,7 +312,7 @@ const AbsenteeAlerts = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
           <span className="text-xs sm:text-sm">
             Page <span className="font-semibold">{currentPage}</span> of{" "}
             <span className="font-semibold">{totalPages || 1}</span> | Total Records:{" "}
@@ -322,17 +322,17 @@ const AbsenteeAlerts = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
               {currentPage}
             </span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronRight size={16} />
             </button>

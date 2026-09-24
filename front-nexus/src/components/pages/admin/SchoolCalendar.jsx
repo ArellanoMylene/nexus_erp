@@ -115,15 +115,15 @@ const SchoolCalendar = () => {
   };
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <Calendar size={24} className="text-indigo-600" />
             School Calendar
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
@@ -139,7 +139,7 @@ const SchoolCalendar = () => {
               onChange={(e) =>
                 setFilters({ ...filters, search: e.target.value })
               }
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -154,7 +154,7 @@ const SchoolCalendar = () => {
               onChange={(e) =>
                 setFilters({ ...filters, event_type: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             >
               <option value="">All Types</option>
               <option value="holiday">Holiday</option>
@@ -168,7 +168,7 @@ const SchoolCalendar = () => {
               type="month"
               value={filters.month}
               onChange={(e) => setFilters({ ...filters, month: e.target.value })}
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
             />
             <button
               onClick={() => setShowModal(true)}
@@ -181,10 +181,10 @@ const SchoolCalendar = () => {
         </div>
 
         {/* Calendar Items Table */}
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
-                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
+                <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                   <th className="px-4 py-2.5">
                     Event Name
                   </th>
@@ -205,7 +205,7 @@ const SchoolCalendar = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+              <tbody className="divide-y divide-slate-100  bg-white ">
                 {calendarItems
                   .filter(item => 
                     (filters.search === "" || 
@@ -215,7 +215,7 @@ const SchoolCalendar = () => {
                   .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                   .length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                    <td colSpan="6" className="px-4 py-8 text-center text-slate-500 ">
                       No calendar items found
                     </td>
                   </tr>
@@ -228,19 +228,19 @@ const SchoolCalendar = () => {
                     )
                     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                     .map((item) => (
-                    <tr key={item.calendar_id} className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150">
+                    <tr key={item.calendar_id} className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150">
                       <td className="px-4 py-2">
                         <div className="font-semibold">
                           {item.event_name}
                         </div>
                         {item.description && (
-                          <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-md">
+                          <div className="text-xs text-slate-500  truncate max-w-md">
                             {item.description}
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-2">
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700  ">
                           {item.event_type}
                         </span>
                       </td>
@@ -252,7 +252,7 @@ const SchoolCalendar = () => {
                       </td>
                       <td className="px-4 py-2">
                         {item.is_recurring && (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700  ">
                             Recurring
                           </span>
                         )}
@@ -261,14 +261,14 @@ const SchoolCalendar = () => {
                         <button
                           onClick={() => handleEdit(item)}
                           title="Edit"
-                          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-indigo-600 hover:text-indigo-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Edit size={14} />
                         </button>
                         <button
                           onClick={() => handleDelete(item.calendar_id)}
                           title="Delete"
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Trash2 size={14} />
                         </button>
@@ -281,7 +281,7 @@ const SchoolCalendar = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
           <span className="text-xs sm:text-sm">
             Page <span className="font-semibold">{currentPage}</span> of{" "}
             <span className="font-semibold">{Math.ceil(calendarItems.filter(item => 
@@ -299,11 +299,11 @@ const SchoolCalendar = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
               {currentPage}
             </span>
             <button
@@ -317,7 +317,7 @@ const SchoolCalendar = () => {
                   item.event_name?.toLowerCase().includes(filters.search.toLowerCase()) ||
                   item.description?.toLowerCase().includes(filters.search.toLowerCase()))
               ).length / itemsPerPage)}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -328,15 +328,15 @@ const SchoolCalendar = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50 transition-opacity duration-300" onClick={handleCloseModal}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 {selectedItem ? "Edit" : "Add"} Calendar Item
               </h3>
               <button
                 onClick={handleCloseModal}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
@@ -345,7 +345,7 @@ const SchoolCalendar = () => {
             {/* Modal Body */}
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Event Name *
                 </label>
                 <input
@@ -355,11 +355,11 @@ const SchoolCalendar = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, event_name: e.target.value })
                   }
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Event Type
                 </label>
                 <select
@@ -367,7 +367,7 @@ const SchoolCalendar = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, event_type: e.target.value })
                   }
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 >
                   <option value="holiday">Holiday</option>
                   <option value="exam">Exam</option>
@@ -379,7 +379,7 @@ const SchoolCalendar = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Start Date *
                   </label>
                   <input
@@ -389,11 +389,11 @@ const SchoolCalendar = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, start_date: e.target.value })
                     }
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     End Date
                   </label>
                   <input
@@ -402,12 +402,12 @@ const SchoolCalendar = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, end_date: e.target.value })
                     }
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Description
                 </label>
                 <textarea
@@ -416,7 +416,7 @@ const SchoolCalendar = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -427,22 +427,22 @@ const SchoolCalendar = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, is_recurring: e.target.checked })
                   }
-                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500"
+                  className="w-4 h-4 rounded border-slate-300  text-indigo-600 focus:ring-indigo-500"
                 />
                 <label
                   htmlFor="is_recurring"
-                  className="text-sm font-medium text-slate-700 dark:text-slate-300"
+                  className="text-sm font-medium text-slate-700 "
                 >
                   Recurring Event
                 </label>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 mt-4">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200  mt-4">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  className="px-4 py-2 text-sm border border-slate-300  rounded-md hover:bg-slate-50  transition-colors"
                 >
                   Cancel
                 </button>

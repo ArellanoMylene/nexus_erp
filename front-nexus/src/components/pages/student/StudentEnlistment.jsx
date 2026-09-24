@@ -77,10 +77,10 @@ const StudentEnlistment = () => {
   const currentSubjects = filteredSubjects.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <BookOpen size={24} className="text-indigo-600" />
             Subject Enlistment
           </h2>
@@ -103,12 +103,12 @@ const StudentEnlistment = () => {
         </div>
 
         {/* Enrolled Subjects */}
-        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">My Enrolled Subjects</h3>
+        <div className="bg-white  rounded-lg border border-slate-200  p-4">
+          <h3 className="text-lg font-bold text-slate-900  mb-4">My Enrolled Subjects</h3>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <table className="min-w-full divide-y divide-slate-200 ">
               <thead>
-                <tr className="text-left text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
+                <tr className="text-left text-xs font-bold uppercase text-slate-700 ">
                   <th className="px-4 py-2">Subject Code</th>
                   <th className="px-4 py-2">Subject Name</th>
                   <th className="px-4 py-2">Units</th>
@@ -117,9 +117,9 @@ const StudentEnlistment = () => {
                   <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              <tbody className="divide-y divide-slate-100 ">
                 {enrolledSubjects.map((subject) => (
-                  <tr key={subject.enrollment_id} className="text-sm hover:bg-indigo-50/50 dark:hover:bg-slate-700">
+                  <tr key={subject.enrollment_id} className="text-sm hover:bg-indigo-50/50 ">
                     <td className="px-4 py-2 font-mono font-semibold text-indigo-600">{subject.subject_code}</td>
                     <td className="px-4 py-2 font-medium">{subject.subject_name}</td>
                     <td className="px-4 py-2">{subject.units}</td>
@@ -147,15 +147,15 @@ const StudentEnlistment = () => {
             placeholder="Search subjects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm"
+            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
           />
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
         </div>
 
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Subject Code</th>
                 <th className="px-4 py-2.5">Subject Name</th>
                 <th className="px-4 py-2.5">Units</th>
@@ -165,9 +165,9 @@ const StudentEnlistment = () => {
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {currentSubjects.map((subject) => (
-                <tr key={subject.subject_id} className="text-sm hover:bg-indigo-50/50 dark:hover:bg-slate-700">
+                <tr key={subject.subject_id} className="text-sm hover:bg-indigo-50/50 ">
                   <td className="px-4 py-2 font-mono font-semibold text-indigo-600">{subject.subject_code}</td>
                   <td className="px-4 py-2 font-medium">{subject.subject_name}</td>
                   <td className="px-4 py-2">{subject.units}</td>
@@ -199,14 +199,14 @@ const StudentEnlistment = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border bg-white dark:bg-slate-700 disabled:opacity-50"
+              className="p-1.5 rounded-md border bg-white  disabled:opacity-50"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md border bg-white dark:bg-slate-700 disabled:opacity-50"
+              className="p-1.5 rounded-md border bg-white  disabled:opacity-50"
             >
               <ChevronRight size={16} />
             </button>

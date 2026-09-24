@@ -80,27 +80,27 @@ const StudentChat = () => {
   );
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <MessageCircle size={24} className="text-indigo-600" />
             Chat
           </h2>
         </div>
 
         {/* Chat Interface */}
-        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden flex" style={{ height: "600px" }}>
+        <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden flex" style={{ height: "600px" }}>
           {/* Conversations List */}
-          <div className="w-full md:w-1/3 border-r border-slate-200 dark:border-slate-700 flex flex-col">
-            <div className="p-3 border-b border-slate-200 dark:border-slate-700">
+          <div className="w-full md:w-1/3 border-r border-slate-200  flex flex-col">
+            <div className="p-3 border-b border-slate-200 ">
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search conversations..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
                 />
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
               </div>
@@ -110,14 +110,14 @@ const StudentChat = () => {
               {filteredConversations.length === 0 ? (
                 <div className="p-8 text-center">
                   <MessageCircle size={48} className="mx-auto text-slate-400 mb-3" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No conversations yet</p>
+                  <p className="text-sm text-slate-500 ">No conversations yet</p>
                 </div>
               ) : (
                 filteredConversations.map((conv) => (
                   <div
                     key={conv.conversation_id}
                     onClick={() => setSelectedConversation(conv)}
-                    className={`p-3 border-b border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 ${selectedConversation?.conversation_id === conv.conversation_id ? "bg-indigo-50 dark:bg-indigo-900/20" : ""
+                    className={`p-3 border-b border-slate-200  cursor-pointer hover:bg-slate-50  ${selectedConversation?.conversation_id === conv.conversation_id ? "bg-indigo-50 " : ""
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -125,8 +125,8 @@ const StudentChat = () => {
                         {conv.name?.[0] || "U"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-900 dark:text-white truncate">{conv.name}</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{conv.last_message || "No messages yet"}</p>
+                        <h4 className="font-semibold text-slate-900  truncate">{conv.name}</h4>
+                        <p className="text-xs text-slate-500  truncate">{conv.last_message || "No messages yet"}</p>
                       </div>
                       {conv.unread_count > 0 && (
                         <span className="bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">{conv.unread_count}</span>
@@ -143,13 +143,13 @@ const StudentChat = () => {
             {selectedConversation ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+                <div className="p-4 border-b border-slate-200  flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
                     {selectedConversation.name?.[0] || "U"}
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white">{selectedConversation.name}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{selectedConversation.role || "Faculty"}</p>
+                    <h3 className="font-bold text-slate-900 ">{selectedConversation.name}</h3>
+                    <p className="text-xs text-slate-500 ">{selectedConversation.role || "Faculty"}</p>
                   </div>
                 </div>
 
@@ -162,10 +162,10 @@ const StudentChat = () => {
                     >
                       <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${msg.is_sender
                           ? "bg-indigo-600 text-white"
-                          : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
+                          : "bg-slate-100  text-slate-900 "
                         }`}>
                         <p className="text-sm">{msg.message}</p>
-                        <p className={`text-xs mt-1 ${msg.is_sender ? "text-indigo-200" : "text-slate-500 dark:text-slate-400"}`}>
+                        <p className={`text-xs mt-1 ${msg.is_sender ? "text-indigo-200" : "text-slate-500 "}`}>
                           {new Date(msg.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </p>
                       </div>
@@ -174,14 +174,14 @@ const StudentChat = () => {
                 </div>
 
                 {/* Message Input */}
-                <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 dark:border-slate-700">
+                <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 ">
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white"
+                      className="flex-1 px-4 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500  "
                     />
                     <button
                       type="submit"
@@ -196,8 +196,8 @@ const StudentChat = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <MessageCircle size={64} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                  <p className="text-slate-500 dark:text-slate-400">Select a conversation to start chatting</p>
+                  <MessageCircle size={64} className="mx-auto text-slate-300  mb-4" />
+                  <p className="text-slate-500 ">Select a conversation to start chatting</p>
                 </div>
               </div>
             )}

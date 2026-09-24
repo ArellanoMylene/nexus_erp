@@ -375,12 +375,12 @@ const InventoryAssetManagement = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      available: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      in_use: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-      maintenance: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-      repair: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-      disposed: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-      lost: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
+      available: "bg-green-100 text-green-700  ",
+      in_use: "bg-blue-100 text-blue-700  ",
+      maintenance: "bg-yellow-100 text-yellow-700  ",
+      repair: "bg-orange-100 text-orange-700  ",
+      disposed: "bg-red-100 text-red-700  ",
+      lost: "bg-gray-100 text-gray-700  ",
     };
     return colors[status] || colors.available;
   };
@@ -394,21 +394,21 @@ const InventoryAssetManagement = () => {
   ];
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <ClipboardList size={24} className="text-indigo-600" />
             Inventory Asset Management
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -417,8 +417,8 @@ const InventoryAssetManagement = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    ? "border-indigo-600 text-indigo-600  bg-indigo-50/50 "
+                    : "border-transparent text-slate-600  hover:text-slate-900  hover:bg-slate-50 "
                 }`}
               >
                 <Icon size={16} />
@@ -437,7 +437,7 @@ const InventoryAssetManagement = () => {
               placeholder="Search assets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -452,7 +452,7 @@ const InventoryAssetManagement = () => {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+                  className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
                 >
                   <option value="all">All Types</option>
                   <option value="equipment">Equipment</option>
@@ -464,7 +464,7 @@ const InventoryAssetManagement = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-40"
+                  className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-40"
                 >
                   <option value="all">All Status</option>
                   <option value="available">Available</option>
@@ -505,10 +505,10 @@ const InventoryAssetManagement = () => {
 
         {/* Assets Tab */}
         {activeTab === "assets" && (
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Asset Name</th>
                 <th className="px-4 py-2.5">Type</th>
                 <th className="px-4 py-2.5">Serial Number</th>
@@ -518,10 +518,10 @@ const InventoryAssetManagement = () => {
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {currentAssets.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 ">
                     No assets found
                   </td>
                 </tr>
@@ -529,18 +529,18 @@ const InventoryAssetManagement = () => {
                 currentAssets.map((asset) => (
                   <tr
                     key={asset.asset_id}
-                    className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                    className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                   >
                     <td className="px-4 py-2">
                       <div className="font-semibold">{asset.asset_name}</div>
                       {asset.description && (
-                        <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-md">
+                        <div className="text-xs text-slate-500  truncate max-w-md">
                           {asset.description}
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-2">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700  ">
                         {asset.asset_type}
                       </span>
                     </td>
@@ -561,28 +561,28 @@ const InventoryAssetManagement = () => {
                         <button
                           onClick={() => handleEdit(asset)}
                           title="Edit Asset"
-                          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-indigo-600 hover:text-indigo-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Edit size={14} />
                         </button>
                         <button
                           onClick={() => openTransferModal(asset)}
                           title="Transfer Asset"
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-blue-600 hover:text-blue-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <History size={14} />
                         </button>
                         <button
                           onClick={() => openMaintenanceModal(asset)}
                           title="Schedule Maintenance"
-                          className="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-orange-600 hover:text-orange-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Wrench size={14} />
                         </button>
                         <button
                           onClick={() => handleDelete(asset.asset_id)}
                           title="Delete Asset"
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Trash2 size={14} />
                         </button>
@@ -598,10 +598,10 @@ const InventoryAssetManagement = () => {
 
         {/* Transfers Tab */}
         {activeTab === "transfers" && (
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Asset Name</th>
                 <th className="px-4 py-2.5">From Location</th>
                 <th className="px-4 py-2.5">To Location</th>
@@ -610,10 +610,10 @@ const InventoryAssetManagement = () => {
                 <th className="px-4 py-2.5">Requested By</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {transfers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="6" className="px-4 py-8 text-center text-slate-500 ">
                     No transfers found
                   </td>
                 </tr>
@@ -621,7 +621,7 @@ const InventoryAssetManagement = () => {
                 transfers.map((transfer) => (
                   <tr
                     key={transfer.transfer_id}
-                    className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                    className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                   >
                     <td className="px-4 py-2 font-semibold">{transfer.asset_name || `Asset #${transfer.asset_id}`}</td>
                     <td className="px-4 py-2">{transfer.from_location}</td>
@@ -629,9 +629,9 @@ const InventoryAssetManagement = () => {
                     <td className="px-4 py-2">{new Date(transfer.transfer_date).toLocaleDateString()}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                        transfer.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                        transfer.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        transfer.status === 'completed' ? 'bg-green-100 text-green-700  ' :
+                        transfer.status === 'pending' ? 'bg-yellow-100 text-yellow-700  ' :
+                        'bg-red-100 text-red-700  '
                       }`}>
                         {transfer.status}
                       </span>
@@ -647,10 +647,10 @@ const InventoryAssetManagement = () => {
 
         {/* Maintenance Tab */}
         {activeTab === "maintenance" && (
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Asset Name</th>
                 <th className="px-4 py-2.5">Type</th>
                 <th className="px-4 py-2.5">Date</th>
@@ -660,10 +660,10 @@ const InventoryAssetManagement = () => {
                 <th className="px-4 py-2.5">Performed By</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {maintenance.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 ">
                     No maintenance records found
                   </td>
                 </tr>
@@ -671,11 +671,11 @@ const InventoryAssetManagement = () => {
                 maintenance.map((maint) => (
                   <tr
                     key={maint.maintenance_id}
-                    className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                    className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                   >
                     <td className="px-4 py-2 font-semibold">{maint.asset_name || `Asset #${maint.asset_id}`}</td>
                     <td className="px-4 py-2">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700  ">
                         {maint.maintenance_type}
                       </span>
                     </td>
@@ -686,9 +686,9 @@ const InventoryAssetManagement = () => {
                     <td className="px-4 py-2">₱{parseFloat(maint.maintenance_cost || 0).toFixed(2)}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                        maint.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                        maint.status === 'scheduled' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                        maint.status === 'completed' ? 'bg-green-100 text-green-700  ' :
+                        maint.status === 'scheduled' ? 'bg-yellow-100 text-yellow-700  ' :
+                        'bg-orange-100 text-orange-700  '
                       }`}>
                         {maint.status}
                       </span>
@@ -704,10 +704,10 @@ const InventoryAssetManagement = () => {
 
         {/* Requests Tab */}
         {activeTab === "requests" && (
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Request Type</th>
                 <th className="px-4 py-2.5">Item Name</th>
                 <th className="px-4 py-2.5">Department</th>
@@ -718,10 +718,10 @@ const InventoryAssetManagement = () => {
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {requests.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="8" className="px-4 py-8 text-center text-slate-500 ">
                     No requests found
                   </td>
                 </tr>
@@ -729,10 +729,10 @@ const InventoryAssetManagement = () => {
                 requests.map((request) => (
                   <tr
                     key={request.request_id}
-                    className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150"
+                    className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150"
                   >
                     <td className="px-4 py-2">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700  ">
                         {request.request_type.replace('_', ' ')}
                       </span>
                     </td>
@@ -740,18 +740,18 @@ const InventoryAssetManagement = () => {
                     <td className="px-4 py-2">{request.department || 'N/A'}</td>
                     <td className="px-4 py-2">
                       <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                        request.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                        request.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        request.priority === 'high' ? 'bg-red-100 text-red-700  ' :
+                        request.priority === 'medium' ? 'bg-yellow-100 text-yellow-700  ' :
+                        'bg-green-100 text-green-700  '
                       }`}>
                         {request.priority}
                       </span>
                     </td>
                     <td className="px-4 py-2">
                       <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                        request.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                        request.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        request.status === 'approved' ? 'bg-green-100 text-green-700  ' :
+                        request.status === 'pending' ? 'bg-yellow-100 text-yellow-700  ' :
+                        'bg-red-100 text-red-700  '
                       }`}>
                         {request.status}
                       </span>
@@ -764,21 +764,21 @@ const InventoryAssetManagement = () => {
                           <button
                             onClick={() => handleApproveRequest(request.request_id, 'approved')}
                             title="Approve"
-                            className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 transition-colors px-2 py-1 rounded text-xs font-medium hover:bg-green-50 dark:hover:bg-green-900/20"
+                            className="text-green-600 hover:text-green-800   transition-colors px-2 py-1 rounded text-xs font-medium hover:bg-green-50 "
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleApproveRequest(request.request_id, 'rejected')}
                             title="Reject"
-                            className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors px-2 py-1 rounded text-xs font-medium hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="text-red-600 hover:text-red-800   transition-colors px-2 py-1 rounded text-xs font-medium hover:bg-red-50 "
                           >
                             Reject
                           </button>
                         </div>
                       )}
                       {request.status !== 'pending' && (
-                        <span className="text-xs text-slate-500 dark:text-slate-400">No actions</span>
+                        <span className="text-xs text-slate-500 ">No actions</span>
                       )}
                     </td>
                   </tr>
@@ -794,55 +794,55 @@ const InventoryAssetManagement = () => {
         <div className="space-y-4">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Total Assets</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{summary.total_assets}</p>
+                  <p className="text-xs font-medium text-slate-500  uppercase">Total Assets</p>
+                  <p className="text-2xl font-bold text-slate-900  mt-1">{summary.total_assets}</p>
                 </div>
-                <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-lg">
-                  <Package className="text-indigo-600 dark:text-indigo-400" size={24} />
+                <div className="bg-indigo-100  p-3 rounded-lg">
+                  <Package className="text-indigo-600 " size={24} />
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Total Value</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">₱{parseFloat(summary.total_value || 0).toFixed(2)}</p>
+                  <p className="text-xs font-medium text-slate-500  uppercase">Total Value</p>
+                  <p className="text-2xl font-bold text-slate-900  mt-1">₱{parseFloat(summary.total_value || 0).toFixed(2)}</p>
                 </div>
-                <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-                  <TrendingDown className="text-green-600 dark:text-green-400" size={24} />
+                <div className="bg-green-100  p-3 rounded-lg">
+                  <TrendingDown className="text-green-600 " size={24} />
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Available</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{summary.available_assets}</p>
+                  <p className="text-xs font-medium text-slate-500  uppercase">Available</p>
+                  <p className="text-2xl font-bold text-slate-900  mt-1">{summary.available_assets}</p>
                 </div>
-                <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg">
-                  <Package className="text-green-600 dark:text-green-400" size={24} />
+                <div className="bg-green-100  p-3 rounded-lg">
+                  <Package className="text-green-600 " size={24} />
                 </div>
               </div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">In Use</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{summary.in_use_assets}</p>
+                  <p className="text-xs font-medium text-slate-500  uppercase">In Use</p>
+                  <p className="text-2xl font-bold text-slate-900  mt-1">{summary.in_use_assets}</p>
                 </div>
-                <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-lg">
-                  <Package className="text-blue-600 dark:text-blue-400" size={24} />
+                <div className="bg-blue-100  p-3 rounded-lg">
+                  <Package className="text-blue-600 " size={24} />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Assets by Type */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
+            <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
               <BarChart3 size={20} className="text-indigo-600" />
               Assets by Type
             </h3>
@@ -850,25 +850,25 @@ const InventoryAssetManagement = () => {
               {summary.by_type?.map((type) => (
                 <div key={type.asset_type} className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize min-w-[100px]">
+                    <span className="text-sm font-medium text-slate-700  capitalize min-w-[100px]">
                       {type.asset_type}
                     </span>
-                    <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                    <div className="flex-1 bg-slate-200  rounded-full h-2">
                       <div
-                        className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all"
+                        className="bg-indigo-600  h-2 rounded-full transition-all"
                         style={{ width: `${(type.count / summary.total_assets) * 100}%` }}
                       />
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-slate-900 dark:text-white ml-3">{type.count}</span>
+                  <span className="text-sm font-bold text-slate-900  ml-3">{type.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Assets by Status */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="bg-white  rounded-lg border border-slate-200  p-4">
+            <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
               <BarChart3 size={20} className="text-indigo-600" />
               Assets by Status
             </h3>
@@ -876,17 +876,17 @@ const InventoryAssetManagement = () => {
               {summary.by_status?.map((status) => (
                 <div key={status.status} className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 capitalize min-w-[100px]">
+                    <span className="text-sm font-medium text-slate-700  capitalize min-w-[100px]">
                       {status.status.replace('_', ' ')}
                     </span>
-                    <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                    <div className="flex-1 bg-slate-200  rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all ${getStatusColor(status.status).replace('bg-', 'bg-').split(' ')[0]}`}
                         style={{ width: `${(status.count / summary.total_assets) * 100}%` }}
                       />
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-slate-900 dark:text-white ml-3">{status.count}</span>
+                  <span className="text-sm font-bold text-slate-900  ml-3">{status.count}</span>
                 </div>
               ))}
             </div>
@@ -895,7 +895,7 @@ const InventoryAssetManagement = () => {
         )}
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
           <span className="text-xs sm:text-sm">
             Page <span className="font-semibold">{currentPage}</span> of{" "}
             <span className="font-semibold">{totalPages || 1}</span> | Total Records:{" "}
@@ -905,17 +905,17 @@ const InventoryAssetManagement = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
               {currentPage}
             </span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -930,11 +930,11 @@ const InventoryAssetManagement = () => {
           onClick={handleCloseModal}
         >
           <div 
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+            className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 {modalType === "asset" && <Package className="inline w-5 h-5 text-indigo-600 mr-2" />}
                 {modalType === "transfer" && <History className="inline w-5 h-5 text-blue-600 mr-2" />}
                 {modalType === "maintenance" && <Wrench className="inline w-5 h-5 text-orange-600 mr-2" />}
@@ -946,7 +946,7 @@ const InventoryAssetManagement = () => {
               </h3>
               <button
                 onClick={handleCloseModal}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-600/50 rounded-full p-1 transition-all"
+                className="text-slate-400 hover:text-slate-600  hover:bg-slate-200/50  rounded-full p-1 transition-all"
               >
                 <Plus className="w-5 h-5 rotate-45" />
               </button>
@@ -956,7 +956,7 @@ const InventoryAssetManagement = () => {
               {modalType === "asset" && (
               <>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Asset Name *
                 </label>
                 <input
@@ -966,12 +966,12 @@ const InventoryAssetManagement = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, asset_name: e.target.value })
                   }
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Asset Type *
                   </label>
                   <select
@@ -980,7 +980,7 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, asset_type: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   >
                     <option value="equipment">Equipment</option>
                     <option value="furniture">Furniture</option>
@@ -990,7 +990,7 @@ const InventoryAssetManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Serial Number
                   </label>
                   <input
@@ -999,12 +999,12 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, serial_number: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Description
                 </label>
                 <textarea
@@ -1013,12 +1013,12 @@ const InventoryAssetManagement = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all resize-none"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Purchase Date
                   </label>
                   <input
@@ -1027,11 +1027,11 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, purchase_date: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Purchase Price
                   </label>
                   <input
@@ -1041,13 +1041,13 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, purchase_price: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Current Value
                   </label>
                   <input
@@ -1057,11 +1057,11 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, current_value: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Location
                   </label>
                   <input
@@ -1070,13 +1070,13 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, location: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Status *
                   </label>
                   <select
@@ -1085,7 +1085,7 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, status: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   >
                     <option value="available">Available</option>
                     <option value="in_use">In Use</option>
@@ -1094,7 +1094,7 @@ const InventoryAssetManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Condition *
                   </label>
                   <select
@@ -1103,7 +1103,7 @@ const InventoryAssetManagement = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, condition: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   >
                     <option value="excellent">Excellent</option>
                     <option value="good">Good</option>
@@ -1113,7 +1113,7 @@ const InventoryAssetManagement = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Assigned To
                 </label>
                 <input
@@ -1122,7 +1122,7 @@ const InventoryAssetManagement = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, assigned_to: e.target.value })
                   }
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500  transition-all"
                   placeholder="Employee name or department"
                 />
               </div>
@@ -1132,12 +1132,12 @@ const InventoryAssetManagement = () => {
               {/* Transfer Form */}
               {modalType === "transfer" && selectedItem && (
               <>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-3">
-                <p className="text-sm font-medium text-blue-900 dark:text-blue-300">Asset: {selectedItem.asset_name}</p>
-                <p className="text-xs text-blue-700 dark:text-blue-400">Current Location: {selectedItem.location || 'N/A'}</p>
+              <div className="bg-blue-50  border border-blue-200  rounded-md p-3 mb-3">
+                <p className="text-sm font-medium text-blue-900 ">Asset: {selectedItem.asset_name}</p>
+                <p className="text-xs text-blue-700 ">Current Location: {selectedItem.location || 'N/A'}</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   From Location *
                 </label>
                 <input
@@ -1145,11 +1145,11 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.from_location}
                   onChange={(e) => setFormData({ ...formData, from_location: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   To Location *
                 </label>
                 <input
@@ -1157,34 +1157,34 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.to_location}
                   onChange={(e) => setFormData({ ...formData, to_location: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Department
                 </label>
                 <input
                   type="text"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Assigned To
                 </label>
                 <input
                   type="text"
                   value={formData.assigned_to}
                   onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   placeholder="Employee name"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Transfer Reason *
                 </label>
                 <textarea
@@ -1192,7 +1192,7 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.transfer_reason}
                   onChange={(e) => setFormData({ ...formData, transfer_reason: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
                 />
               </div>
               </>
@@ -1201,20 +1201,20 @@ const InventoryAssetManagement = () => {
               {/* Maintenance Form */}
               {modalType === "maintenance" && selectedItem && (
               <>
-              <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md p-3 mb-3">
-                <p className="text-sm font-medium text-orange-900 dark:text-orange-300">Asset: {selectedItem.asset_name}</p>
-                <p className="text-xs text-orange-700 dark:text-orange-400">Serial: {selectedItem.serial_number || 'N/A'}</p>
+              <div className="bg-orange-50  border border-orange-200  rounded-md p-3 mb-3">
+                <p className="text-sm font-medium text-orange-900 ">Asset: {selectedItem.asset_name}</p>
+                <p className="text-xs text-orange-700 ">Serial: {selectedItem.serial_number || 'N/A'}</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Maintenance Type *
                   </label>
                   <select
                     required
                     value={formData.maintenance_type}
                     onChange={(e) => setFormData({ ...formData, maintenance_type: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   >
                     <option value="preventive">Preventive</option>
                     <option value="corrective">Corrective</option>
@@ -1223,7 +1223,7 @@ const InventoryAssetManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Maintenance Date *
                   </label>
                   <input
@@ -1231,12 +1231,12 @@ const InventoryAssetManagement = () => {
                     required
                     value={formData.maintenance_date}
                     onChange={(e) => setFormData({ ...formData, maintenance_date: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Description *
                 </label>
                 <textarea
@@ -1244,13 +1244,13 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.maintenance_description}
                   onChange={(e) => setFormData({ ...formData, maintenance_description: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
                   placeholder="Describe the maintenance work"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Estimated Cost
                   </label>
                   <input
@@ -1258,18 +1258,18 @@ const InventoryAssetManagement = () => {
                     step="0.01"
                     value={formData.maintenance_cost}
                     onChange={(e) => setFormData({ ...formData, maintenance_cost: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Performed By
                   </label>
                   <input
                     type="text"
                     value={formData.performed_by}
                     onChange={(e) => setFormData({ ...formData, performed_by: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     placeholder="Technician name"
                   />
                 </div>
@@ -1282,14 +1282,14 @@ const InventoryAssetManagement = () => {
               <>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Request Type *
                   </label>
                   <select
                     required
                     value={formData.request_type}
                     onChange={(e) => setFormData({ ...formData, request_type: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   >
                     <option value="new_asset">New Asset</option>
                     <option value="replacement">Replacement</option>
@@ -1298,14 +1298,14 @@ const InventoryAssetManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Priority *
                   </label>
                   <select
                     required
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -1314,7 +1314,7 @@ const InventoryAssetManagement = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Item Name *
                 </label>
                 <input
@@ -1322,24 +1322,24 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.requested_item_name}
                   onChange={(e) => setFormData({ ...formData, requested_item_name: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   placeholder="Name of the requested item"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Department
                 </label>
                 <input
                   type="text"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   placeholder="Requesting department"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-xs font-medium text-slate-700  mb-1">
                   Justification *
                 </label>
                 <textarea
@@ -1347,24 +1347,24 @@ const InventoryAssetManagement = () => {
                   required
                   value={formData.justification}
                   onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
-                  className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-md text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
+                  className="w-full px-3 py-2 bg-white  border border-slate-300  rounded-md text-slate-900  text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none"
                   placeholder="Explain why this request is necessary"
                 />
               </div>
               </>
               )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 ">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-50 dark:hover:bg-slate-600 transition-all text-sm shadow-sm"
+                  className="px-4 py-2 bg-white  border border-slate-300  text-slate-700  rounded-md hover:bg-slate-50  transition-all text-sm shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-md transition-all text-sm shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700   text-white rounded-md transition-all text-sm shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40"
                 >
                   {modalType === "asset" && (selectedItem ? "Update" : "Create")}
                   {modalType === "transfer" && "Submit Transfer"}

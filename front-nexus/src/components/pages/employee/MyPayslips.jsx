@@ -343,15 +343,15 @@ const MyPayslips = () => {
   }
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-8xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <DollarSign size={24} className="text-indigo-600" />
             My Payslips
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             View and download your payslips
           </span>
         </div>
@@ -366,7 +366,7 @@ const MyPayslips = () => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="flex-1 pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm"
+            className="flex-1 pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
           />
         </div>
 
@@ -376,33 +376,33 @@ const MyPayslips = () => {
             paginatedPayslips.map((payslip) => (
               <div
                 key={payslip.payslip_id}
-                className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
+                className="bg-white  p-4 rounded-lg border border-slate-200  hover:shadow-md transition-shadow"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Payslip Info */}
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-slate-900 dark:text-white">
+                      <span className="font-semibold text-slate-900 ">
                         {payslip.payslip_number}
                       </span>
-                      <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                      <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700  ">
                         Period
                       </span>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                       <div>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">
+                        <p className="text-slate-500  text-xs">
                           GROSS PAY
                         </p>
-                        <p className="font-semibold text-green-600 dark:text-green-400">
+                        <p className="font-semibold text-green-600 ">
                           ₱{parseFloat(payslip.gross_pay || 0).toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">
+                        <p className="text-slate-500  text-xs">
                           DEDUCTIONS
                         </p>
-                        <p className="font-semibold text-red-600 dark:text-red-400">
+                        <p className="font-semibold text-red-600 ">
                           ₱
                           {parseFloat(
                             payslip.total_deductions || 0,
@@ -410,18 +410,18 @@ const MyPayslips = () => {
                         </p>
                       </div>
                       <div>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">
+                        <p className="text-slate-500  text-xs">
                           NET PAY
                         </p>
-                        <p className="font-semibold text-indigo-600 dark:text-indigo-400">
+                        <p className="font-semibold text-indigo-600 ">
                           ₱{parseFloat(payslip.net_pay || 0).toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-slate-500 dark:text-slate-400 text-xs">
+                        <p className="text-slate-500  text-xs">
                           PERIOD
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-slate-900 ">
                           {payslip.start_date
                             ? new Date(payslip.start_date).toLocaleDateString(
                                 "en-US",
@@ -440,7 +440,7 @@ const MyPayslips = () => {
                   <div className="flex gap-2 sm:flex-col">
                     <button
                       onClick={() => handleViewPayslip(payslip)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md font-medium text-sm bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                      className="flex items-center gap-2 px-3 py-2 rounded-md font-medium text-sm bg-slate-100  text-slate-900  hover:bg-slate-200  transition-colors border border-slate-300 "
                     >
                       <Eye size={14} />
                       <span className="hidden sm:inline">View</span>
@@ -471,7 +471,7 @@ const MyPayslips = () => {
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-slate-500 dark:text-slate-400">
+              <p className="text-slate-500 ">
                 {searchTerm
                   ? "No payslips found matching your search"
                   : "No payslips available yet"}
@@ -483,14 +483,14 @@ const MyPayslips = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-between items-center mt-4">
-            <span className="text-sm text-slate-600 dark:text-slate-400">
+            <span className="text-sm text-slate-600 ">
               Page {currentPage} of {totalPages}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="px-3 py-1.5 rounded-md border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 "
               >
                 Previous
               </button>
@@ -499,7 +499,7 @@ const MyPayslips = () => {
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700"
+                className="px-3 py-1.5 rounded-md border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 "
               >
                 Next
               </button>
@@ -510,9 +510,9 @@ const MyPayslips = () => {
         {/* Payslip Details Modal */}
         {showModal && selectedPayslip && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+            <div className="bg-white  rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 flex justify-between items-center p-4 border-b border-slate-200  bg-white ">
+                <h3 className="text-lg font-semibold text-slate-900 ">
                   {selectedPayslip.payslip_number}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -541,7 +541,7 @@ const MyPayslips = () => {
                   </button>
                   <button
                     onClick={() => setShowModal(false)}
-                    className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                    className="text-slate-500 hover:text-slate-700  "
                   >
                     ✕
                   </button>
@@ -551,7 +551,7 @@ const MyPayslips = () => {
               {/* Payslip Content - Printable */}
               <div
                 id={`payslip-${selectedPayslip.payslip_id}`}
-                className="p-8 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                className="p-8 bg-white  text-slate-900 "
               >
                 {/* Header */}
                 <div className="text-center mb-8 border-b pb-4">
@@ -562,20 +562,20 @@ const MyPayslips = () => {
                 </div>
 
                 {/* Employee Info Row */}
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded">
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50  rounded">
                   <div>
-                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-semibold text-slate-600 ">
                       EMPLOYEE
                     </p>
                     <p className="font-semibold">
                       {selectedPayslip.first_name} {selectedPayslip.last_name}
                     </p>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                    <p className="text-xs text-slate-600 ">
                       {selectedPayslip.employee_number}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-semibold text-slate-600 ">
                       PERIOD
                     </p>
                     <p className="font-semibold">
@@ -594,9 +594,9 @@ const MyPayslips = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded">
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50  rounded">
                   <div>
-                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-semibold text-slate-600 ">
                       DEPARTMENT
                     </p>
                     <p className="font-semibold">
@@ -604,7 +604,7 @@ const MyPayslips = () => {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-semibold text-slate-600 ">
                       POSITION
                     </p>
                     <p className="font-semibold">{selectedPayslip.position}</p>
@@ -684,9 +684,9 @@ const MyPayslips = () => {
                           })}
                         </td>
                       </tr>
-                      <tr className="font-bold bg-green-50 dark:bg-green-900/20">
+                      <tr className="font-bold bg-green-50 ">
                         <td className="py-2">GROSS PAY</td>
-                        <td className="text-right text-green-600 dark:text-green-400">
+                        <td className="text-right text-green-600 ">
                           ₱
                           {parseFloat(
                             selectedPayslip.gross_pay || 0,
@@ -772,9 +772,9 @@ const MyPayslips = () => {
                           })}
                         </td>
                       </tr>
-                      <tr className="font-bold bg-red-50 dark:bg-red-900/20">
+                      <tr className="font-bold bg-red-50 ">
                         <td className="py-2">TOTAL DEDUCTIONS</td>
-                        <td className="text-right text-red-600 dark:text-red-400">
+                        <td className="text-right text-red-600 ">
                           ₱
                           {parseFloat(
                             selectedPayslip.total_deductions || 0,
@@ -793,25 +793,25 @@ const MyPayslips = () => {
                     <h3 className="font-bold text-lg mb-2 border-b-2 pb-1">
                       NOTES
                     </h3>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <p className="text-sm text-slate-700 ">
                       {selectedPayslip.notes}
                     </p>
                   </div>
                 )}
 
                 {/* Net Pay Section */}
-                <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border-2 border-indigo-600">
-                  <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                <div className="p-4 bg-indigo-50  rounded-lg border-2 border-indigo-600">
+                  <p className="text-xs font-semibold text-indigo-600 ">
                     NET PAY
                   </p>
-                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="text-3xl font-bold text-indigo-600 ">
                     ₱
                     {parseFloat(selectedPayslip.net_pay || 0).toLocaleString(
                       undefined,
                       { minimumFractionDigits: 2 },
                     )}
                   </p>
-                  <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-2 pt-2 border-t border-indigo-200 dark:border-indigo-800">
+                  <p className="text-xs text-indigo-500  mt-2 pt-2 border-t border-indigo-200 ">
                     ₱
                     {parseFloat(
                       selectedPayslip.gross_pay || 0,
@@ -829,7 +829,7 @@ const MyPayslips = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-8 pt-4 border-t text-xs text-slate-600 dark:text-slate-400 text-center">
+                <div className="mt-8 pt-4 border-t text-xs text-slate-600  text-center">
                   <p>This is a confidential document. Keep it safe.</p>
                   <p>
                     Generated on {new Date().toLocaleDateString()} at{" "}
@@ -839,10 +839,10 @@ const MyPayslips = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+              <div className="p-4 border-t border-slate-200  flex justify-end gap-2">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  className="px-4 py-2 rounded-md border border-slate-300  hover:bg-slate-100 "
                 >
                   Close
                 </button>

@@ -14,6 +14,12 @@ import NexusAIChat from "../../NexusAIChat";
 
 dayjs.extend(relativeTime);
 
+const formatActivityTime = (value) => {
+  const timestamp = dayjs(value);
+  if (!timestamp.isValid()) return "Unknown time";
+  return `${timestamp.fromNow()} (${timestamp.format("MMM D, YYYY h:mm A")})`;
+};
+
 // ---------- Helper Components ----------
 
 // Smaller Stats Card
@@ -75,18 +81,12 @@ const RecentActivity = ({ activities, loading }) => (
 );
 
 // Upcoming Calendar using dayjs
-const UpcomingCalendar = () => {
+const UpcomingCalendar = ({ events }) => {
   const today = dayjs();
   const startOfMonth = today.startOf("month");
   const endOfMonth = today.endOf("month");
   const daysInMonth = endOfMonth.date();
   const firstDayIndex = startOfMonth.day(); // Sunday = 0
-
-  const events = {
-    [today.date()]: "Current Day",
-    10: "Registration Deadline",
-    18: "Faculty Meeting",
-  };
 
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -109,8 +109,13 @@ const UpcomingCalendar = () => {
 
         {Array.from({ length: daysInMonth }).map((_, idx) => {
           const day = idx + 1;
+          const weekdayIndex = (firstDayIndex + idx) % 7;
           const isToday = day === today.date();
-          const event = events[day];
+          const dayEvents = events.filter((event) => {
+            const eventDate = dayjs(event.start_date);
+            return eventDate.isValid() && eventDate.date() === day && eventDate.month() === today.month() && eventDate.year() === today.year();
+          });
+          const event = dayEvents[0];
 
           let classes =
             "p-1 text-xs rounded transition duration-150 cursor-pointer h-8 flex items-center justify-center relative ";
@@ -126,10 +131,42 @@ const UpcomingCalendar = () => {
           }
 
           return (
-            <div key={day} className={classes} title={event || ""}>
+            <div
+              key={day}
+              className={`${classes} group`}
+            >
               {day}
               {event && (
                 <span className="absolute bottom-0.5 right-0.5 h-1 w-1 bg-yellow-600 rounded-full"></span>
+              )}
+              {dayEvents.length > 0 && (
+                <div className={`pointer-events-none absolute bottom-full z-30 mb-2 hidden w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-lg border border-slate-200 bg-white p-3 text-left shadow-xl group-hover:block ${
+                  weekdayIndex === 0 ? "left-0 translate-x-0" : weekdayIndex === 6 ? "right-0 left-auto translate-x-0" : "left-1/2"
+                }`}>
+                  <div className="mb-2 flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                    <span className="text-xs font-bold text-slate-700">
+                    {dayjs(`${today.format("YYYY-MM")}-${String(day).padStart(2, "0")}`).format("ddd, MMM D, YYYY")}
+                    </span>
+                    <span className="shrink-0 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
+                      {dayEvents.length} {dayEvents.length === 1 ? "event" : "events"}
+                    </span>
+                  </div>
+                  <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                    {dayEvents.map((item) => (
+                      <div key={item.id} className="border-b border-slate-100 pb-2 last:border-b-0 last:pb-0">
+                        <p className="break-words text-xs font-semibold leading-4 text-slate-900">{item.title}</p>
+                        {item.type && (
+                          <p className="mt-0.5 text-[10px] capitalize text-indigo-600">{item.type}</p>
+                        )}
+                        {item.end_date && item.end_date !== item.start_date && (
+                          <p className="mt-0.5 text-[10px] text-slate-500">
+                            Until {dayjs(item.end_date).format("MMM D, YYYY")}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           );
@@ -148,6 +185,7 @@ export default function AdminDashboard() {
     pendingAdmissions: 0,
   });
   const [recentActivity, setRecentActivity] = useState([]);
+  const [calendarEvents, setCalendarEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -162,25 +200,51 @@ export default function AdminDashboard() {
       setLoading(true);
 
       // Fetch all data in parallel
-      const [
-        usersRes,
-        coursesRes,
-        admissionsRes,
-        enrollmentsRes,
-        clearancesRes,
-      ] = await Promise.all([
+      const results = await Promise.allSettled([
         axios.get(`${API_BASE}/api/users`),
         axios.get(`${API_BASE}/api/course/courses`),
         axios.get(`${API_BASE}/api/admissions`),
         axios.get(`${API_BASE}/api/enrollments`),
         axios.get(`${API_BASE}/api/clearances`),
+        axios.get(`${API_BASE}/api/academic-events`),
+        axios.get(`${API_BASE}/api/events/calendar`),
+        axios.get(`${API_BASE}/api/programs`),
       ]);
 
-      const users = usersRes.data || [];
-      const courses = coursesRes.data || [];
-      const admissions = admissionsRes.data || [];
-      const enrollments = enrollmentsRes.data || [];
-      const clearances = clearancesRes.data || [];
+      const getResponseData = (index, fallback = []) => {
+        const result = results[index];
+        if (result?.status !== "fulfilled") return fallback;
+        const data = result.value.data;
+        return Array.isArray(data) ? data : data?.data || fallback;
+      };
+
+      const users = getResponseData(0);
+      const courses = getResponseData(1);
+      const admissions = getResponseData(2);
+      const enrollments = getResponseData(3);
+      const clearances = getResponseData(4);
+      const academicEvents = getResponseData(5);
+      const schoolCalendarEvents = getResponseData(6);
+      const programs = getResponseData(7);
+
+      const normalizedEvents = [
+        ...academicEvents.map((event) => ({
+          id: `academic-${event.event_id}`,
+          title: event.event_name,
+          start_date: event.start_date,
+          end_date: event.end_date,
+          type: event.event_type,
+        })),
+        ...schoolCalendarEvents.map((event) => ({
+          id: `calendar-${event.calendar_id}`,
+          title: event.event_title,
+          start_date: event.start_date,
+          end_date: event.end_date,
+          type: event.calendar_type,
+        })),
+      ].filter((event) => event.title && dayjs(event.start_date).isValid());
+
+      setCalendarEvents(normalizedEvents);
 
       // Calculate statistics
       const students = users.filter((u) => u.role === "Student");
@@ -204,7 +268,8 @@ export default function AdminDashboard() {
         activities.push({
           type: "Student Enrollment",
           detail: `${enrollment.student_name} enrolled in ${enrollment.course_code}`,
-          time: dayjs(enrollment.created_at).fromNow(),
+          timestamp: enrollment.created_at,
+          time: formatActivityTime(enrollment.created_at),
           color: "border-green-500",
           icon: Users,
         });
@@ -215,7 +280,8 @@ export default function AdminDashboard() {
         activities.push({
           type: "New Admission",
           detail: `${admission.first_name} ${admission.last_name} applied for ${admission.program_applied}`,
-          time: dayjs(admission.created_at).fromNow(),
+          timestamp: admission.created_at,
+          time: formatActivityTime(admission.created_at),
           color: "border-indigo-500",
           icon: Users,
         });
@@ -226,18 +292,27 @@ export default function AdminDashboard() {
         activities.push({
           type: "Clearance Update",
           detail: `${clearance.student_name} clearance status: ${clearance.overall_status}`,
-          time: dayjs(clearance.updated_at).fromNow(),
+          timestamp: clearance.updated_at,
+          time: formatActivityTime(clearance.updated_at),
           color: "border-yellow-500",
           icon: CheckSquare,
         });
       });
 
-      // Sort by most recent
-      activities.sort((a, b) => {
-        const timeA = a.time.includes("ago") ? a.time : "999 days ago";
-        const timeB = b.time.includes("ago") ? b.time : "999 days ago";
-        return timeA.localeCompare(timeB);
+      // Recently created academic programs
+      programs.slice(0, 2).forEach((program) => {
+        activities.push({
+          type: "New Program",
+          detail: `${program.code || "Program"} - ${program.name} created`,
+          timestamp: program.created_at,
+          time: formatActivityTime(program.created_at),
+          color: "border-blue-500",
+          icon: BookOpen,
+        });
       });
+
+      // Sort by most recent
+      activities.sort((a, b) => dayjs(b.timestamp).valueOf() - dayjs(a.timestamp).valueOf());
 
       setRecentActivity(activities.slice(0, 4));
       setLoading(false);
@@ -313,7 +388,7 @@ export default function AdminDashboard() {
           {/* Recent Activity & Calendar */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <RecentActivity activities={recentActivity} loading={loading} />
-            <UpcomingCalendar />
+            <UpcomingCalendar events={calendarEvents} />
           </div>
         </div>
       </main>

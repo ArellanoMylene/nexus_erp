@@ -167,53 +167,53 @@ const PaymentCollection = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
-            <DollarSign className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2 bg-indigo-50  rounded-lg">
+            <DollarSign className="w-6 h-6 text-indigo-600 " />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-slate-900 ">
               Payment Collection
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-500 ">
               Record and manage student payments
             </p>
           </div>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-300">
-          Data Integrity: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Online</span>
+        <div className="text-sm text-slate-600 ">
+          Data Integrity: <span className="text-emerald-600  font-semibold">Online</span>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Collected</p>
-          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+        <div className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+          <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">Total Collected</p>
+          <p className="text-2xl font-bold text-emerald-600  mt-1">
             ₱{parseFloat(summary.total_collected || 0).toLocaleString()}
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Verified</p>
-          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
+        <div className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+          <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">Verified</p>
+          <p className="text-2xl font-bold text-indigo-600  mt-1">
             ₱{parseFloat(summary.verified_amount || 0).toLocaleString()}
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Pending Verification</p>
-          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">
+        <div className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+          <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">Pending Verification</p>
+          <p className="text-2xl font-bold text-amber-600  mt-1">
             ₱{parseFloat(summary.pending_amount || 0).toLocaleString()}
           </p>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">Total Transactions</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+        <div className="bg-white  p-4 rounded-lg shadow-md border border-slate-200 ">
+          <p className="text-xs font-medium text-slate-500  uppercase tracking-wide">Total Transactions</p>
+          <p className="text-2xl font-bold text-slate-900  mt-1">
             {summary.total_payments || 0}
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  rounded-lg shadow-md border border-slate-200  mb-6">
         <div className="p-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex-1 flex gap-3">
@@ -227,7 +227,7 @@ const PaymentCollection = () => {
                     setFilters({ ...filters, search: e.target.value });
                     setCurrentPage(1);
                   }}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
             </div>
@@ -238,7 +238,7 @@ const PaymentCollection = () => {
                   setFilters({ ...filters, payment_method: e.target.value });
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               >
                 <option value="">All Methods</option>
                 {paymentMethods.map((method) => (
@@ -253,7 +253,7 @@ const PaymentCollection = () => {
                   setFilters({ ...filters, payment_status: e.target.value });
                   setCurrentPage(1);
                 }}
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               >
                 <option value="">All Status</option>
                 <option value="Pending">Pending</option>
@@ -266,7 +266,7 @@ const PaymentCollection = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, start_date: e.target.value })
                 }
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               />
               <input
                 type="date"
@@ -274,7 +274,7 @@ const PaymentCollection = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, end_date: e.target.value })
                 }
-                className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                className="px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
               />
               <button
                 onClick={() => {
@@ -293,37 +293,37 @@ const PaymentCollection = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-          <thead className="bg-slate-50 dark:bg-slate-700">
+      <div className="bg-white  rounded-lg shadow-md border border-slate-200  overflow-hidden">
+        <table className="min-w-full divide-y divide-slate-200 ">
+          <thead className="bg-slate-50 ">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Reference
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Student
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Invoice
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Amount
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Method
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Date
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-100 dark:divide-slate-700">
+          <tbody className="bg-white  divide-y divide-slate-100 ">
             {(() => {
               const searchTerm = filters.search.toLowerCase();
               const filtered = payments.filter((payment) => {
@@ -342,7 +342,7 @@ const PaymentCollection = () => {
               if (paginatedData.length === 0) {
                 return (
                   <tr>
-                    <td colSpan="8" className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <td colSpan="8" className="px-4 py-8 text-center text-sm text-slate-500 ">
                       No payments found matching your search criteria.
                     </td>
                   </tr>
@@ -350,37 +350,37 @@ const PaymentCollection = () => {
               }
 
               return paginatedData.map((payment) => (
-                <tr key={payment.payment_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                  <td className="px-4 py-2 whitespace-nowrap font-mono text-sm text-slate-900 dark:text-white">
+                <tr key={payment.payment_id} className="hover:bg-slate-50  transition-colors">
+                  <td className="px-4 py-2 whitespace-nowrap font-mono text-sm text-slate-900 ">
                     {payment.payment_reference}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div>
-                      <div className="font-medium text-sm text-slate-900 dark:text-white">{payment.student_name}</div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
+                      <div className="font-medium text-sm text-slate-900 ">{payment.student_name}</div>
+                      <div className="text-xs text-slate-500 ">
                         {payment.student_number}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-900 dark:text-white">
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-900 ">
                     {payment.invoice_number}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap font-semibold text-sm text-emerald-600 dark:text-emerald-400">
+                  <td className="px-4 py-2 whitespace-nowrap font-semibold text-sm text-emerald-600 ">
                     ₱{parseFloat(payment.amount_paid).toLocaleString()}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-700 ">
                     {payment.payment_method}
                   </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
+                  <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-700 ">
                     {new Date(payment.payment_date).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-2 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${payment.payment_status === "Verified"
-                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                        ? "bg-emerald-100 text-emerald-800  "
                         : payment.payment_status === "Pending"
-                          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                          : "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400"
+                          ? "bg-amber-100 text-amber-800  "
+                          : "bg-indigo-100 text-indigo-800  "
                         }`}
                     >
                       {payment.payment_status}
@@ -390,7 +390,7 @@ const PaymentCollection = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => viewReceipt(payment)}
-                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                        className="text-indigo-600  hover:text-indigo-800  transition-colors"
                         title="View Receipt"
                       >
                         <Eye size={18} />
@@ -398,7 +398,7 @@ const PaymentCollection = () => {
                       {payment.payment_status === "Pending" && (
                         <button
                           onClick={() => handleVerify(payment.payment_id)}
-                          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors"
+                          className="text-emerald-600  hover:text-emerald-800  transition-colors"
                           title="Verify Payment"
                         >
                           <FileText size={18} />
@@ -414,7 +414,7 @@ const PaymentCollection = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
         <span className="text-xs sm:text-sm">
           Page <span className="font-semibold">{currentPage}</span> of{" "}
           <span className="font-semibold">{(() => {
@@ -446,9 +446,9 @@ const PaymentCollection = () => {
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
           >
-            <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+            <ChevronLeft size={16} className="text-slate-600 " />
           </button>
           {(() => {
             const searchTerm = filters.search.toLowerCase();
@@ -468,7 +468,7 @@ const PaymentCollection = () => {
                 onClick={() => setCurrentPage(i + 1)}
                 className={`px-3 py-1.5 text-xs rounded border transition-colors ${currentPage === i + 1
                   ? "bg-indigo-600 text-white border-indigo-600"
-                  : "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  : "border-slate-300  text-slate-700  hover:bg-slate-100 "
                   }`}
               >
                 {i + 1}
@@ -502,9 +502,9 @@ const PaymentCollection = () => {
               const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
               return currentPage === totalPages;
             })()}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
           >
-            <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+            <ChevronRight size={16} className="text-slate-600 " />
           </button>
         </div>
       </div>
@@ -512,10 +512,10 @@ const PaymentCollection = () => {
       {/* Payment Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50 transition-opacity duration-300" onClick={() => setShowModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg z-10">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg z-10">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 Record Payment
               </h3>
               <button
@@ -523,7 +523,7 @@ const PaymentCollection = () => {
                   setShowModal(false);
                   resetForm();
                 }}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
@@ -533,7 +533,7 @@ const PaymentCollection = () => {
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Invoice *
                   </label>
                   <select
@@ -541,7 +541,7 @@ const PaymentCollection = () => {
                     value={formData.invoice_id}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   >
                     <option value="">Select Invoice</option>
                     {invoices.map((inv) => (
@@ -553,7 +553,7 @@ const PaymentCollection = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Amount Paid *
                   </label>
                   <input
@@ -563,11 +563,11 @@ const PaymentCollection = () => {
                     onChange={handleInputChange}
                     step="0.01"
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Payment Method *
                   </label>
                   <select
@@ -575,7 +575,7 @@ const PaymentCollection = () => {
                     value={formData.payment_method}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   >
                     {paymentMethods.map((method) => (
                       <option key={method} value={method}>
@@ -585,7 +585,7 @@ const PaymentCollection = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Payment Date *
                   </label>
                   <input
@@ -594,11 +594,11 @@ const PaymentCollection = () => {
                     value={formData.payment_date}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Bank Name
                   </label>
                   <input
@@ -606,11 +606,11 @@ const PaymentCollection = () => {
                     name="bank_name"
                     value={formData.bank_name}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Check/Reference Number
                   </label>
                   <input
@@ -618,11 +618,11 @@ const PaymentCollection = () => {
                     name="reference_number"
                     value={formData.reference_number}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Notes
                   </label>
                   <textarea
@@ -630,20 +630,20 @@ const PaymentCollection = () => {
                     value={formData.notes}
                     onChange={handleInputChange}
                     rows="2"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    transition-colors border border-slate-300 "
                 >
                   Cancel
                 </button>
@@ -662,20 +662,20 @@ const PaymentCollection = () => {
       {/* Receipt Modal */}
       {showReceiptModal && selectedPayment && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50 transition-opacity duration-300" onClick={() => setShowReceiptModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl transform transition-transform duration-300 scale-100 border border-slate-200 " onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   Payment Receipt
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                <p className="text-xs text-slate-500  font-mono">
                   {selectedPayment.payment_reference}
                 </p>
               </div>
               <button
                 onClick={() => setShowReceiptModal(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
@@ -685,40 +685,40 @@ const PaymentCollection = () => {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Student</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Student</p>
+                  <p className="text-sm font-semibold text-slate-900 ">
                     {selectedPayment.student_name}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Student Number</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Student Number</p>
+                  <p className="text-sm font-semibold text-slate-900 ">
                     {selectedPayment.student_number}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Invoice</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Invoice</p>
+                  <p className="text-sm font-semibold text-slate-900 ">
                     {selectedPayment.invoice_number}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Date</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Date</p>
+                  <p className="text-sm font-semibold text-slate-900 ">
                     {new Date(
                       selectedPayment.payment_date
                     ).toLocaleDateString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Payment Method</p>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Payment Method</p>
+                  <p className="text-sm font-semibold text-slate-900 ">
                     {selectedPayment.payment_method}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">Amount Paid</p>
-                  <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                  <p className="text-xs font-medium text-slate-500  uppercase tracking-wide mb-1">Amount Paid</p>
+                  <p className="text-xl font-bold text-emerald-600 ">
                     ₱{parseFloat(selectedPayment.amount_paid).toLocaleString()}
                   </p>
                 </div>
@@ -726,7 +726,7 @@ const PaymentCollection = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-100 dark:border-slate-700/50 rounded-b-lg">
+            <div className="flex justify-end gap-2 px-4 py-3 border-t border-slate-100  rounded-b-lg">
               <button
                 onClick={() => setShowReceiptModal(false)}
                 className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/30"

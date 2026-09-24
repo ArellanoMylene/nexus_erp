@@ -179,7 +179,7 @@ const IncomeExpensesReports = () => {
     parseFloat(summary.total_expenses || 0);
 
   return (
-    <div className="p-6 bg-slate-50 dark:bg-slate-900 min-h-screen">
+    <div className="p-6 bg-slate-50  min-h-screen">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
@@ -187,15 +187,15 @@ const IncomeExpensesReports = () => {
             <DollarSign className="text-white" size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            <h1 className="text-2xl font-bold text-slate-800 ">
               Income & Expenses Reports
             </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-slate-600 ">
               Track financial transactions and budget
             </p>
           </div>
         </div>
-        {/*  <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+        {/*  <div className="flex items-center gap-2 text-xs text-slate-600 ">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span>Data Integrity: Online</span>
@@ -205,60 +205,60 @@ const IncomeExpensesReports = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Income</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-sm text-slate-600 ">Total Income</p>
+              <p className="text-2xl font-bold text-green-600 ">
                 ₱{parseFloat(summary.total_income || 0).toLocaleString()}
               </p>
             </div>
-            <TrendingUp className="text-green-600 dark:text-green-400" size={32} />
+            <TrendingUp className="text-green-600 " size={32} />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+              <p className="text-sm text-slate-600 ">Total Expenses</p>
+              <p className="text-2xl font-bold text-red-600 ">
                 ₱{parseFloat(summary.total_expenses || 0).toLocaleString()}
               </p>
             </div>
-            <TrendingDown className="text-red-600 dark:text-red-400" size={32} />
+            <TrendingDown className="text-red-600 " size={32} />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Net Income</p>
+              <p className="text-sm text-slate-600 ">Net Income</p>
               <p
-                className={`text-2xl font-bold ${netIncome >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                className={`text-2xl font-bold ${netIncome >= 0 ? "text-green-600 " : "text-red-600 "
                   }`}
               >
                 ₱{netIncome.toLocaleString()}
               </p>
             </div>
             <DollarSign
-              className={netIncome >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}
+              className={netIncome >= 0 ? "text-green-600 " : "text-red-600 "}
               size={32}
             />
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Transactions</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+              <p className="text-sm text-slate-600 ">Transactions</p>
+              <p className="text-2xl font-bold text-slate-800 ">
                 {summary.total_transactions || 0}
               </p>
             </div>
-            <Calendar className="text-indigo-600 dark:text-indigo-400" size={32} />
+            <Calendar className="text-indigo-600 " size={32} />
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200  mb-6">
         <div className="space-y-3">
           {/* Top Row: Search + New Transaction Button */}
           <div className="flex flex-col sm:flex-row gap-3">
@@ -276,7 +276,7 @@ const IncomeExpensesReports = () => {
                     setFilters({ ...filters, search: e.target.value });
                     setCurrentPage(1);
                   }}
-                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -285,7 +285,7 @@ const IncomeExpensesReports = () => {
                 resetForm();
                 setShowModal(true);
               }}
-              className="flex items-center justify-center gap-2 bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors text-sm font-medium whitespace-nowrap"
+              className="flex items-center justify-center gap-2 bg-indigo-600  text-white px-4 py-2 rounded-lg hover:bg-indigo-700  transition-colors text-sm font-medium whitespace-nowrap"
             >
               <Plus size={18} />
               New Transaction
@@ -300,7 +300,7 @@ const IncomeExpensesReports = () => {
                 setFilters({ ...filters, transaction_type: e.target.value });
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="">All Types</option>
               <option value="Income">Income</option>
@@ -312,7 +312,7 @@ const IncomeExpensesReports = () => {
                 setFilters({ ...filters, category: e.target.value });
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="">All Categories</option>
               {[...incomeCategories, ...expenseCategories].map((cat) => (
@@ -327,7 +327,7 @@ const IncomeExpensesReports = () => {
                 setFilters({ ...filters, department: e.target.value });
                 setCurrentPage(1);
               }}
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="">All Departments</option>
               {departments.map((dept) => {
@@ -350,7 +350,7 @@ const IncomeExpensesReports = () => {
                 setCurrentPage(1);
               }}
               placeholder="Start Date"
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             <input
               type="date"
@@ -360,42 +360,42 @@ const IncomeExpensesReports = () => {
                 setCurrentPage(1);
               }}
               placeholder="End Date"
-              className="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="px-3 py-2 text-sm border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden mb-4">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  overflow-hidden mb-4">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-50 dark:bg-slate-700">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-50 ">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Department
                 </th>
-               {/*  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+               {/*  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Description
                 </th> */}
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="bg-white  divide-y divide-slate-200 ">
               {(() => {
                 const searchTerm = filters.search.toLowerCase();
                 const filtered = transactions.filter((transaction) => {
@@ -413,7 +413,7 @@ const IncomeExpensesReports = () => {
                 if (paginatedData.length === 0) {
                   return (
                     <tr>
-                      <td colSpan="7" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan="7" className="px-4 py-8 text-center text-slate-500 ">
                         No transactions found matching your search criteria.
                       </td>
                     </tr>
@@ -421,27 +421,27 @@ const IncomeExpensesReports = () => {
                 }
 
                 return paginatedData.map((transaction) => (
-                  <tr key={transaction.transaction_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+                  <tr key={transaction.transaction_id} className="hover:bg-slate-50  transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 ">
                       {new Date(transaction.transaction_date).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 text-xs rounded-full font-medium ${transaction.transaction_type === "Income"
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                          : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
+                          ? "bg-green-100  text-green-800 "
+                          : "bg-red-100  text-red-800 "
                           }`}
                       >
                         {transaction.transaction_type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 ">
                       {transaction.category}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-900 ">
                       {transaction.department}
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-100">
+                    <td className="px-4 py-3 text-sm text-slate-900 ">
                       <div className="max-w-xs truncate">
                         {transaction.description}
                       </div>
@@ -449,8 +449,8 @@ const IncomeExpensesReports = () => {
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span
                         className={`font-semibold text-sm ${transaction.transaction_type === "Income"
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
+                          ? "text-green-600 "
+                          : "text-red-600 "
                           }`}
                       >
                         {transaction.transaction_type === "Income" ? "+" : "-"}₱
@@ -461,14 +461,14 @@ const IncomeExpensesReports = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEdit(transaction)}
-                          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                          className="text-indigo-600  hover:text-indigo-800  transition-colors"
                           title="Edit"
                         >
                           <Edit size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(transaction.transaction_id)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                          className="text-red-600  hover:text-red-800  transition-colors"
                           title="Delete"
                         >
                           <Trash2 size={18} />
@@ -484,7 +484,7 @@ const IncomeExpensesReports = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
         <span className="text-xs sm:text-sm">
           Page <span className="font-semibold">{currentPage}</span> of{" "}
           <span className="font-semibold">{(() => {
@@ -516,9 +516,9 @@ const IncomeExpensesReports = () => {
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
           >
-            <ChevronLeft size={16} className="text-slate-600 dark:text-slate-400" />
+            <ChevronLeft size={16} className="text-slate-600 " />
           </button>
           {(() => {
             const searchTerm = filters.search.toLowerCase();
@@ -538,7 +538,7 @@ const IncomeExpensesReports = () => {
                 onClick={() => setCurrentPage(i + 1)}
                 className={`px-3 py-1.5 text-xs rounded border transition-colors ${currentPage === i + 1
                   ? "bg-indigo-600 text-white border-indigo-600"
-                  : "border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  : "border-slate-300  text-slate-700  hover:bg-slate-100 "
                   }`}
               >
                 {i + 1}
@@ -572,9 +572,9 @@ const IncomeExpensesReports = () => {
               const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
               return currentPage === totalPages;
             })()}
-            className="p-1.5 rounded border border-slate-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            className="p-1.5 rounded border border-slate-300  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
           >
-            <ChevronRight size={16} className="text-slate-600 dark:text-slate-400" />
+            <ChevronRight size={16} className="text-slate-600 " />
           </button>
         </div>
       </div>
@@ -589,12 +589,12 @@ const IncomeExpensesReports = () => {
           }}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
+            className="bg-white  rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sticky Header */}
-            <div className="sticky top-0 bg-slate-50 dark:bg-slate-700 px-6 py-4 border-b border-slate-200 dark:border-slate-600 rounded-t-lg flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+            <div className="sticky top-0 bg-slate-50  px-6 py-4 border-b border-slate-200  rounded-t-lg flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-slate-800 ">
                 {formData.transaction_id ? "Edit" : "New"} Transaction
               </h2>
               <button
@@ -602,7 +602,7 @@ const IncomeExpensesReports = () => {
                   setShowModal(false);
                   resetForm();
                 }}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className="text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={24} className="rotate-45" />
               </button>
@@ -613,7 +613,7 @@ const IncomeExpensesReports = () => {
               <div className="flex-1 overflow-y-auto px-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Type *
                     </label>
                     <select
@@ -621,14 +621,14 @@ const IncomeExpensesReports = () => {
                       value={formData.transaction_type}
                       onChange={handleInputChange}
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="Income">Income</option>
                       <option value="Expense">Expense</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Category *
                     </label>
                     <select
@@ -636,7 +636,7 @@ const IncomeExpensesReports = () => {
                       value={formData.category}
                       onChange={handleInputChange}
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="">Select Category</option>
                       {formData.transaction_type === "Income"
@@ -653,7 +653,7 @@ const IncomeExpensesReports = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Amount *
                     </label>
                     <input
@@ -663,11 +663,11 @@ const IncomeExpensesReports = () => {
                       onChange={handleInputChange}
                       step="0.01"
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Date *
                     </label>
                     <input
@@ -676,11 +676,11 @@ const IncomeExpensesReports = () => {
                       value={formData.transaction_date}
                       onChange={handleInputChange}
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Department *
                     </label>
                     <select
@@ -688,7 +688,7 @@ const IncomeExpensesReports = () => {
                       value={formData.department}
                       onChange={handleInputChange}
                       required
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="">Select Department</option>
                       {departments.map((dept) => {
@@ -702,14 +702,14 @@ const IncomeExpensesReports = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Payment Method
                     </label>
                     <select
                       name="payment_method"
                       value={formData.payment_method}
                       onChange={handleInputChange}
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       {paymentMethods.map((method) => (
                         <option key={method} value={method}>
@@ -719,7 +719,7 @@ const IncomeExpensesReports = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Reference Number
                     </label>
                     <input
@@ -727,11 +727,11 @@ const IncomeExpensesReports = () => {
                       name="reference_number"
                       value={formData.reference_number}
                       onChange={handleInputChange}
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Recorded By
                     </label>
                     <input
@@ -739,11 +739,11 @@ const IncomeExpensesReports = () => {
                       name="recorded_by"
                       value={formData.recorded_by}
                       onChange={handleInputChange}
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-slate-700  mb-1">
                       Description
                     </label>
                     <textarea
@@ -751,21 +751,21 @@ const IncomeExpensesReports = () => {
                       value={formData.description}
                       onChange={handleInputChange}
                       rows="2"
-                      className="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full text-sm border border-slate-300  rounded-lg px-3 py-2 bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Sticky Footer */}
-              <div className="sticky bottom-0 bg-white dark:bg-slate-800 px-6 py-4 border-t border-slate-200 dark:border-slate-600 rounded-b-lg flex gap-3 justify-end">
+              <div className="sticky bottom-0 bg-white  px-6 py-4 border-t border-slate-200  rounded-b-lg flex gap-3 justify-end">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-slate-700  bg-white  border border-slate-300  rounded-lg hover:bg-slate-50  transition-colors"
                 >
                   Cancel
                 </button>

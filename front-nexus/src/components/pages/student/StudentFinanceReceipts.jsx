@@ -60,18 +60,18 @@ const StudentFinanceReceipts = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      paid: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-      cancelled: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      paid: "bg-green-100 text-green-700  ",
+      pending: "bg-yellow-100 text-yellow-700  ",
+      cancelled: "bg-red-100 text-red-700  ",
     };
     return colors[status] || colors.paid;
   };
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <Receipt size={24} className="text-indigo-600" />
             Payment Receipts
           </h2>
@@ -84,16 +84,16 @@ const StudentFinanceReceipts = () => {
             placeholder="Search receipts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm"
+            className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm"
           />
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
         </div>
 
         {/* Receipts Table */}
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">Receipt #</th>
                 <th className="px-4 py-2.5">Date</th>
                 <th className="px-4 py-2.5">Description</th>
@@ -103,28 +103,28 @@ const StudentFinanceReceipts = () => {
                 <th className="px-4 py-2.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {currentReceipts.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                  <td colSpan="7" className="px-4 py-8 text-center text-slate-500 ">
                     No receipts found
                   </td>
                 </tr>
               ) : (
                 currentReceipts.map((receipt) => (
-                  <tr key={receipt.receipt_id} className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700">
-                    <td className="px-4 py-2 font-mono font-semibold text-indigo-600 dark:text-indigo-400">
+                  <tr key={receipt.receipt_id} className="text-sm text-slate-700  hover:bg-indigo-50/50 ">
+                    <td className="px-4 py-2 font-mono font-semibold text-indigo-600 ">
                       {receipt.receipt_number}
                     </td>
                     <td className="px-4 py-2">{new Date(receipt.payment_date).toLocaleDateString()}</td>
                     <td className="px-4 py-2 font-medium">{receipt.description}</td>
                     <td className="px-4 py-2">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700  ">
                         <CreditCard size={12} />
                         {receipt.payment_method}
                       </span>
                     </td>
-                    <td className="px-4 py-2 font-bold text-green-600 dark:text-green-400">
+                    <td className="px-4 py-2 font-bold text-green-600 ">
                       ₱{parseFloat(receipt.amount).toLocaleString()}
                     </td>
                     <td className="px-4 py-2">
@@ -139,19 +139,19 @@ const StudentFinanceReceipts = () => {
                             setSelectedReceipt(receipt);
                             setShowModal(true);
                           }}
-                          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-indigo-600 hover:text-indigo-800  p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Eye size={14} />
                         </button>
                         <button
                           onClick={() => handleDownloadReceipt(receipt.receipt_id)}
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-blue-600 hover:text-blue-800  p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Download size={14} />
                         </button>
                         <button
                           onClick={() => window.print()}
-                          className="text-green-600 hover:text-green-800 dark:text-green-400 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                          className="text-green-600 hover:text-green-800  p-1 rounded-full hover:bg-slate-200 "
                         >
                           <Printer size={14} />
                         </button>
@@ -166,21 +166,21 @@ const StudentFinanceReceipts = () => {
 
         {/* Pagination */}
         <div className="flex justify-between items-center">
-          <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-200">
+          <span className="text-xs sm:text-sm text-slate-700 ">
             Page {currentPage} of {totalPages || 1} | Total: {filteredReceipts.length}
           </span>
           <div className="flex gap-1">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50"
             >
               <ChevronRight size={16} />
             </button>
@@ -191,9 +191,9 @@ const StudentFinanceReceipts = () => {
       {/* Receipt Modal */}
       {showModal && selectedReceipt && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50" onClick={() => setShowModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 " onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50 ">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 <Receipt className="inline w-5 h-5 text-green-600 mr-2" />
                 Payment Receipt
               </h3>
@@ -202,42 +202,42 @@ const StudentFinanceReceipts = () => {
               </button>
             </div>
             <div className="p-6">
-              <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
+              <div className="bg-slate-50  border border-slate-200  rounded-lg p-6">
                 <div className="text-center mb-6">
-                  <h4 className="text-2xl font-bold text-slate-900 dark:text-white">Official Receipt</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Receipt No: {selectedReceipt.receipt_number}</p>
+                  <h4 className="text-2xl font-bold text-slate-900 ">Official Receipt</h4>
+                  <p className="text-sm text-slate-500 ">Receipt No: {selectedReceipt.receipt_number}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Date</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    <p className="text-xs font-medium text-slate-500  uppercase mb-1">Date</p>
+                    <p className="text-sm font-semibold text-slate-900 ">
                       {new Date(selectedReceipt.payment_date).toLocaleDateString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Payment Method</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{selectedReceipt.payment_method}</p>
+                    <p className="text-xs font-medium text-slate-500  uppercase mb-1">Payment Method</p>
+                    <p className="text-sm font-semibold text-slate-900  capitalize">{selectedReceipt.payment_method}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Description</p>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{selectedReceipt.description}</p>
+                    <p className="text-xs font-medium text-slate-500  uppercase mb-1">Description</p>
+                    <p className="text-sm font-semibold text-slate-900 ">{selectedReceipt.description}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mb-1">Status</p>
+                    <p className="text-xs font-medium text-slate-500  uppercase mb-1">Status</p>
                     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(selectedReceipt.status)}`}>
                       {selectedReceipt.status}
                     </span>
                   </div>
                 </div>
-                <div className="border-t border-b border-slate-300 dark:border-slate-600 py-4 my-4">
+                <div className="border-t border-b border-slate-300  py-4 my-4">
                   <div className="flex justify-between items-center">
-                    <p className="text-lg font-medium text-slate-700 dark:text-slate-300">Amount Paid</p>
-                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    <p className="text-lg font-medium text-slate-700 ">Amount Paid</p>
+                    <p className="text-3xl font-bold text-green-600 ">
                       ₱{parseFloat(selectedReceipt.amount).toLocaleString()}
                     </p>
                   </div>
                 </div>
-                <div className="text-center text-xs text-slate-500 dark:text-slate-400">
+                <div className="text-center text-xs text-slate-500 ">
                   <p>This is an official receipt issued by the institution.</p>
                   <p>Thank you for your payment!</p>
                 </div>

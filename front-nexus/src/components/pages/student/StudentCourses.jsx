@@ -484,11 +484,11 @@ const StudentCourses = () => {
   ];
 
   return (
-   <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+   <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <BookOpen size={24} className="text-indigo-600" />
             My Courses
           </h2>
@@ -519,7 +519,7 @@ const StudentCourses = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -528,8 +528,8 @@ const StudentCourses = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
-                    : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300"
+                    ? "border-indigo-600 text-indigo-600 "
+                    : "border-transparent text-slate-600  hover:text-slate-900 "
                 }`}
               >
                 <Icon size={16} />
@@ -585,8 +585,8 @@ const StudentCourses = () => {
               <div
                 className={`rounded-lg p-4 border ${
                   enrollmentStatus.isOpen
-                    ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                    : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
+                    ? "bg-green-50  border-green-200 "
+                    : "bg-amber-50  border-amber-200 "
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -596,17 +596,17 @@ const StudentCourses = () => {
                     <AlertCircle size={20} className="text-amber-600 mt-0.5" />
                   )}
                   <div className="flex-1">
-                    <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                    <h4 className="font-bold text-slate-900  mb-1">
                       {enrollmentStatus.isOpen
                         ? "Enrollment Period Active"
                         : "Enrollment Period Closed"}
                     </h4>
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <p className="text-sm text-slate-700 ">
                       {enrollmentStatus.message ||
                         "Check with the registrar for enrollment schedules"}
                     </p>
                     {enrollmentStatus.deadline && (
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                      <p className="text-xs text-slate-600  mt-1">
                         Deadline:{" "}
                         {new Date(
                           enrollmentStatus.deadline,
@@ -615,7 +615,7 @@ const StudentCourses = () => {
                     )}
                     {enrollmentStatus.maxUnits && (
                       <div className="flex items-center gap-4 mt-2">
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        <span className="text-sm font-medium text-slate-700 ">
                           Units:{" "}
                           {enrolledSubjects.reduce(
                             (sum, s) => sum + (s.units || 0),
@@ -623,7 +623,7 @@ const StudentCourses = () => {
                           )}{" "}
                           / {enrollmentStatus.maxUnits}
                         </span>
-                        <div className="flex-1 max-w-xs bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                        <div className="flex-1 max-w-xs bg-slate-200  rounded-full h-2">
                           <div
                             className="bg-indigo-600 h-2 rounded-full transition-all"
                             style={{
@@ -657,77 +657,77 @@ const StudentCourses = () => {
             </div>
 
             {/* Enrolled Subjects Table */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 ">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   Currently Enrolled
                 </h3>
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-slate-500 ">
                   {enrolledSubjects.length} subject
                   {enrolledSubjects.length !== 1 ? "s" : ""}
                 </span>
               </div>
               {enrolledSubjects.length === 0 ? (
-                <p className="text-center text-slate-500 dark:text-slate-400 py-10">
+                <p className="text-center text-slate-500  py-10">
                   No subjects enrolled yet
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-700/50 text-left">
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 w-8">
+                      <tr className="bg-slate-50  text-left">
+                        <th className="px-4 py-3 font-semibold text-slate-600  w-8">
                           #
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
+                        <th className="px-4 py-3 font-semibold text-slate-600 ">
                           Subject Name
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
+                        <th className="px-4 py-3 font-semibold text-slate-600 ">
                           Code
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 text-center">
+                        <th className="px-4 py-3 font-semibold text-slate-600  text-center">
                           Units
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
+                        <th className="px-4 py-3 font-semibold text-slate-600 ">
                           Schedule
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300">
+                        <th className="px-4 py-3 font-semibold text-slate-600 ">
                           Instructor
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 text-center">
+                        <th className="px-4 py-3 font-semibold text-slate-600  text-center">
                           Status
                         </th>
-                        <th className="px-4 py-3 font-semibold text-slate-600 dark:text-slate-300 text-center">
+                        <th className="px-4 py-3 font-semibold text-slate-600  text-center">
                           Action
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                    <tbody className="divide-y divide-slate-100 ">
                       {enrolledSubjects.map((subject, index) => (
                         <tr
                           key={subject.enrollment_id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                          className="hover:bg-slate-50  transition-colors"
                         >
-                          <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                          <td className="px-4 py-3 text-slate-500 ">
                             {index + 1}
                           </td>
-                          <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                          <td className="px-4 py-3 font-medium text-slate-900 ">
                             {subject.subject_name}
                           </td>
-                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                          <td className="px-4 py-3 text-slate-600  font-mono text-xs">
                             {subject.subject_code}
                           </td>
-                          <td className="px-4 py-3 text-center text-slate-700 dark:text-slate-300">
+                          <td className="px-4 py-3 text-center text-slate-700 ">
                             {subject.units}
                           </td>
-                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                          <td className="px-4 py-3 text-slate-600 ">
                             {subject.schedule || "TBA"}
                           </td>
-                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                          <td className="px-4 py-3 text-slate-600 ">
                             {subject.instructor || "TBA"}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100  text-green-700 ">
                               <CheckCircle size={11} />
                               Enrolled
                             </span>
@@ -735,7 +735,7 @@ const StudentCourses = () => {
                           <td className="px-4 py-3 text-center">
                             <button
                               onClick={() => handleDrop(subject.enrollment_id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1 rounded-md text-xs font-medium transition-colors"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50  px-3 py-1 rounded-md text-xs font-medium transition-colors"
                             >
                               Drop
                             </button>
@@ -744,14 +744,14 @@ const StudentCourses = () => {
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="bg-slate-50 dark:bg-slate-700/50 border-t border-slate-200 dark:border-slate-700">
+                      <tr className="bg-slate-50  border-t border-slate-200 ">
                         <td
                           colSpan={3}
-                          className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 text-right"
+                          className="px-4 py-2 text-xs font-semibold text-slate-600  text-right"
                         >
                           Total Units:
                         </td>
-                        <td className="px-4 py-2 text-center font-bold text-slate-900 dark:text-white">
+                        <td className="px-4 py-2 text-center font-bold text-slate-900 ">
                           {enrolledSubjects.reduce(
                             (sum, s) => sum + (s.units || 0),
                             0,
@@ -777,7 +777,7 @@ const StudentCourses = () => {
                   className={`px-4 py-2 rounded-md font-medium text-sm whitespace-nowrap transition-colors ${
                     selectedDay === day
                       ? "bg-indigo-600 text-white"
-                      : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                      : "bg-slate-100  text-slate-700  hover:bg-slate-200 "
                   }`}
                 >
                   {day}
@@ -786,7 +786,7 @@ const StudentCourses = () => {
             </div>
 
             {/* Selected Day Table View */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="bg-white  rounded-lg border border-slate-200  overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-3">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Calendar size={18} />
@@ -796,7 +796,7 @@ const StudentCourses = () => {
 
               {groupedByDay[selectedDay]?.length === 0 ? (
                 <div className="p-6 text-center">
-                  <p className="text-slate-500 dark:text-slate-400">
+                  <p className="text-slate-500 ">
                     No classes scheduled
                   </p>
                 </div>
@@ -804,47 +804,47 @@ const StudentCourses = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
-                        <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                      <tr className="border-b border-slate-200  bg-slate-50 ">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                           Time
                         </th>
-                        <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                           Subject
                         </th>
-                        <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                           Code
                         </th>
-                        <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                           Room
                         </th>
-                        <th className="px-4 py-3 text-left font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-700  text-sm">
                           Instructor
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tbody className="divide-y divide-slate-200 ">
                       {groupedByDay[selectedDay]?.map((item, index) => (
                         <tr
                           key={index}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
+                          className="hover:bg-slate-50  transition-colors"
                         >
                           <td className="px-4 py-3">
-                            <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
+                            <span className="text-sm text-slate-700  font-medium">
                               {item.start_time} - {item.end_time}
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                            <p className="text-sm font-semibold text-slate-900 ">
                               {item.subject_name}
                             </p>
                           </td>
                           <td className="px-4 py-3">
-                            <p className="text-sm text-slate-600 dark:text-slate-400 font-mono">
+                            <p className="text-sm text-slate-600  font-mono">
                               {item.subject_code}
                             </p>
                           </td>
                           <td className="px-4 py-3">
-                            <p className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                            <p className="text-sm text-slate-600  flex items-center gap-1">
                               <MapPin
                                 size={14}
                                 className="text-indigo-600 flex-shrink-0"
@@ -853,7 +853,7 @@ const StudentCourses = () => {
                             </p>
                           </td>
                           <td className="px-4 py-3">
-                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                            <p className="text-sm text-slate-600 ">
                               {item.instructor}
                             </p>
                           </td>
@@ -870,75 +870,75 @@ const StudentCourses = () => {
         {/* Confirmation Modal */}
         {showConfirmModal && selectedSubject && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-lg max-w-md w-full p-6 shadow-xl">
+            <div className="bg-white  rounded-lg max-w-md w-full p-6 shadow-xl">
               <div className="flex items-start gap-3 mb-4">
-                <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-full p-2">
+                <div className="bg-indigo-100  rounded-full p-2">
                   <FileText size={24} className="text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-bold text-slate-900  mb-1">
                     Confirm Enrollment
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-600 ">
                     Review the subject details before enrolling
                   </p>
                 </div>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 space-y-2">
+              <div className="bg-slate-50  rounded-lg p-4 mb-4 space-y-2">
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-500 ">
                     Subject Name
                   </p>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-bold text-slate-900 ">
                     {selectedSubject.subject_name}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 ">
                       Subject Code
                     </p>
-                    <p className="font-medium text-slate-900 dark:text-white">
+                    <p className="font-medium text-slate-900 ">
                       {selectedSubject.subject_code}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 ">
                       Units
                     </p>
-                    <p className="font-medium text-slate-900 dark:text-white">
+                    <p className="font-medium text-slate-900 ">
                       {selectedSubject.units}
                     </p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-500 ">
                     Schedule
                   </p>
-                  <p className="font-medium text-slate-900 dark:text-white">
+                  <p className="font-medium text-slate-900 ">
                     {selectedSubject.schedule}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-500 ">
                     Instructor
                   </p>
-                  <p className="font-medium text-slate-900 dark:text-white">
+                  <p className="font-medium text-slate-900 ">
                     {selectedSubject.instructor}
                   </p>
                 </div>
                 {selectedSubject.prerequisites &&
                   selectedSubject.prerequisites.length > 0 && (
-                    <div className="border-t border-slate-200 dark:border-slate-600 pt-2 mt-2">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                    <div className="border-t border-slate-200  pt-2 mt-2">
+                      <p className="text-xs text-slate-500  mb-1">
                         Prerequisites Required
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {selectedSubject.prerequisites.map((prereq, index) => (
                           <span
                             key={index}
-                            className="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded"
+                            className="text-xs bg-amber-100  text-amber-700  px-2 py-1 rounded"
                           >
                             {prereq}
                           </span>
@@ -949,10 +949,10 @@ const StudentCourses = () => {
               </div>
 
               {enrollmentStatus && !enrollmentStatus.isOpen && (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+                <div className="bg-amber-50  border border-amber-200  rounded-lg p-3 mb-4">
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-amber-600" />
-                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                    <p className="text-xs text-amber-700 ">
                       Enrollment period is currently closed. Contact the
                       registrar for assistance.
                     </p>
@@ -966,7 +966,7 @@ const StudentCourses = () => {
                     setShowConfirmModal(false);
                     setSelectedSubject(null);
                   }}
-                  className="flex-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white px-4 py-2 rounded-md font-medium transition-colors"
+                  className="flex-1 bg-slate-200 hover:bg-slate-300   text-slate-900  px-4 py-2 rounded-md font-medium transition-colors"
                 >
                   Cancel
                 </button>

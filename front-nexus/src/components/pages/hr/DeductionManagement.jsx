@@ -118,44 +118,44 @@ const DeductionManagement = () => {
   };
 
   return (
-    <div className="dark:bg-slate-900 p-3 sm:p-4 transition-colors duration-500">
+    <div className=" p-3 sm:p-4 transition-colors duration-500">
       <div className="w-full max-w-7xl mx-auto space-y-4 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <DollarSign size={24} className="text-indigo-600" />
             Deduction Management
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Data Integrity: Online
           </span>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="bg-white dark:bg-slate-800 rounded-md shadow-sm p-4 border-l-4 border-indigo-500 dark:border-indigo-600">
+          <div className="bg-white  rounded-md shadow-sm p-4 border-l-4 border-indigo-500 ">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Total Deductions</p>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                <p className="text-xs font-medium text-slate-600 ">Total Deductions</p>
+                <p className="text-2xl font-bold text-slate-900  mt-1">
                   {deductions.length}
                 </p>
               </div>
-              <TrendingDown className="text-indigo-600 dark:text-indigo-400" size={28} />
+              <TrendingDown className="text-indigo-600 " size={28} />
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-md shadow-sm p-4 border-l-4 border-green-500 dark:border-green-600">
+          <div className="bg-white  rounded-md shadow-sm p-4 border-l-4 border-green-500 ">
             <div>
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Active Deductions</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
+              <p className="text-xs font-medium text-slate-600 ">Active Deductions</p>
+              <p className="text-2xl font-bold text-green-600  mt-1">
                 {deductions.filter((d) => d.status === "Active").length}
               </p>
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-md shadow-sm p-4 border-l-4 border-blue-500 dark:border-blue-600">
+          <div className="bg-white  rounded-md shadow-sm p-4 border-l-4 border-blue-500 ">
             <div>
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Total Amount</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+              <p className="text-xs font-medium text-slate-600 ">Total Amount</p>
+              <p className="text-2xl font-bold text-blue-600  mt-1">
                 ₱
                 {deductions
                   .reduce((sum, d) => sum + parseFloat(d.amount || 0), 0)
@@ -176,7 +176,7 @@ const DeductionManagement = () => {
               onChange={(e) =>
                 setFilters({ ...filters, search: e.target.value })
               }
-              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-800 dark:text-white text-sm transition-all shadow-inner"
+              className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm transition-all shadow-inner"
             />
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -191,7 +191,7 @@ const DeductionManagement = () => {
               onChange={(e) =>
                 setFilters({ ...filters, deduction_type: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-44"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-44"
             >
               <option value="">All Deduction Types</option>
               {deductionTypes.map((type) => (
@@ -205,7 +205,7 @@ const DeductionManagement = () => {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-3 py-2 rounded-md border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-white text-sm w-32"
+              className="px-3 py-2 rounded-md border border-slate-300  focus:outline-none focus:ring-2 focus:ring-indigo-500   text-sm w-32"
             >
               <option value="">All Status</option>
               {statuses.map((status) => (
@@ -228,10 +228,10 @@ const DeductionManagement = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded border border-slate-200 dark:border-slate-700">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-slate-100 dark:bg-slate-700/70">
-              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <div className="overflow-x-auto rounded border border-slate-200 ">
+          <table className="min-w-full divide-y divide-slate-200 ">
+            <thead className="bg-slate-100 ">
+              <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700 ">
                 <th className="px-4 py-2.5">
                   Employee
                 </th>
@@ -255,22 +255,22 @@ const DeductionManagement = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+            <tbody className="divide-y divide-slate-100  bg-white ">
               {deductions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).length ? (
                 deductions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((deduction) => (
-                  <tr key={deduction.deduction_id} className="text-sm text-slate-700 dark:text-slate-200 hover:bg-indigo-50/50 dark:hover:bg-slate-700 transition duration-150">
+                  <tr key={deduction.deduction_id} className="text-sm text-slate-700  hover:bg-indigo-50/50  transition duration-150">
                     <td className="px-4 py-2">
                       <div>
-                        <div className="font-medium text-slate-900 dark:text-white">
+                        <div className="font-medium text-slate-900 ">
                           {deduction.first_name} {deduction.last_name}
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                        <div className="text-xs text-slate-500  font-mono">
                           {deduction.employee_number}
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-2">
-                      <span className="inline-flex px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
+                      <span className="inline-flex px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800   rounded-full">
                         {deduction.deduction_type}
                       </span>
                     </td>
@@ -284,9 +284,9 @@ const DeductionManagement = () => {
                       {deduction.total_balance > 0 ? (
                         <div>
                           <div className="flex items-center gap-2 mb-1">
-                            <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                            <div className="flex-1 bg-slate-200  rounded-full h-2">
                               <div
-                                className="bg-green-600 dark:bg-green-500 h-2 rounded-full transition-all"
+                                className="bg-green-600  h-2 rounded-full transition-all"
                                 style={{
                                   width: `${calculateProgress(
                                     deduction.remaining_balance,
@@ -295,7 +295,7 @@ const DeductionManagement = () => {
                                 }}
                               />
                             </div>
-                            <span className="text-xs text-slate-600 dark:text-slate-400">
+                            <span className="text-xs text-slate-600 ">
                               {calculateProgress(
                                 deduction.remaining_balance,
                                 deduction.total_balance
@@ -303,21 +303,21 @@ const DeductionManagement = () => {
                               %
                             </span>
                           </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                          <div className="text-xs text-slate-500 ">
                             ₱{parseFloat(deduction.remaining_balance || 0).toLocaleString()} / ₱{parseFloat(deduction.total_balance || 0).toLocaleString()}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-sm text-slate-500 dark:text-slate-400">N/A</span>
+                        <span className="text-sm text-slate-500 ">N/A</span>
                       )}
                     </td>
                     <td className="px-4 py-2">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${deduction.status === "Active"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                            ? "bg-green-100 text-green-700  "
                             : deduction.status === "Completed"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                              : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                              ? "bg-blue-100 text-blue-700  "
+                              : "bg-slate-100 text-slate-700  "
                           }`}
                       >
                         {deduction.status}
@@ -327,14 +327,14 @@ const DeductionManagement = () => {
                       <button
                         onClick={() => handleEdit(deduction)}
                         title="Edit"
-                        className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                        className="text-indigo-600 hover:text-indigo-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                       >
                         <Edit size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(deduction.deduction_id)}
                         title="Delete"
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700"
+                        className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                       >
                         <Trash2 size={14} />
                       </button>
@@ -356,7 +356,7 @@ const DeductionManagement = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 dark:text-slate-200">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700 ">
           <span className="text-xs sm:text-sm">
             Page <span className="font-semibold">{currentPage}</span> of{" "}
             <span className="font-semibold">{Math.ceil(deductions.length / itemsPerPage) || 1}</span> | Total Records:{" "}
@@ -366,17 +366,17 @@ const DeductionManagement = () => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+            <span className="px-2 py-1 text-xs font-semibold text-indigo-600 ">
               {currentPage}
             </span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(deductions.length / itemsPerPage)))}
               disabled={currentPage === Math.ceil(deductions.length / itemsPerPage) || deductions.length === 0}
-              className="p-1.5 rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
+              className="p-1.5 rounded-md border border-slate-300  bg-white  disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100  transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -387,10 +387,10 @@ const DeductionManagement = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-2 z-50 transition-opacity duration-300" onClick={() => setShowModal(false)}>
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-3xl transform transition-transform duration-300 scale-100 border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white  rounded-lg shadow-2xl w-full max-w-3xl transform transition-transform duration-300 scale-100 border border-slate-200  max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 rounded-t-lg">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-slate-50  rounded-t-lg">
+              <h3 className="text-lg font-bold text-slate-900 ">
                 {formData.deduction_id ? "Edit" : "Add"} Deduction
               </h3>
               <button
@@ -398,7 +398,7 @@ const DeductionManagement = () => {
                   setShowModal(false);
                   resetForm();
                 }}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600  transition-colors"
               >
                 <Plus size={18} className="rotate-45" />
               </button>
@@ -408,7 +408,7 @@ const DeductionManagement = () => {
             <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Employee ID *
                   </label>
                   <input
@@ -417,11 +417,11 @@ const DeductionManagement = () => {
                     value={formData.employee_id}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Deduction Type *
                   </label>
                   <select
@@ -429,7 +429,7 @@ const DeductionManagement = () => {
                     value={formData.deduction_type}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   >
                     {deductionTypes.map((type) => (
                       <option key={type} value={type}>
@@ -439,7 +439,7 @@ const DeductionManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Amount *
                   </label>
                   <input
@@ -449,11 +449,11 @@ const DeductionManagement = () => {
                     onChange={handleInputChange}
                     step="0.01"
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Frequency *
                   </label>
                   <select
@@ -461,7 +461,7 @@ const DeductionManagement = () => {
                     value={formData.frequency}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   >
                     {frequencies.map((freq) => (
                       <option key={freq} value={freq}>
@@ -471,7 +471,7 @@ const DeductionManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Status *
                   </label>
                   <select
@@ -479,7 +479,7 @@ const DeductionManagement = () => {
                     value={formData.status}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   >
                     {statuses.map((status) => (
                       <option key={status} value={status}>
@@ -489,7 +489,7 @@ const DeductionManagement = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Start Date *
                   </label>
                   <input
@@ -498,11 +498,11 @@ const DeductionManagement = () => {
                     value={formData.start_date}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     End Date
                   </label>
                   <input
@@ -510,11 +510,11 @@ const DeductionManagement = () => {
                     name="end_date"
                     value={formData.end_date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Total Balance
                   </label>
                   <input
@@ -523,12 +523,12 @@ const DeductionManagement = () => {
                     value={formData.total_balance}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                     placeholder="For loans/advances"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Remaining Balance
                   </label>
                   <input
@@ -537,12 +537,12 @@ const DeductionManagement = () => {
                     value={formData.remaining_balance}
                     onChange={handleInputChange}
                     step="0.01"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                     placeholder="For loans/advances"
                   />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-medium text-slate-700  mb-1">
                     Notes
                   </label>
                   <textarea
@@ -550,20 +550,20 @@ const DeductionManagement = () => {
                     value={formData.notes}
                     onChange={handleInputChange}
                     rows="2"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md dark:bg-slate-700 dark:text-white focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 ">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 transition-colors border border-slate-300 dark:border-slate-600"
+                  className="px-3 py-1.5 text-sm bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300    transition-colors border border-slate-300 "
                 >
                   Cancel
                 </button>

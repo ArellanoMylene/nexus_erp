@@ -470,15 +470,15 @@ const StudentLMS = () => {
   const getStatusColor = (status) => {
     const colors = {
       completed:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+        "bg-green-100 text-green-700  ",
       pending:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-      missed: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+        "bg-yellow-100 text-yellow-700  ",
+      missed: "bg-red-100 text-red-700  ",
       submitted:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-      late: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+        "bg-green-100 text-green-700  ",
+      late: "bg-orange-100 text-orange-700  ",
       graded:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+        "bg-blue-100 text-blue-700  ",
     };
     return colors[status] || colors.pending;
   };
@@ -491,27 +491,27 @@ const StudentLMS = () => {
   ];
 
   return (
-    <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+    <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <BookOpen size={24} className="text-indigo-600" />
             Learning Management System
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             Online Learning Platform
           </span>
         </div>
 
         {loading && (
-          <div className="flex items-center justify-center py-8 text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-center py-8 text-slate-500 ">
             Loading LMS content...
           </div>
         )}
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-0 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200  pb-0 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -519,8 +519,8 @@ const StudentLMS = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm transition-all border-b-2 whitespace-nowrap ${activeTab === tab.id
-                  ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20"
-                  : "border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                  ? "border-indigo-600 text-indigo-600  bg-indigo-50/50 "
+                  : "border-transparent text-slate-600  hover:text-slate-900  hover:bg-slate-50 "
                   }`}
               >
                 <Icon size={16} />
@@ -534,9 +534,9 @@ const StudentLMS = () => {
         {activeTab === "lessons" && (
           <div className="space-y-4">
             {Object.entries(groupedLessons).length === 0 ? (
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+              <div className="bg-white  rounded-lg border border-slate-200  p-8 text-center">
                 <BookOpen size={48} className="mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   {isEnrolled
                     ? "No learning materials available yet"
                     : "You are not enrolled in any courses for this academic period"}
@@ -547,16 +547,16 @@ const StudentLMS = () => {
                 ([subject, subjectLessons]) => (
                   <div
                     key={subject}
-                    className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4"
+                    className="bg-white  rounded-lg border border-slate-200  p-4"
                   >
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3">
+                    <h3 className="text-lg font-bold text-slate-900  mb-3">
                       {subject}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {subjectLessons.map((lesson) => (
                         <div
                           key={lesson.lesson_id}
-                          className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800 hover:shadow-md transition-shadow"
+                          className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50   rounded-lg border border-indigo-200  hover:shadow-md transition-shadow"
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
@@ -568,15 +568,15 @@ const StudentLMS = () => {
                                   className="text-indigo-600"
                                 />
                               )}
-                              <h4 className="font-semibold text-slate-900 dark:text-white">
+                              <h4 className="font-semibold text-slate-900 ">
                                 {lesson.title}
                               </h4>
                             </div>
                           </div>
-                          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
+                          <p className="text-sm text-slate-600  mb-3 line-clamp-2">
                             {lesson.description}
                           </p>
-                          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3">
+                          <div className="flex items-center justify-between text-xs text-slate-500  mb-3">
                             <span className="flex items-center gap-1">
                               <Clock size={12} />
                               {lesson.duration || "30 min"}
@@ -619,9 +619,9 @@ const StudentLMS = () => {
         {activeTab === "quizzes" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {quizzes.length === 0 ? (
-              <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+              <div className="lg:col-span-2 bg-white  rounded-lg border border-slate-200  p-8 text-center">
                 <FileText size={48} className="mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   No quizzes available
                 </p>
               </div>
@@ -629,14 +629,14 @@ const StudentLMS = () => {
               quizzes.map((quiz) => (
                 <div
                   key={quiz.quiz_id}
-                  className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 hover:shadow-lg transition-shadow"
+                  className="bg-white  rounded-lg border border-slate-200  p-4 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                      <h3 className="text-lg font-bold text-slate-900 ">
                         {quiz.title}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                      <p className="text-sm text-slate-600 ">
                         {quiz.subject_name}
                       </p>
                     </div>
@@ -647,7 +647,7 @@ const StudentLMS = () => {
                     </span>
                   </div>
 
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                  <p className="text-sm text-slate-600  mb-4">
                     {quiz.description}
                   </p>
 
@@ -655,10 +655,10 @@ const StudentLMS = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <CalendarIcon size={16} className="text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 ">
                           Due Date
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-slate-900 ">
                           {new Date(quiz.due_date).toLocaleDateString()}
                         </p>
                       </div>
@@ -666,10 +666,10 @@ const StudentLMS = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <Clock size={16} className="text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 ">
                           Time Limit
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-slate-900 ">
                           {quiz.time_limit || "30"} mins
                         </p>
                       </div>
@@ -677,10 +677,10 @@ const StudentLMS = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <FileText size={16} className="text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 ">
                           Questions
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-slate-900 ">
                           {quiz.total_questions || 20}
                         </p>
                       </div>
@@ -688,10 +688,10 @@ const StudentLMS = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <CheckCircle size={16} className="text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <p className="text-xs text-slate-500 ">
                           Score
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-slate-900 ">
                           {quiz.score
                             ? `${quiz.score}/${quiz.max_score}`
                             : "Not taken"}
@@ -717,7 +717,7 @@ const StudentLMS = () => {
                     </button>
                   )}
                   {quiz.status === "missed" && (
-                    <div className="flex items-center justify-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                    <div className="flex items-center justify-center gap-2 text-red-600  text-sm">
                       <AlertCircle size={16} />
                       Quiz deadline has passed
                     </div>
@@ -732,9 +732,9 @@ const StudentLMS = () => {
         {activeTab === "assignments" && (
           <div className="space-y-3">
             {assignments.length === 0 ? (
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+              <div className="bg-white  rounded-lg border border-slate-200  p-8 text-center">
                 <FileText size={48} className="mx-auto text-slate-400 mb-3" />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   No assignments available
                 </p>
               </div>
@@ -742,16 +742,16 @@ const StudentLMS = () => {
               assignments.map((assignment) => (
                 <div
                   key={assignment.assignment_id}
-                  className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4 hover:shadow-md transition-shadow"
+                  className="bg-white  rounded-lg border border-slate-200  p-4 hover:shadow-md transition-shadow"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                          <h3 className="text-lg font-bold text-slate-900 ">
                             {assignment.title}
                           </h3>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                          <p className="text-sm text-slate-600 ">
                             {assignment.subject_name}
                           </p>
                         </div>
@@ -761,7 +761,7 @@ const StudentLMS = () => {
                           {assignment.status}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                      <p className="text-sm text-slate-600  mb-3">
                         {assignment.description}
                       </p>
 
@@ -769,10 +769,10 @@ const StudentLMS = () => {
                         <div className="flex items-center gap-2">
                           <CalendarIcon size={16} className="text-slate-400" />
                           <div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-xs text-slate-500 ">
                               Due Date
                             </p>
-                            <p className="font-semibold text-slate-900 dark:text-white">
+                            <p className="font-semibold text-slate-900 ">
                               {new Date(
                                 assignment.due_date,
                               ).toLocaleDateString()}
@@ -782,10 +782,10 @@ const StudentLMS = () => {
                         <div className="flex items-center gap-2">
                           <Clock size={16} className="text-slate-400" />
                           <div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-xs text-slate-500 ">
                               Posted
                             </p>
-                            <p className="font-semibold text-slate-900 dark:text-white">
+                            <p className="font-semibold text-slate-900 ">
                               {new Date(
                                 assignment.posted_at,
                               ).toLocaleDateString()}
@@ -796,10 +796,10 @@ const StudentLMS = () => {
                           <div className="flex items-center gap-2">
                             <CheckCircle size={16} className="text-slate-400" />
                             <div>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                              <p className="text-xs text-slate-500 ">
                                 Score
                               </p>
-                              <p className="font-semibold text-slate-900 dark:text-white">
+                              <p className="font-semibold text-slate-900 ">
                                 {assignment.score}/{assignment.max_score}
                               </p>
                             </div>
@@ -837,7 +837,7 @@ const StudentLMS = () => {
                         </button>
                       )}
                       {assignment.status === "late" && (
-                        <div className="flex items-center justify-center gap-2 text-orange-600 dark:text-orange-400 text-sm px-4 py-2">
+                        <div className="flex items-center justify-center gap-2 text-orange-600  text-sm px-4 py-2">
                           <AlertCircle size={16} />
                           Late Submission
                         </div>
@@ -846,27 +846,27 @@ const StudentLMS = () => {
                   </div>
 
                   {assignment.submitted_at && (
-                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-3 pt-3 border-t border-slate-200 ">
+                      <p className="text-xs text-slate-500 ">
                         Submitted on{" "}
                         {new Date(assignment.submitted_at).toLocaleString()}
                       </p>
                       {assignment.feedback && (
-                        <div className="mt-2 bg-slate-50 dark:bg-slate-700/50 p-3 rounded-md border border-slate-100 dark:border-slate-700">
-                          <p className="text-sm text-slate-700 dark:text-slate-300">
+                        <div className="mt-2 bg-slate-50  p-3 rounded-md border border-slate-100 ">
+                          <p className="text-sm text-slate-700 ">
                             <strong>Feedback:</strong> {assignment.feedback}
                           </p>
                         </div>
                       )}
 
                       {assignment.graded_by_name && (
-                        <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="mt-2 pt-2 border-t border-slate-200  flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 ">
                           <span>
-                            Graded by: <span className="font-medium text-slate-700 dark:text-slate-200">{assignment.graded_by_name}</span>
+                            Graded by: <span className="font-medium text-slate-700 ">{assignment.graded_by_name}</span>
                           </span>
                           {assignment.graded_at && (
                             <span>
-                              on: <span className="font-medium text-slate-700 dark:text-slate-200">{new Date(assignment.graded_at).toLocaleString()}</span>
+                              on: <span className="font-medium text-slate-700 ">{new Date(assignment.graded_at).toLocaleString()}</span>
                             </span>
                           )}
                         </div>
@@ -883,12 +883,12 @@ const StudentLMS = () => {
         {activeTab === "discussions" && (
           <div className="space-y-4">
             {discussions.length === 0 ? (
-              <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
+              <div className="bg-white  rounded-lg border border-slate-200  p-8 text-center">
                 <MessageCircle
                   size={48}
                   className="mx-auto text-slate-400 mb-3"
                 />
-                <p className="text-slate-500 dark:text-slate-400">
+                <p className="text-slate-500 ">
                   No discussions available
                 </p>
               </div>
@@ -896,7 +896,7 @@ const StudentLMS = () => {
               discussions.map((discussion) => (
                 <div
                   key={discussion.id}
-                  className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 hover:shadow-md transition-shadow"
+                  className="bg-white  rounded-lg border border-slate-200  p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
@@ -906,14 +906,14 @@ const StudentLMS = () => {
                             Pin
                           </span>
                         )}
-                        <h3 className="font-semibold text-xl text-slate-900 dark:text-white">
+                        <h3 className="font-semibold text-xl text-slate-900 ">
                           {discussion.title}
                         </h3>
                       </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
+                      <p className="text-sm text-slate-500  mb-2">
                         {discussion.course_name} - {discussion.section_name}
                       </p>
-                      <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-4 text-sm text-slate-500 ">
                         <span className="flex items-center gap-1">
                           <User size={14} />
                           {discussion.author_name}
@@ -926,12 +926,12 @@ const StudentLMS = () => {
                     </div>
                   </div>
 
-                  <p className="text-slate-600 dark:text-slate-300 mb-4 line-clamp-2">
+                  <p className="text-slate-600  mb-4 line-clamp-2">
                     {discussion.content}
                   </p>
 
-                  <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-4">
-                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center justify-between border-t border-slate-100  pt-4">
+                    <div className="flex items-center gap-2 text-slate-500 ">
                       <MessageCircle size={16} />
                       <span className="text-sm">
                         {discussion.reply_count || 0} replies
@@ -952,9 +952,9 @@ const StudentLMS = () => {
         {/* Lesson View Modal */}
         {selectedLesson && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white  rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b border-slate-200 ">
+                <h3 className="text-xl font-bold text-slate-900  flex items-center gap-2">
                   {selectedLesson.type === "video" ? (
                     <Play size={24} className="text-indigo-600" />
                   ) : (
@@ -964,7 +964,7 @@ const StudentLMS = () => {
                 </h3>
                 <button
                   onClick={() => setSelectedLesson(null)}
-                  className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  className="text-slate-500 hover:text-slate-700  "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -984,11 +984,11 @@ const StudentLMS = () => {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg">
-                  <p className="text-slate-700 dark:text-slate-300">
+                <div className="bg-slate-50  p-4 rounded-lg">
+                  <p className="text-slate-700 ">
                     {selectedLesson.description}
                   </p>
-                  <div className="mt-2 flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                  <div className="mt-2 flex items-center gap-4 text-sm text-slate-500 ">
                     <span className="flex items-center gap-1">
                       <User size={14} />
                       {selectedLesson.faculty_name}
@@ -1000,7 +1000,7 @@ const StudentLMS = () => {
                   </div>
                 </div>
 
-                <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900 flex items-center justify-center min-h-[300px]">
+                <div className="border border-slate-200  rounded-lg overflow-hidden bg-slate-100  flex items-center justify-center min-h-[300px]">
                   {selectedLesson.type === "video" && selectedLesson.file_url ? (
                     <video
                       controls
@@ -1020,9 +1020,9 @@ const StudentLMS = () => {
                     <div className="text-center p-8">
                       <FileText
                         size={64}
-                        className="mx-auto text-slate-300 dark:text-slate-600 mb-4"
+                        className="mx-auto text-slate-300  mb-4"
                       />
-                      <p className="text-slate-600 dark:text-slate-400 mb-4">
+                      <p className="text-slate-600  mb-4">
                         This content cannot be previewed directly.
                       </p>
                       {selectedLesson.file_url && (
@@ -1041,10 +1041,10 @@ const StudentLMS = () => {
                 </div>
               </div>
 
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 flex justify-end gap-2">
+              <div className="p-4 border-t border-slate-200  bg-slate-50  flex justify-end gap-2">
                 <button
                   onClick={() => setSelectedLesson(null)}
-                  className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-slate-700  hover:bg-slate-100  rounded-lg transition-colors"
                 >
                   Close
                 </button>
@@ -1056,16 +1056,16 @@ const StudentLMS = () => {
         {/* Assignment Submission Modal */}
         {selectedAssignment && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
-              <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            <div className="bg-white  rounded-xl shadow-xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
+              <div className="p-4 border-b border-slate-200  flex justify-between items-center bg-slate-50 ">
+                <h3 className="text-lg font-bold text-slate-900 ">
                   {selectedAssignment.status === "submitted" || selectedAssignment.status === "graded"
                     ? "Submission Details"
                     : "Submit Assignment"}
                 </h3>
                 <button
                   onClick={() => setSelectedAssignment(null)}
-                  className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  className="text-slate-500 hover:text-slate-700  "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1086,33 +1086,33 @@ const StudentLMS = () => {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* Common Details */}
-                <div className="bg-slate-50 dark:bg-slate-900/30 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                  <h4 className="font-semibold text-slate-900 dark:text-white mb-1">
+                <div className="bg-slate-50  p-3 rounded-lg border border-slate-200 ">
+                  <h4 className="font-semibold text-slate-900  mb-1">
                     {selectedAssignment.title}
                   </h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                  <p className="text-sm text-slate-600  mb-2">
                     {selectedAssignment.description}
                   </p>
                   {selectedAssignment.instructions && (
-                    <div className="mt-2 p-2 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">Instructions</p>
-                      <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{selectedAssignment.instructions}</p>
+                    <div className="mt-2 p-2 bg-white  rounded border border-slate-100 ">
+                      <p className="text-xs text-slate-500  font-semibold mb-1">Instructions</p>
+                      <p className="text-sm text-slate-700  whitespace-pre-wrap">{selectedAssignment.instructions}</p>
                     </div>
                   )}
                   {selectedAssignment.file_url && (
-                    <div className="mt-3 p-2 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700">
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">Attached File</p>
+                    <div className="mt-3 p-2 bg-white  rounded border border-slate-100 ">
+                      <p className="text-xs text-slate-500  font-semibold mb-1">Attached File</p>
                       <a
                         href={selectedAssignment.file_url.startsWith("http") ? selectedAssignment.file_url : `${API_BASE}${selectedAssignment.file_url}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                        className="text-sm text-indigo-600  hover:underline"
                       >
                         {selectedAssignment.file_name || "View Attachment"}
                       </a>
                     </div>
                   )}
-                  <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-2">
+                  <div className="flex justify-between items-center text-xs text-slate-500  border-t border-slate-200  pt-2">
                     <span className="flex items-center gap-1">
                       <CalendarIcon size={12} />
                       Due: {new Date(selectedAssignment.due_date).toLocaleDateString()}
@@ -1128,12 +1128,12 @@ const StudentLMS = () => {
                 {(selectedAssignment.status === "submitted" || selectedAssignment.status === "graded") ? (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <h4 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      <h4 className="text-sm font-semibold text-slate-900  flex items-center gap-2">
                         <CheckCircle size={16} className="text-indigo-600" />
                         Your Submission
                       </h4>
-                      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                      <div className="bg-white  border border-slate-200  rounded-lg p-3">
+                        <p className="text-xs text-slate-500  mb-1">
                           Submitted on {new Date(selectedAssignment.submitted_at).toLocaleString()}
                         </p>
                         {/* Attachment shown in common details above */}
@@ -1142,28 +1142,28 @@ const StudentLMS = () => {
 
                     {/* Grade & Feedback Section */}
                     {selectedAssignment.status === "graded" && (
-                      <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg p-4 space-y-3">
+                      <div className="bg-green-50  border border-green-200  rounded-lg p-4 space-y-3">
                         <div className="flex justify-between items-center">
-                          <h4 className="font-semibold text-green-800 dark:text-green-400 flex items-center gap-2">
+                          <h4 className="font-semibold text-green-800  flex items-center gap-2">
                             <CheckCircle size={18} />
                             Graded
                           </h4>
-                          <span className="text-lg font-bold text-green-700 dark:text-green-300">
-                            {selectedAssignment.score} <span className="text-sm font-normal text-green-600 dark:text-green-400">/ {selectedAssignment.max_score}</span>
+                          <span className="text-lg font-bold text-green-700 ">
+                            {selectedAssignment.score} <span className="text-sm font-normal text-green-600 ">/ {selectedAssignment.max_score}</span>
                           </span>
                         </div>
 
                         {selectedAssignment.feedback && (
-                          <div className="bg-white/60 dark:bg-black/20 p-3 rounded border border-green-100 dark:border-green-800/50">
-                            <p className="text-xs font-semibold text-green-800 dark:text-green-400 mb-1 uppercase tracking-wider">Feedback</p>
-                            <p className="text-sm text-green-900 dark:text-green-100">
+                          <div className="bg-white/60  p-3 rounded border border-green-100 ">
+                            <p className="text-xs font-semibold text-green-800  mb-1 uppercase tracking-wider">Feedback</p>
+                            <p className="text-sm text-green-900 ">
                               {selectedAssignment.feedback}
                             </p>
                           </div>
                         )}
 
                         {selectedAssignment.graded_by_name && (
-                          <div className="text-xs text-green-700 dark:text-green-400 pt-2 border-t border-green-200 dark:border-green-800 flex flex-wrap gap-2">
+                          <div className="text-xs text-green-700  pt-2 border-t border-green-200  flex flex-wrap gap-2">
                             <span>Graded by: <strong>{selectedAssignment.graded_by_name}</strong></span>
                             {selectedAssignment.graded_at && (
                               <span>on {new Date(selectedAssignment.graded_at).toLocaleDateString()}</span>
@@ -1176,7 +1176,7 @@ const StudentLMS = () => {
                     <div className="flex justify-end pt-2">
                       <button
                         onClick={() => setSelectedAssignment(null)}
-                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg transition-colors"
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200   text-slate-700  rounded-lg transition-colors"
                       >
                         Close
                       </button>
@@ -1186,10 +1186,10 @@ const StudentLMS = () => {
                   /* Submit Mode (Pending/Late) */
                   <form onSubmit={handleAssignmentSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-medium text-slate-700  mb-1">
                         Upload File
                       </label>
-                      <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-6 text-center hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors bg-slate-50 dark:bg-slate-900/20">
+                      <div className="border-2 border-dashed border-slate-300  rounded-lg p-6 text-center hover:border-indigo-500  transition-colors bg-slate-50 ">
                         <input
                           type="file"
                           id="file-upload"
@@ -1202,18 +1202,18 @@ const StudentLMS = () => {
                           className="cursor-pointer flex flex-col items-center gap-2"
                         >
                           <Upload size={32} className="text-slate-400" />
-                          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+                          <span className="text-sm font-medium text-indigo-600  hover:text-indigo-500">
                             Click to upload a file
                           </span>
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <span className="text-xs text-slate-500 ">
                             {submissionFile ? submissionFile.name : "PDF, DOCX, ZIP up to 10MB"}
                           </span>
                         </label>
                       </div>
                     </div>
 
-                    <div className="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                      <p className="text-xs text-yellow-800 dark:text-yellow-200 flex items-center gap-1">
+                    <div className="bg-yellow-50  p-3 rounded-lg border border-yellow-200 ">
+                      <p className="text-xs text-yellow-800  flex items-center gap-1">
                         <AlertCircle size={14} />
                         Ensure your file is final before submitting. You cannot edit after submission.
                       </p>
@@ -1224,7 +1224,7 @@ const StudentLMS = () => {
                         type="button"
                         onClick={() => setSelectedAssignment(null)}
                         disabled={isSubmittingAssignment}
-                        className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                        className="px-4 py-2 text-slate-700  hover:bg-slate-100  rounded-lg transition-colors"
                       >
                         Cancel
                       </button>
@@ -1247,15 +1247,15 @@ const StudentLMS = () => {
         {/* Discussion View Modal */}
         {selectedDiscussion && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white  rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-slate-200  flex justify-between items-center">
+                <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                   <MessageCircle size={20} className="text-indigo-600" />
                   Discussion Thread
                 </h3>
                 <button
                   onClick={() => setSelectedDiscussion(null)}
-                  className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  className="text-slate-500 hover:text-slate-700  "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1276,19 +1276,19 @@ const StudentLMS = () => {
 
               <div className="flex-1 overflow-y-auto p-4 space-y-6">
                 {/* Original Post */}
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-100 dark:border-indigo-800">
+                <div className="bg-indigo-50  p-4 rounded-lg border border-indigo-100 ">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-slate-900 dark:text-white text-lg">
+                    <h4 className="font-bold text-slate-900  text-lg">
                       {selectedDiscussion.title}
                     </h4>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-xs text-slate-500 ">
                       {new Date(selectedDiscussion.created_at).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-slate-700 dark:text-slate-300 mb-3 whitespace-pre-wrap">
+                  <p className="text-slate-700  mb-3 whitespace-pre-wrap">
                     {selectedDiscussion.content}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  <div className="flex items-center gap-2 text-sm text-slate-600  font-medium">
                     <User size={14} />
                     {selectedDiscussion.author_name}
                   </div>
@@ -1296,29 +1296,29 @@ const StudentLMS = () => {
 
                 {/* Replies */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">
+                  <h4 className="font-semibold text-slate-900  border-b border-slate-200  pb-2">
                     Replies ({discussionReplies.length})
                   </h4>
                   {discussionReplies.length === 0 ? (
-                    <p className="text-center text-slate-500 dark:text-slate-400 py-4">
+                    <p className="text-center text-slate-500  py-4">
                       No replies yet. Be the first to reply!
                     </p>
                   ) : (
                     discussionReplies.map((reply) => (
-                      <div key={reply.id} className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <div key={reply.id} className="bg-slate-50  p-3 rounded-lg border border-slate-200 ">
                         <div className="flex justify-between items-start mb-2">
-                          <span className="font-medium text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                          <span className="font-medium text-slate-900  text-sm flex items-center gap-2">
                             <User size={14} />
                             {reply.author_name}
-                            <span className="text-xs font-normal text-slate-500 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                            <span className="text-xs font-normal text-slate-500 bg-slate-200  px-2 py-0.5 rounded-full">
                               {reply.author_role}
                             </span>
                           </span>
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <span className="text-xs text-slate-500 ">
                             {new Date(reply.created_at).toLocaleString()}
                           </span>
                         </div>
-                        <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
+                        <p className="text-slate-700  text-sm whitespace-pre-wrap">
                           {reply.content}
                         </p>
                       </div>
@@ -1328,14 +1328,14 @@ const StudentLMS = () => {
               </div>
 
               {/* Reply Form */}
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <div className="p-4 border-t border-slate-200  bg-white ">
                 <form onSubmit={handleReplySubmit} className="flex gap-2">
                   <input
                     type="text"
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                     placeholder="Write a reply..."
-                    className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                    className="flex-1 px-4 py-2 border border-slate-300  rounded-lg bg-white  text-slate-900  focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
                   />
                   <button
                     type="submit"
@@ -1353,15 +1353,15 @@ const StudentLMS = () => {
         {/* Quiz Modal */}
         {selectedQuiz && quizQuestions.length > 0 && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="bg-white  rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-slate-200  flex justify-between items-center bg-slate-50 ">
+                <h3 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                   <Clock size={20} className="text-indigo-600" />
                   {selectedQuiz.title}
                 </h3>
                 <button
                   onClick={() => setSelectedQuiz(null)}
-                  className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  className="text-slate-500 hover:text-slate-700  "
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1373,12 +1373,12 @@ const StudentLMS = () => {
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {quizQuestions.map((q, index) => (
                   <div key={q.id} className="space-y-3">
-                    <p className="font-medium text-slate-900 dark:text-white">
+                    <p className="font-medium text-slate-900 ">
                       {index + 1}. {q.question_text} <span className="text-xs text-slate-500">({q.points} pts)</span>
                     </p>
                     <div className="space-y-2 ml-4">
                       {q.options && q.options.map((option, optIndex) => (
-                        <label key={optIndex} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
+                        <label key={optIndex} className="flex items-center gap-3 p-3 rounded-lg border border-slate-200  hover:bg-slate-50  cursor-pointer transition-colors">
                           <input
                             type="radio"
                             name={`question-${q.id}`}
@@ -1387,7 +1387,7 @@ const StudentLMS = () => {
                             onChange={() => setQuizAnswers({ ...quizAnswers, [q.id]: option })}
                             className="text-indigo-600 focus:ring-indigo-500"
                           />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">{option}</span>
+                          <span className="text-sm text-slate-700 ">{option}</span>
                         </label>
                       ))}
                     </div>
@@ -1395,10 +1395,10 @@ const StudentLMS = () => {
                 ))}
               </div>
 
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/30 flex justify-end gap-2">
+              <div className="p-4 border-t border-slate-200  bg-slate-50  flex justify-end gap-2">
                 <button
                   onClick={() => setSelectedQuiz(null)}
-                  className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-slate-700  hover:bg-slate-100  rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
@@ -1417,14 +1417,14 @@ const StudentLMS = () => {
       {/* Quiz Modal */}
       {selectedQuiz && quizQuestions.length > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-800 z-10">
+          <div className="bg-white  rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-200  flex justify-between items-center sticky top-0 bg-white  z-10">
               <div>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                <h2 className="text-xl font-bold text-slate-900 ">
                   {selectedQuiz.title}
                 </h2>
                 {isReviewMode && (
-                  <p className="text-sm font-semibold text-green-600 dark:text-green-400 mt-1">
+                  <p className="text-sm font-semibold text-green-600  mt-1">
                     Results: {selectedQuiz.score}/{selectedQuiz.total_points}
                   </p>
                 )}
@@ -1434,7 +1434,7 @@ const StudentLMS = () => {
                   setSelectedQuiz(null);
                   setIsReviewMode(false);
                 }}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="text-slate-400 hover:text-slate-600 "
               >
                 <X size={24} />
               </button>
@@ -1443,7 +1443,7 @@ const StudentLMS = () => {
             <div className="p-6 space-y-6">
               {quizQuestions.map((q, index) => (
                 <div key={q.id || index} className="space-y-3">
-                  <p className="font-medium text-slate-900 dark:text-white">
+                  <p className="font-medium text-slate-900 ">
                     {index + 1}. {q.question_text}{" "}
                     <span className="text-sm font-normal text-slate-500">
                       ({q.points} pts)
@@ -1454,8 +1454,8 @@ const StudentLMS = () => {
                       <div className="space-y-2">
                         {/* Student Answer */}
                         <div className={`p-3 rounded-lg border flex items-center gap-3 ${quizAnswers[q.id] === q.correct_answer
-                            ? "bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300"
-                            : "bg-red-50 border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300"
+                            ? "bg-green-50 border-green-200 text-green-700   "
+                            : "bg-red-50 border-red-200 text-red-700   "
                           }`}>
                           {quizAnswers[q.id] === q.correct_answer ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <X className="w-5 h-5 flex-shrink-0" />}
                           <span className="font-medium">
@@ -1468,7 +1468,7 @@ const StudentLMS = () => {
 
                         {/* Correct Answer (only if wrong) */}
                         {quizAnswers[q.id] !== q.correct_answer && (
-                          <div className="p-3 rounded-lg border flex items-center gap-3 bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300">
+                          <div className="p-3 rounded-lg border flex items-center gap-3 bg-green-50 border-green-200 text-green-700   ">
                             <CheckCircle className="w-5 h-5 flex-shrink-0" />
                             <span className="font-medium">
                               {q.correct_answer}
@@ -1490,8 +1490,8 @@ const StudentLMS = () => {
                             }
                           }}
                           className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${quizAnswers[q.id] === option
-                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 shadow-sm"
-                            : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                            ? "border-indigo-600 bg-indigo-50  shadow-sm"
+                            : "border-slate-200  hover:bg-slate-50 "
                             } cursor-pointer`}
                         >
                           <input
@@ -1502,7 +1502,7 @@ const StudentLMS = () => {
                             onChange={() => { }} // Handled by label onClick
                             className="w-4 h-4 text-indigo-600 focus:ring-indigo-500 transition-transform duration-200 transform scale-100 active:scale-95"
                           />
-                          <span className="text-slate-700 dark:text-slate-300">
+                          <span className="text-slate-700 ">
                             {option}
                           </span>
                         </label>
@@ -1513,13 +1513,13 @@ const StudentLMS = () => {
               ))}
             </div>
 
-            <div className="p-6 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-slate-800">
+            <div className="p-6 border-t border-slate-200  flex justify-end gap-3 sticky bottom-0 bg-white ">
               <button
                 onClick={() => {
                   setSelectedQuiz(null);
                   setIsReviewMode(false);
                 }}
-                className="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="px-4 py-2 border border-slate-200  rounded-lg text-slate-600  hover:bg-slate-50  transition-colors"
               >
                 Cancel
               </button>

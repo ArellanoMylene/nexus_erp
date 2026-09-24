@@ -333,15 +333,15 @@ const StudentDashboard = () => {
   };
 
   return (
-   <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+   <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <LayoutDashboard size={24} className="text-indigo-600" />
             Student Dashboard
           </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+          <span className="text-sm text-slate-500  font-medium">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -423,43 +423,43 @@ const StudentDashboard = () => {
           {/* Left Column - Upcoming Classes & Recent Grades */}
           <div className="lg:col-span-2 space-y-4">
             {/* Upcoming Classes */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
                 <Calendar size={20} className="text-indigo-600" />
                 Today's Classes
               </h3>
               <div className="space-y-3">
                 {upcomingClasses.length === 0 ? (
-                  <p className="text-center text-slate-500 dark:text-slate-400 py-4">
+                  <p className="text-center text-slate-500  py-4">
                     No classes today
                   </p>
                 ) : (
                   upcomingClasses.map((classItem, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600"
+                      className="flex items-center justify-between p-3 bg-slate-50  rounded-lg border border-slate-200 "
                     >
                       <div className="flex items-center gap-3">
-                        <div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg">
+                        <div className="bg-indigo-100  p-2 rounded-lg">
                           <Clock
                             size={18}
-                            className="text-indigo-600 dark:text-indigo-400"
+                            className="text-indigo-600 "
                           />
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900 dark:text-white">
+                          <p className="font-semibold text-slate-900 ">
                             {classItem.subject_name}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mb-1">
+                          <p className="text-xs text-slate-500  font-mono mb-1">
                             {classItem.code}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="text-xs text-slate-500 ">
                             {classItem.room} • {classItem.instructor}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                        <p className="text-sm font-bold text-indigo-600 ">
                           {classItem.time}
                         </p>
                       </div>
@@ -470,27 +470,27 @@ const StudentDashboard = () => {
             </div>
 
             {/* Recent Grades */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
                 <GraduationCap size={20} className="text-green-600" />
                 Recent Grades
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                <table className="min-w-full divide-y divide-slate-200 ">
                   <thead>
-                    <tr className="text-left text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+                    <tr className="text-left text-xs font-bold uppercase text-slate-600 ">
                       <th className="pb-2">Subject</th>
                       <th className="pb-2">Code</th>
                       <th className="pb-2">Assessment</th>
                       <th className="pb-2 text-right">Grade</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  <tbody className="divide-y divide-slate-100 ">
                     {recentGrades.length === 0 ? (
                       <tr>
                         <td
                           colSpan="4"
-                          className="py-4 text-center text-slate-500 dark:text-slate-400"
+                          className="py-4 text-center text-slate-500 "
                         >
                           No recent grades
                         </td>
@@ -498,17 +498,17 @@ const StudentDashboard = () => {
                     ) : (
                       recentGrades.map((grade, index) => (
                         <tr key={index} className="text-sm">
-                          <td className="py-2 font-medium text-slate-900 dark:text-white">
+                          <td className="py-2 font-medium text-slate-900 ">
                             {grade.subject}
                           </td>
-                          <td className="py-2 text-slate-600 dark:text-slate-400 font-mono text-xs">
+                          <td className="py-2 text-slate-600  font-mono text-xs">
                             {grade.code}
                           </td>
-                          <td className="py-2 text-slate-600 dark:text-slate-400">
+                          <td className="py-2 text-slate-600 ">
                             {grade.assessment}
                           </td>
                           <td className="py-2 text-right">
-                            <span className="font-bold text-green-600 dark:text-green-400">
+                            <span className="font-bold text-green-600 ">
                               {typeof grade.grade === "number"
                                 ? grade.grade.toFixed(2)
                                 : grade.grade}
@@ -526,21 +526,21 @@ const StudentDashboard = () => {
           {/* Right Column - Announcements & Quick Links */}
           <div className="space-y-4">
             {/* Announcements */}
-            <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <div className="bg-white  rounded-lg border border-slate-200  p-4">
+              <h3 className="text-lg font-bold text-slate-900  mb-4 flex items-center gap-2">
                 <Bell size={20} className="text-orange-600" />
                 Announcements
               </h3>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {announcements.length === 0 ? (
-                  <p className="text-center text-slate-500 dark:text-slate-400 py-4">
+                  <p className="text-center text-slate-500  py-4">
                     No announcements
                   </p>
                 ) : (
                   announcements.map((announcement, index) => (
                     <div
                       key={index}
-                      className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600"
+                      className="p-3 bg-slate-50  rounded-lg border border-slate-200 "
                     >
                       <div className="flex items-start gap-2">
                         <AlertCircle
@@ -548,13 +548,13 @@ const StudentDashboard = () => {
                           className="text-orange-500 mt-0.5 flex-shrink-0"
                         />
                         <div>
-                          <p className="font-semibold text-sm text-slate-900 dark:text-white">
+                          <p className="font-semibold text-sm text-slate-900 ">
                             {announcement.title}
                           </p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                          <p className="text-xs text-slate-600  mt-1">
                             {announcement.message}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                          <p className="text-xs text-slate-500  mt-1">
                             {announcement.date}
                           </p>
                         </div>

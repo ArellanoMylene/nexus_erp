@@ -31,7 +31,7 @@ const Field = ({ label, value }) => (
     <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-0.5">
       {label}
     </p>
-    <p className="text-sm font-semibold text-slate-800 dark:text-white">
+    <p className="text-sm font-semibold text-slate-800 ">
       {value || (
         <span className="text-slate-400 font-normal italic">Not provided</span>
       )}
@@ -40,8 +40,8 @@ const Field = ({ label, value }) => (
 );
 
 const SectionCard = ({ title, children }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
-    <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+  <div className="bg-white  rounded-xl border border-slate-200  p-5">
+    <h3 className="text-sm font-bold text-slate-500  uppercase tracking-wider mb-4">
       {title}
     </h3>
     <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
@@ -52,7 +52,7 @@ const SectionCard = ({ title, children }) => (
 
 const FormField = ({ label, children, span }) => (
   <div className={span ? "col-span-2 md:col-span-3" : ""}>
-    <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+    <label className="block text-xs font-medium text-slate-500  mb-1">
       {label}
     </label>
     {children}
@@ -60,9 +60,9 @@ const FormField = ({ label, children, span }) => (
 );
 
 const inputCls =
-  "w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  "w-full px-3 py-2 bg-slate-50  border border-slate-300  rounded-lg text-slate-900  text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500";
 const readonlyCls =
-  "w-full px-3 py-2 bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed";
+  "w-full px-3 py-2 bg-slate-100  border border-slate-200  rounded-lg text-slate-500  text-sm cursor-not-allowed";
 
 const StudentProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -196,11 +196,11 @@ const StudentProfile = () => {
   };
 
   return (
-   <div className="dark:bg-slate-900 px-4 py-3 transition-colors duration-500">
+   <div className=" px-4 py-3 transition-colors duration-500">
       <div className="w-full space-y-2 font-sans">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="flex justify-between items-center border-b border-slate-200  pb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900  flex items-center gap-2">
             <Users size={24} className="text-indigo-600" />
             My Profile
           </h2>
@@ -234,7 +234,7 @@ const StudentProfile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left — Avatar card */}
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 flex flex-col items-center text-center">
+              <div className="bg-white  rounded-xl border border-slate-200  p-6 flex flex-col items-center text-center">
                 {profile.profile_picture_url ? (
                   <img
                     src={profile.profile_picture_url}
@@ -247,7 +247,7 @@ const StudentProfile = () => {
                     {profile.last_name?.[0]}
                   </div>
                 )}
-                <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                <h3 className="mt-4 text-lg font-bold text-slate-900  leading-snug">
                   {profile.first_name}{" "}
                   {profile.middle_name ? profile.middle_name + " " : ""}
                   {profile.last_name}
@@ -259,7 +259,7 @@ const StudentProfile = () => {
                 <span className="mt-2 inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-700">
                   {profile.status || "Active"}
                 </span>
-                <div className="mt-5 w-full divide-y divide-slate-100 dark:divide-slate-700 text-sm">
+                <div className="mt-5 w-full divide-y divide-slate-100  text-sm">
                   {[
                     ["Role", profile.role],
                     ["Course", profile.course],
@@ -274,7 +274,7 @@ const StudentProfile = () => {
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between py-2">
                       <span className="text-slate-500">{label}</span>
-                      <span className="font-semibold text-slate-800 dark:text-white text-right max-w-[55%] truncate">
+                      <span className="font-semibold text-slate-800  text-right max-w-[55%] truncate">
                         {val || "—"}
                       </span>
                     </div>
@@ -342,10 +342,10 @@ const StudentProfile = () => {
       {/* ── Edit Modal ── */}
       {isEditing && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-white  rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200  shrink-0">
+              <h2 className="text-lg font-bold text-slate-900  flex items-center gap-2">
                 <Edit size={18} className="text-indigo-600" /> Edit Profile
               </h2>
               <button
@@ -511,13 +511,13 @@ const StudentProfile = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200  shrink-0">
               <button
                 onClick={() => {
                   setIsEditing(false);
                   setSaveError(null);
                 }}
-                className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-600 dark:text-slate-300 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                className="px-4 py-2 border border-slate-300  rounded-lg text-slate-600  font-medium text-sm hover:bg-slate-50  transition-colors"
               >
                 Cancel
               </button>

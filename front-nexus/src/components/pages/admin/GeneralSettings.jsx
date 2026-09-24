@@ -126,16 +126,16 @@ const GeneralSettings = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
-    <div className="min-h-screen dark:bg-slate-900 p-3 sm:p-4">
+    <div className="min-h-screen  p-3 sm:p-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-500/10 dark:bg-blue-500/20 rounded-lg">
-            <Settings className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className="p-2 bg-blue-500/10  rounded-lg">
+            <Settings className="h-6 w-6 text-blue-600 " />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">General Settings</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Manage system configuration settings</p>
+            <h1 className="text-2xl font-bold text-slate-800 ">General Settings</h1>
+            <p className="text-sm text-slate-600 ">Manage system configuration settings</p>
           </div>
         </div>
         <button
@@ -152,23 +152,23 @@ const GeneralSettings = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Total Settings</p>
-              <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{settings.length}</p>
+              <p className="text-sm text-slate-600 ">Total Settings</p>
+              <p className="text-2xl font-bold text-slate-800  mt-1">{settings.length}</p>
             </div>
-            <BarChart3 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            <BarChart3 className="h-8 w-8 text-blue-600 " />
           </div>
         </div>
         {categories.slice(1).map((cat) => {
           const count = settings.filter((s) => s.category === cat.value).length;
           return (
-            <div key={cat.value} className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
+            <div key={cat.value} className="bg-white  p-4 rounded-lg shadow-sm border border-slate-200 ">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{cat.label}</p>
-                  <p className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{count}</p>
+                  <p className="text-sm text-slate-600 ">{cat.label}</p>
+                  <p className="text-2xl font-bold text-slate-800  mt-1">{count}</p>
                 </div>
                 <Settings className="h-8 w-8 text-slate-400" />
               </div>
@@ -178,7 +178,7 @@ const GeneralSettings = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  mb-6">
         <div className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
@@ -188,13 +188,13 @@ const GeneralSettings = () => {
                 placeholder="Search settings..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
               />
             </div>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+              className="px-4 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
             >
               {categories.map((cat) => (
                 <option key={cat.value} value={cat.value}>
@@ -207,55 +207,55 @@ const GeneralSettings = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white  rounded-lg shadow-sm border border-slate-200  overflow-hidden">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-slate-600 dark:text-slate-400 mt-2">Loading settings...</p>
+              <p className="text-slate-600  mt-2">Loading settings...</p>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-              <thead className="bg-slate-100 dark:bg-slate-700/70">
+            <table className="min-w-full divide-y divide-slate-200 ">
+              <thead className="bg-slate-100 ">
                 <tr>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Setting Key
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Value
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-slate-700  uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+              <tbody className="bg-white  divide-y divide-slate-200 ">
                 {currentData.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-4 text-center text-slate-500 dark:text-slate-400">
+                    <td colSpan="5" className="px-6 py-4 text-center text-slate-500 ">
                       No settings found
                     </td>
                   </tr>
                 ) : (
                   currentData.map((setting) => (
-                    <tr key={setting.setting_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                      <td className="px-6 py-2 text-sm font-medium text-slate-900 dark:text-white">
+                    <tr key={setting.setting_id} className="hover:bg-slate-50 ">
+                      <td className="px-6 py-2 text-sm font-medium text-slate-900 ">
                         {setting.setting_key}
                       </td>
-                      <td className="px-6 py-2 text-sm text-slate-600 dark:text-slate-300">
+                      <td className="px-6 py-2 text-sm text-slate-600 ">
                         {setting.setting_value}
                       </td>
-                      <td className="px-6 py-2 text-sm text-slate-600 dark:text-slate-300">
+                      <td className="px-6 py-2 text-sm text-slate-600 ">
                         {setting.description || "N/A"}
                       </td>
                       <td className="px-6 py-2 text-sm">
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800  ">
                           {setting.category}
                         </span>
                       </td>
@@ -263,13 +263,13 @@ const GeneralSettings = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEdit(setting)}
-                            className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                            className="p-1 text-blue-600 hover:bg-blue-50  rounded"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(setting.setting_key)}
-                            className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                            className="p-1 text-red-600 hover:bg-red-50  rounded"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -285,7 +285,7 @@ const GeneralSettings = () => {
       </div>
 
       {/* Pagination */}
-      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600 dark:text-slate-400">
+      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-600 ">
         <div>
           Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
         </div>
@@ -293,7 +293,7 @@ const GeneralSettings = () => {
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border border-slate-300  rounded hover:bg-slate-50  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -303,7 +303,7 @@ const GeneralSettings = () => {
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 border border-slate-300  rounded hover:bg-slate-50  disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -313,10 +313,10 @@ const GeneralSettings = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white  rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+                <h2 className="text-xl font-bold text-slate-800 ">
                   {selectedSetting ? "Edit Setting" : "Add Setting"}
                 </h2>
                 <button
@@ -324,7 +324,7 @@ const GeneralSettings = () => {
                     setShowModal(false);
                     resetForm();
                   }}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  className="text-slate-400 hover:text-slate-600 "
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -332,7 +332,7 @@ const GeneralSettings = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-sm font-medium text-slate-700  mb-1">
                     Setting Key *
                   </label>
                   <input
@@ -341,12 +341,12 @@ const GeneralSettings = () => {
                     onChange={(e) => setFormData({ ...formData, setting_key: e.target.value })}
                     disabled={!!selectedSetting}
                     required
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white disabled:opacity-50"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500   disabled:opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-sm font-medium text-slate-700  mb-1">
                     Setting Value *
                   </label>
                   <input
@@ -354,31 +354,31 @@ const GeneralSettings = () => {
                     value={formData.setting_value}
                     onChange={(e) => setFormData({ ...formData, setting_value: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-sm font-medium text-slate-700  mb-1">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-sm font-medium text-slate-700  mb-1">
                     Category *
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-slate-300  rounded-lg focus:ring-2 focus:ring-blue-500  "
                   >
                     {categories.slice(1).map((cat) => (
                       <option key={cat.value} value={cat.value}>
@@ -402,7 +402,7 @@ const GeneralSettings = () => {
                       setShowModal(false);
                       resetForm();
                     }}
-                    className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
+                    className="px-4 py-2 border border-slate-300  text-slate-700  rounded-lg hover:bg-slate-50 "
                   >
                     Cancel
                   </button>
