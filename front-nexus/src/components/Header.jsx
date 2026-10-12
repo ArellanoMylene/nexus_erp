@@ -1,12 +1,17 @@
 // src/components/Header.jsx
 import React, { useState, useEffect } from "react";
-import { Menu, Bell, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Menu, LogOut, ChevronDown } from "lucide-react";
 
 const Header = ({ toggleSidebar, onLogout }) => {
   const firstName = localStorage.getItem("firstName") || "";
   const lastName = localStorage.getItem("lastName") || "";
   const userName =
     firstName || lastName ? `${firstName} ${lastName}`.trim() : "User";
+  const userInitials = [firstName, lastName]
+    .map((name) => name.trim().charAt(0))
+    .filter(Boolean)
+    .join("")
+    .toUpperCase() || "U";
   const userRole = localStorage.getItem("role") || "";
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isConfirmingLogout, setIsConfirmingLogout] = useState(false);
@@ -59,31 +64,14 @@ const Header = ({ toggleSidebar, onLogout }) => {
 
       {/* Right Section */}
       <div className="flex items-center space-x-4">
-        <button
-          className="p-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none hidden sm:block"
-          aria-label="Notifications"
-        >
-          <Bell size={20} />
-        </button>
-
-        <button
-          className="p-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none hidden sm:block"
-          aria-label="Settings"
-        >
-          <Settings size={20} />
-        </button>
-
         <div className="relative">
           <button
             onClick={toggleDropdown}
             className="flex items-center space-x-2 text-gray-700 focus:outline-none hover:text-gray-900 transition duration-150"
           >
             <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">
-              {userName[0]}
+              {userInitials}
             </div>
-            <span className="hidden md:inline text-sm font-medium">
-              {userName}
-            </span>
             <ChevronDown
               size={16}
               className={`ml-1 transition-transform duration-200 hidden sm:block ${

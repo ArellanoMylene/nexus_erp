@@ -123,7 +123,7 @@ const FacultyDashboard = () => {
       // Fetch real data from multiple endpoints
       const [coursesRes, scheduleRes, gradesRes, attendanceRes] = await Promise.all([
         axios.get(`${API_BASE}/api/course/courses`).catch(() => ({ data: [] })),
-        axios.get(`${API_BASE}/api/schedules`).catch(() => ({ data: [] })),
+        axios.get(`${API_BASE}/api/faculty-schedules/faculty/${facultyUserId}`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE}/api/grades`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE}/api/student-attendance`).catch(() => ({ data: { data: [] } })),
       ]);

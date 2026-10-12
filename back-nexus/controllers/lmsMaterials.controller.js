@@ -1,10 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { ensureUploadDirectory } from "../helpers/uploadStorage.js";
 import LMSMaterials from "../model/lmsMaterials.model.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const lmsMaterialsController = {
   // Upload a learning material file and return a persistent URL
@@ -22,10 +19,7 @@ const lmsMaterialsController = {
       const base64Data = file_base64.replace(/^data:.+;base64,/, "");
       const buffer = Buffer.from(base64Data, "base64");
 
-      const uploadDir = path.join(__dirname, "../public/uploads/materials");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
+      const uploadDir = ensureUploadDirectory("materials");
 
       const uniqueFilename = `${Date.now()}-${file_name.replace(/\s+/g, "-")}`;
       const filePath = path.join(uploadDir, uniqueFilename);

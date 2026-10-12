@@ -51,11 +51,14 @@ router.get("/users/student/next-number", previewStudentNumber);
 router.get("/users/employee/next-id", previewEmployeeId);
 router.get("/users/:userId", getUserById);
 
-router.post("/users/student",  registerLimiter, validate(registerStudentSchema),  registerStudent);
-router.post("/users/employee", registerLimiter, validate(registerEmployeeSchema), registerEmployee);
+// These user-management routes are protected by the global authenticated API
+// middleware and admin role checks. Keep the low registration throttle for
+// public self-registration, rather than limiting normal admin account setup.
+router.post("/users/student",  validate(registerStudentSchema),  registerStudent);
+router.post("/users/employee", validate(registerEmployeeSchema), registerEmployee);
 
-router.put("/users/student/:userId",  registerLimiter, validate(updateStudentSchema),  updateStudent);
-router.put("/users/employee/:userId", registerLimiter, validate(updateEmployeeSchema), updateEmployee);
+router.put("/users/student/:userId",  validate(updateStudentSchema),  updateStudent);
+router.put("/users/employee/:userId", validate(updateEmployeeSchema), updateEmployee);
 
 router.delete("/users/:userId", deleteUser);
 

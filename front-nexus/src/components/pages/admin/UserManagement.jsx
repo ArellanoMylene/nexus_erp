@@ -508,7 +508,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, isEditing, selectedRole, onR
   if (!isOpen) return null;
 
   const roleOptions = [
-   /*  { value: "Student",    label: "Student" }, */
+    { value: "Student",    label: "Student" },
     { value: "Admin",      label: "Admin" },
     { value: "Faculty",    label: "Faculty" },
     { value: "Staff",      label: "Staff" },

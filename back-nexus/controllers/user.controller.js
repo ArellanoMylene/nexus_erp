@@ -15,12 +15,9 @@ import {
 } from "../services/user.service.js";
 
 import { clearAuthCookie, generateToken, setAuthCookie } from "../helpers/jwt.js";
+import { ensureUploadDirectory } from "../helpers/uploadStorage.js";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Get all users
 export const getAllUsers = async (req, res) => {
@@ -223,10 +220,7 @@ export const updateEmployee = async (req, res) => {
         );
         const buffer = Buffer.from(base64Data, "base64");
 
-        const uploadDir = path.join(__dirname, "../public/uploads/profile_pics");
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        const uploadDir = ensureUploadDirectory("profile_pics");
 
         const filename = `user-${userId}-${Date.now()}.png`;
         const filepath = path.join(uploadDir, filename);

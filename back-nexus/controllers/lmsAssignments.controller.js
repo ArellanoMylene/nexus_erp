@@ -648,11 +648,8 @@ export default lmsAssignmentsController;
 import LMSAssignments from "../model/lmsAssignments.model.js";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import { runTensorFlowAiCheck, initializeTensorFlow } from "../services/aiChecker.service.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { ensureUploadDirectory, resolveUploadPath } from "../helpers/uploadStorage.js";
 
 class AiCheckError extends Error {
   constructor(status, message) {
@@ -694,7 +691,7 @@ const extractSubmissionText = async (submission) => {
   let studentText = submission.submission_text || "";
 
   if (submission.file_url) {
-    const filePath = path.join(__dirname, "../public", submission.file_url);
+    const filePath = resolveUploadPath(submission.file_url);
     if (fs.existsSync(filePath)) {
       const ext = path.extname(submission.file_name || submission.file_url).toLowerCase();
       try {
@@ -722,7 +719,7 @@ const runAiCheck = async ({ submission, modelAnswer, modelAnswerFileUrl }) => {
 
   // ✅ Extract text from model answer file if provided
   if (modelAnswerFileUrl) {
-    const filePath = path.join(__dirname, "../public", modelAnswerFileUrl);
+      const filePath = resolveUploadPath(modelAnswerFileUrl);
     if (fs.existsSync(filePath)) {
       const ext = path.extname(modelAnswerFileUrl).toLowerCase();
       try {
@@ -1358,10 +1355,7 @@ const lmsAssignmentsController = {
       const base64Data = file_base64.replace(/^data:.+;base64,/, "");
       const buffer = Buffer.from(base64Data, "base64");
 
-      const uploadDir = path.join(__dirname, "../public/uploads/assignments");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
+      const uploadDir = ensureUploadDirectory("assignments");
 
       const uniqueFilename = `${Date.now()}-${file_name.replace(/\s+/g, "-")}`;
       const filepath = path.join(uploadDir, uniqueFilename);

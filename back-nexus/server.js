@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv"; //  ESM import
 dotenv.config(); // load env variables
 import { authenticateToken, enforceApiAccess } from "./helpers/jwt.js";
+import { getUploadsRoot } from "./helpers/uploadStorage.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -101,7 +102,9 @@ app.use(
     exposedHeaders: ["Authorization"],
   }),
 );
-app.use(helmet());
+// Profile and other uploaded media are served by the API origin and displayed
+// by the separate frontend origin, so allow cross-origin resource embedding.
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 // Rate limiter
 // server.js — fix the global limiter (place it BEFORE all routes)
 const globalLimiter = rateLimit({
@@ -113,9 +116,10 @@ const globalLimiter = rateLimit({
 });
 
 
-app.use(globalLimiter); // ✅ Move this UP, before all app.use("/api", ...) calls
+app.use(globalLimiter); // Move this UP, before all app.use("/api", ...) calls
 app.use(bodyParser.json({ limit: "25mb" }));
 app.use(bodyParser.urlencoded({ limit: "25mb", extended: true }));
+// Parse the HTTP-only session cookie before the global API authentication check.
 app.use(cookieParser());
 
 // Require a valid token for private APIs. Only authentication, public reference
@@ -126,7 +130,6 @@ app.use("/api", (req, res, next) => {
   const method = req.method.toUpperCase();
   const publicAuthPaths = new Set([
     "/api/auth/login",
-    "/api/auth/logout",
     "/api/auth/register",
     "/api/auth/verify-email",
     "/api/auth/resend-verification",
@@ -140,10 +143,6 @@ app.use("/api", (req, res, next) => {
     "/api/calendar/health",
   ]);
   const isPublicEventDetail = path.startsWith("/api/events/public/");
-  const origin = req.get("origin");
-  if (!new Set(["GET", "HEAD", "OPTIONS"]).has(method) && origin && !allowedOrigins.has(origin)) {
-    return res.status(403).json({ message: "Request origin is not allowed" });
-  }
   if (publicAuthPaths.has(path) || (method === "GET" && (publicGetPaths.has(path) || isPublicEventDetail))) {
     return next();
   }
@@ -156,7 +155,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Serve static files
-app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+app.use("/uploads", express.static(getUploadsRoot()));
 
 // Root route
 app.get("/", (req, res) => res.send("ERP Backendsdsds running"));

@@ -116,6 +116,7 @@ const EmailVerification = ({
   };
 
   const submitVerification = async (codeToVerify) => {
+    if (loading || isVerified) return;
     const code = codeToVerify || digits.join("");
     if (code.length !== 6) {
       setErrorMessage("Please enter all 6 digits of your verification code.");
@@ -127,10 +128,11 @@ const EmailVerification = ({
     setSuccessMessage("");
 
     try {
-      const response = await api.post("/api/auth/verify-email", {
-        email,
-        code,
-      });
+      const response = await api.post(
+        "/api/auth/verify-email",
+        { email, code },
+        { timeout: 15000 },
+      );
 
       setIsVerified(true);
       setSuccessMessage(
@@ -145,8 +147,12 @@ const EmailVerification = ({
     } catch (err) {
       const msg =
         err.response?.data?.message ||
-        "Failed to verify code. Please double check and try again.";
+        (err.code === "ECONNABORTED"
+          ? "Verification is taking too long. Check your connection and try again."
+          : "Failed to verify code. Please double check and try again.");
       setErrorMessage(msg);
+      setDigits(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
