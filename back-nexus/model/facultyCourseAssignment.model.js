@@ -23,17 +23,27 @@ const FacultyCourseAssignment = {
   getByFacultyId: (facultyUserId) => {
     return db.query(
       `
-            SELECT fca.*, 
-              CONCAT(u.first_name, ' ', u.last_name) AS faculty_name, u.first_name, u.last_name, ed.employee_id,
+            SELECT fca.*,
+              CONCAT_WS(' ', u.first_name,
+                CASE WHEN NULLIF(TRIM(u.middle_name), '') IS NULL THEN NULL
+                     ELSE CONCAT(UPPER(LEFT(TRIM(u.middle_name), 1)), IF(RIGHT(TRIM(u.middle_name), 1) = '.', '', '.')) END,
+                u.last_name, NULLIF(TRIM(u.suffix), '')) AS faculty_name,
+              u.first_name, u.middle_name, u.last_name, u.suffix, ed.employee_id,
               c.code as course_code, c.title as course_title, c.units,
+              COALESCE(p.department_id, c.department_id) AS department_id,
+              CONCAT_WS(' ', dh.first_name,
+                CASE WHEN NULLIF(TRIM(dh.middle_name), '') IS NULL THEN NULL
+                     ELSE CONCAT(UPPER(LEFT(TRIM(dh.middle_name), 1)), IF(RIGHT(TRIM(dh.middle_name), 1) = '.', '', '.')) END,
+                dh.last_name, NULLIF(TRIM(dh.suffix), '')) AS department_head_name,
+              d.name AS department_name,
               ap.school_year, ap.semester,
               fas.schedule_day, fas.schedule_time_start, fas.schedule_time_end,
               s.section_id,
               (SELECT COUNT(*)
  FROM enrollments e
- JOIN sections s ON e.section_id = s.section_id
+ JOIN sections enrolled_section ON e.section_id = enrolled_section.section_id
  WHERE e.period_id = fca.academic_period_id
- AND s.section_name = fca.section
+ AND enrolled_section.section_id = s.section_id
  AND e.status = 'Enrolled'
 ) AS current_enrolled
             FROM faculty_course_assignments fca
@@ -41,9 +51,25 @@ const FacultyCourseAssignment = {
             INNER JOIN employee_details ed ON u.user_id = ed.user_id
             INNER JOIN courses c ON fca.course_id = c.course_id
             INNER JOIN academic_periods ap ON fca.academic_period_id = ap.period_id
-         LEFT JOIN sections s
-ON fca.academic_period_id = s.period_id
-AND fca.section = s.section_name
+         LEFT JOIN sections s ON s.section_id = (
+              SELECT matched_section.section_id
+              FROM sections matched_section
+              WHERE matched_section.period_id = fca.academic_period_id
+                AND matched_section.section_name = fca.section
+              ORDER BY CASE WHEN EXISTS (
+                SELECT 1
+                FROM enrollments matched_enrollment
+                WHERE matched_enrollment.section_id = matched_section.section_id
+                  AND matched_enrollment.period_id = fca.academic_period_id
+                  AND matched_enrollment.course_id = fca.course_id
+                  AND matched_enrollment.status = 'Enrolled'
+              ) THEN 0 ELSE 1 END,
+              matched_section.section_id
+              LIMIT 1
+            )
+            LEFT JOIN programs p ON s.program_id = p.program_id
+            LEFT JOIN departments d ON COALESCE(p.department_id, c.department_id) = d.department_id
+            LEFT JOIN users dh ON d.head_user_id = dh.user_id
             LEFT JOIN faculty_assignment_schedules fas ON fca.assignment_id = fas.assignment_id
             WHERE fca.faculty_user_id = ?
             ORDER BY ap.school_year DESC, ap.semester DESC

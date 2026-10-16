@@ -45,13 +45,13 @@ const GradeEntriesService = {
       }
 
       // Calculate percentage if raw_score and max_score are provided
-      if (entryData.raw_score && entryData.max_score) {
+      if (entryData.raw_score !== null && entryData.raw_score !== undefined && entryData.max_score > 0) {
         entryData.percentage =
           (entryData.raw_score / entryData.max_score) * 100;
       }
 
       // Calculate weighted score if percentage and weight are provided
-      if (entryData.percentage && entryData.weight) {
+      if (entryData.percentage !== null && entryData.percentage !== undefined && entryData.weight !== null && entryData.weight !== undefined) {
         entryData.weighted_score =
           (entryData.percentage * entryData.weight) / 100;
       }
@@ -72,28 +72,30 @@ const GradeEntriesService = {
     try {
       // Check if entry is locked before allowing update
       const existingEntry = await GradeEntriesModel.getById(entryId);
+      if (!existingEntry) {
+        return {
+          success: false,
+          message: "Grade entry not found",
+        };
+      }
       if (existingEntry && existingEntry.is_locked) {
         throw new Error("This grade entry is locked and cannot be modified. Contact an administrator to unlock it.");
       }
 
       // Recalculate percentage and weighted score
-      if (entryData.raw_score && entryData.max_score) {
+      if (entryData.raw_score !== null && entryData.raw_score !== undefined && entryData.max_score > 0) {
         entryData.percentage =
           (entryData.raw_score / entryData.max_score) * 100;
       }
 
-      if (entryData.percentage && entryData.weight) {
+      if (entryData.percentage !== null && entryData.percentage !== undefined && entryData.weight !== null && entryData.weight !== undefined) {
         entryData.weighted_score =
           (entryData.percentage * entryData.weight) / 100;
       }
 
-      const affectedRows = await GradeEntriesModel.update(entryId, entryData);
-      if (affectedRows === 0) {
-        return {
-          success: false,
-          message: "Grade entry not found or no changes made",
-        };
-      }
+      await GradeEntriesModel.update(entryId, entryData);
+      // MySQL may report zero affected rows when a save repeats the same
+      // values. The entry was found above, so this is still a successful save.
       return { success: true, message: "Grade entry updated successfully" };
     } catch (error) {
       console.error("Error in updateEntry service:", error);

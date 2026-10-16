@@ -45,8 +45,7 @@ const GradeEntriesController = {
     try {
       const entryData = req.body;
       const result = await GradeEntriesService.createEntry(entryData);
-
-      res.status(201).json(result);
+      res.status(result.success ? (result.entryId ? 201 : 200) : 400).json(result);
     } catch (error) {
       console.error("Error in createEntry controller:", error);
       res

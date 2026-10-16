@@ -34,6 +34,16 @@ const getErrorMessage = (err, fallback) => {
   return fallback;
 };
 
+const formatStandardTime = (time) => {
+  if (!time) return "";
+  const match = String(time).match(/^(\d{1,2}):(\d{2})/);
+  if (!match) return time;
+  const hour24 = Number(match[1]);
+  const hour12 = hour24 % 12 || 12;
+  const period = hour24 >= 12 ? "PM" : "AM";
+  return `${hour12}:${match[2]} ${period}`;
+};
+
 // --- Generic Confirm Modal (Yes / No), same pattern used across the module ---
 const ConfirmModal = ({
   isOpen,
@@ -645,15 +655,41 @@ const FacultyAssignCourse = () => {
     fetchSubjectSections();
   }, []);
 
-  const filtered = assignments.filter((a) => {
-    const matchSearch =
-      (a.faculty_name || "").toLowerCase().includes(search.toLowerCase()) ||
-      (a.course_code || "").toLowerCase().includes(search.toLowerCase()) ||
-      (a.course_title || "").toLowerCase().includes(search.toLowerCase());
-    const assignmentFacultyId = a.faculty_user_id ?? a.faculty_id;
-    const matchFaculty = !filterFaculty || String(assignmentFacultyId) === String(filterFaculty.value);
-    const matchCourse = !filterCourse || String(a.course_id) === String(filterCourse.value);
-    const matchYearLevel = !filterYearLevel || a.course_year_level === filterYearLevel;
+  const filtered = assignments.filter((assignment) => {
+    const normalize = (value) => String(value ?? "").trim().toLocaleLowerCase();
+    const query = normalize(search);
+    const assignmentFacultyName = assignment.faculty_name
+      || [assignment.first_name, assignment.middle_name, assignment.last_name].filter(Boolean).join(" ");
+    const searchFields = [
+      assignmentFacultyName,
+      assignment.employee_id,
+      assignment.faculty_user_id,
+      assignment.course_code,
+      assignment.course_title,
+      assignment.section,
+      assignment.room,
+      assignment.school_year,
+      assignment.semester,
+    ];
+    const matchSearch = !query || searchFields.some((value) => normalize(value).includes(query));
+
+    const assignmentFacultyId = assignment.faculty_user_id
+      ?? assignment.faculty_id
+      ?? assignment.user_id;
+    const selectedFacultyName = filterFaculty?.label?.split("(")[0]?.trim();
+    const assignmentFacultyNameNormalized = normalize(assignmentFacultyName);
+    const selectedFacultyNameNormalized = normalize(selectedFacultyName);
+    const matchFaculty = !filterFaculty
+      || String(assignmentFacultyId) === String(filterFaculty.value)
+      || (selectedFacultyNameNormalized
+        && assignmentFacultyNameNormalized
+        && (assignmentFacultyNameNormalized.includes(selectedFacultyNameNormalized)
+          || selectedFacultyNameNormalized.includes(assignmentFacultyNameNormalized)));
+    const assignmentCourseId = assignment.course_id ?? assignment.id;
+    const matchCourse = !filterCourse || String(assignmentCourseId) === String(filterCourse.value);
+    const matchYearLevel = !filterYearLevel
+      || String(assignment.course_year_level ?? "") === String(filterYearLevel);
+
     return matchSearch && matchFaculty && matchCourse && matchYearLevel;
   });
 
@@ -777,7 +813,7 @@ const FacultyAssignCourse = () => {
           <div className="relative flex-grow min-w-[220px] max-w-xs">
             <input
               type="text"
-              placeholder="Search by faculty or course..."
+              placeholder="Search by faculty, ID, or course..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -889,8 +925,8 @@ const FacultyAssignCourse = () => {
                         {Array.isArray(assignment.schedules)
                           ? assignment.schedules.map((s, i) => (
                               <div key={i}>
-                                {s.schedule_day} {s.schedule_time_start} –{" "}
-                                {s.schedule_time_end}
+                                {s.schedule_day} {formatStandardTime(s.schedule_time_start)} –{" "}
+                                {formatStandardTime(s.schedule_time_end)}
                               </div>
                             ))
                           : assignment.schedule

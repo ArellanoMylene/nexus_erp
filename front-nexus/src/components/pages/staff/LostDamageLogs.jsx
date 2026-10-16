@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
@@ -117,9 +116,10 @@ const LostDamageLogs = () => {
       fetchIncidents();
       fetchStatistics();
       closeModal();
+      window.alert(currentIncident ? "Incident updated successfully." : "Incident saved successfully.");
     } catch (error) {
       console.error("Error saving incident:", error);
-      toast.error(error.response?.data?.error || "Error saving incident");
+      window.alert(error.response?.data?.error || "Error saving incident.");
     }
   };
 
@@ -146,9 +146,10 @@ const LostDamageLogs = () => {
         await axios.delete(`${API_BASE}/api/library/incidents/${id}`);
         fetchIncidents();
         fetchStatistics();
+        window.alert("Incident deleted successfully.");
       } catch (error) {
         console.error("Error deleting incident:", error);
-        toast.error("Error deleting incident");
+        window.alert(error.response?.data?.error || "Error deleting incident.");
       }
     }
   };

@@ -19,12 +19,12 @@ const GradeEntriesModel = {
         a.first_name AS approver_first_name,
         a.last_name AS approver_last_name
       FROM grade_entries ge
-      INNER JOIN users s ON ge.student_id = s.user_id
+      LEFT JOIN users s ON ge.student_id = s.user_id
       LEFT JOIN student_details sd ON s.user_id = sd.user_id
-      INNER JOIN courses c ON ge.course_id = c.course_id
+      LEFT JOIN courses c ON ge.course_id = c.course_id
       LEFT JOIN sections sec ON ge.section_id = sec.section_id
-      INNER JOIN academic_periods ap ON ge.period_id = ap.period_id
-      INNER JOIN users f ON ge.submitted_by = f.user_id
+      LEFT JOIN academic_periods ap ON ge.period_id = ap.period_id
+      LEFT JOIN users f ON ge.submitted_by = f.user_id
       LEFT JOIN users a ON ge.approved_by = a.user_id
       WHERE 1=1
     `;
@@ -85,9 +85,9 @@ const GradeEntriesModel = {
         sec.section_name,
         e.exam_name
       FROM grade_entries ge
-      INNER JOIN users s ON ge.student_id = s.user_id
+      LEFT JOIN users s ON ge.student_id = s.user_id
       LEFT JOIN student_details sd ON s.user_id = sd.user_id
-      INNER JOIN courses c ON ge.course_id = c.course_id
+      LEFT JOIN courses c ON ge.course_id = c.course_id
       LEFT JOIN sections sec ON ge.section_id = sec.section_id
       LEFT JOIN exams e ON ge.exam_id = e.exam_id
       WHERE ge.entry_id = ?
@@ -114,11 +114,11 @@ const GradeEntriesModel = {
       entryData.exam_id || null,
       entryData.component_name,
       entryData.component_type || "other",
-      entryData.raw_score || null,
-      entryData.max_score || null,
-      entryData.percentage || null,
-      entryData.weight || null,
-      entryData.weighted_score || null,
+      entryData.raw_score ?? null,
+      entryData.max_score ?? null,
+      entryData.percentage ?? null,
+      entryData.weight ?? null,
+      entryData.weighted_score ?? null,
       entryData.remarks || null,
       entryData.submitted_by,
       entryData.label || "midterm",
@@ -159,11 +159,11 @@ const GradeEntriesModel = {
       entryData.exam_id || null,
       entryData.component_name,
       entryData.component_type,
-      entryData.raw_score || null,
-      entryData.max_score || null,
-      entryData.percentage || null,
-      entryData.weight || null,
-      entryData.weighted_score || null,
+      entryData.raw_score ?? null,
+      entryData.max_score ?? null,
+      entryData.percentage ?? null,
+      entryData.weight ?? null,
+      entryData.weighted_score ?? null,
       entryData.remarks || null,
       entryData.label || "midterm",
       entryData.is_locked || false,

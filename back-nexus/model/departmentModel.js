@@ -8,7 +8,10 @@ export const getAllDepartments = async () => {
         d.name,
         d.description,
         d.head_user_id AS user_id,
-        CONCAT(u.first_name, ' ', u.last_name) AS head,
+        CONCAT_WS(' ', u.first_name,
+          CASE WHEN NULLIF(TRIM(u.middle_name), '') IS NULL THEN NULL
+               ELSE CONCAT(UPPER(LEFT(TRIM(u.middle_name), 1)), IF(RIGHT(TRIM(u.middle_name), 1) = '.', '', '.')) END,
+          u.last_name, NULLIF(TRIM(u.suffix), '')) AS head,
         d.status,
         d.created_at
      FROM departments d

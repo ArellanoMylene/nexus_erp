@@ -40,23 +40,6 @@ const StatCard = ({ title, value, icon: Icon, color, detail, trend }) => (
   </div>
 );
 
-// Quick Action Card
-const QuickAction = ({ title, description, icon: Icon, color, onClick }) => (
-  <button
-    onClick={onClick}
-    className="bg-white p-3 rounded-lg shadow border border-gray-100 hover:shadow-md transition-all duration-200 text-left w-full"
-  >
-    <div className="flex items-start space-x-2">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-4 h-4 text-white" />
-      </div>
-      <div className="flex-1">
-        <h4 className="font-semibold text-gray-900 text-sm">{title}</h4>
-        <p className="text-xs text-gray-500">{description}</p>
-      </div>
-    </div>
-  </button>
-);
 
 // Recent Activity Item
 const ActivityItem = ({ activity }) => (
@@ -122,7 +105,7 @@ const FacultyDashboard = () => {
     try {
       // Fetch real data from multiple endpoints
       const [coursesRes, scheduleRes, gradesRes, attendanceRes] = await Promise.all([
-        axios.get(`${API_BASE}/api/course/courses`).catch(() => ({ data: [] })),
+        axios.get(`${API_BASE}/api/faculty-assignments/faculty/${facultyUserId}`).catch(() => ({ data: { data: [] } })),
         axios.get(`${API_BASE}/api/faculty-schedules/faculty/${facultyUserId}`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE}/api/grades`).catch(() => ({ data: [] })),
         axios.get(`${API_BASE}/api/student-attendance`).catch(() => ({ data: { data: [] } })),
@@ -130,17 +113,18 @@ const FacultyDashboard = () => {
 
       const courses = Array.isArray(coursesRes.data) ? coursesRes.data : (coursesRes.data.data || []);
       const schedules = Array.isArray(scheduleRes.data) ? scheduleRes.data : (scheduleRes.data.data || []);
-      const grades = Array.isArray(gradesRes.data) ? gradesRes.data : (gradesRes.data.data || []);
-      const attendance = attendanceRes.data.data || [];
+      const assignedCourseIds = new Set(courses.map((course) => String(course.course_id || course.id)));
+      const grades = (Array.isArray(gradesRes.data) ? gradesRes.data : (gradesRes.data.data || [])).filter((g) => assignedCourseIds.has(String(g.course_id)));
+      const attendance = (attendanceRes.data.data || []).filter((a) => assignedCourseIds.has(String(a.course_id)));
 
       // Calculate stats from real data
-      const assignedCourses = courses.length;
+      const assignedCourses = assignedCourseIds.size;
       const pendingGrades = grades.filter(g => !g.grade || g.grade === 'Pending').length;
       const presentCount = attendance.filter(a => a.status === 'present').length;
       const attendanceRate = attendance.length > 0 ? ((presentCount / attendance.length) * 100).toFixed(1) : 0;
 
       // Build upcoming classes from schedules
-      const upcomingClasses = schedules.slice(0, 3).map((s, idx) => ({
+      const upcomingClasses = schedules.filter((s) => assignedCourseIds.has(String(s.course_id))).slice(0, 3).map((s, idx) => ({
         id: s.id || idx + 1,
         code: s.course_code || s.code || `Course ${idx + 1}`,
         name: s.course_title || s.course_name || s.title || 'Course',
@@ -185,7 +169,7 @@ const FacultyDashboard = () => {
   };
 
   return (
-    <div className="bg-gray-50">
+    <div className="min-h-full bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-gray-900 flex items-center">
@@ -233,43 +217,8 @@ const FacultyDashboard = () => {
 
       {/* Main Content Grid - All sections side by side */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
-            <BookOpen className="w-5 h-5 mr-2 text-indigo-600" />
-            Quick Actions
-          </h2>
-          <div className="space-y-2">
-            <QuickAction
-              title="Mark Attendance"
-              description="Record student attendance for today"
-              icon={CalendarCheck}
-              color="bg-blue-500"
-              onClick={() => window.location.href = '/faculty_mark_attendance'}
-            />
-            <QuickAction
-              title="Enter Grades"
-              description="Submit grades for completed assessments"
-              icon={CheckSquare}
-              color="bg-green-500"
-              onClick={() => window.location.href = '/faculty_grade_encoding'}
-            />
-            <QuickAction
-              title="Upload Materials"
-              description="Share learning resources with students"
-              icon={BookOpen}
-              color="bg-purple-500"
-              onClick={() => window.location.href = '/faculty_lms_materials'}
-            />
-            <QuickAction
-              title="Send Announcement"
-              description="Communicate with your classes"
-              icon={Bell}
-              color="bg-yellow-500"
-              onClick={() => window.location.href = '/faculty_announcements'}
-            />
-          </div>
-        </div>
+        
+       
 
         {/* Upcoming Classes */}
         <div className="bg-white rounded-lg shadow p-4">

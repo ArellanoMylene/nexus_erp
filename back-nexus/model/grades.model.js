@@ -1,5 +1,33 @@
 import pool from "../config/db.js";
 
+const BCC_COMPONENT_NAMES = [
+  "BCC Quiz / Activity 1",
+  "BCC Quiz / Activity 2",
+  "BCC Quiz / Activity 3",
+  "BCC Performance",
+  "BCC Attendance",
+  "BCC Project",
+  "BCC Prelim Exam",
+  "BCC Midterm Exam",
+  "BCC Finals Exam",
+];
+
+const bccTransmutedRating = (score, maxScore) => {
+  const scoreValue = Number(score);
+  const maxValue = Number(maxScore);
+  if (score === null || score === undefined || score === "" || !Number.isFinite(scoreValue) || maxValue <= 0) return null;
+  return Math.min(100, 30 + (70 * scoreValue / maxValue));
+};
+
+const bccPercentageRating = (score, maxScore) => {
+  const scoreValue = Number(score);
+  const maxValue = Number(maxScore);
+  if (score === null || score === undefined || score === "" || !Number.isFinite(scoreValue) || maxValue <= 0) return null;
+  return Math.min(100, scoreValue / maxValue * 100);
+};
+
+const roundGrade = (value) => Number(value.toFixed(2));
+
 const GradesModel = {
   /**
    * Retrieves all grades combining:
@@ -24,6 +52,13 @@ const GradesModel = {
           c.units,
           ap.school_year AS period_name,
           ap.semester AS year,
+          (SELECT sec.section_name
+           FROM enrollments e
+           INNER JOIN sections sec ON sec.section_id = e.section_id
+           WHERE e.student_id = g.student_user_id
+             AND e.course_id = g.course_id
+             AND e.period_id = g.period_id
+           LIMIT 1) AS section_name,
           g.prelim_grade,
           g.midterm_grade,
           g.finals_grade,
@@ -109,6 +144,13 @@ const GradesModel = {
           c.units,
           ap.school_year AS period_name,
           ap.semester AS year,
+          (SELECT sec.section_name
+           FROM enrollments e
+           INNER JOIN sections sec ON sec.section_id = e.section_id
+           WHERE e.student_id = ge.student_id
+             AND e.course_id = ge.course_id
+             AND e.period_id = ge.period_id
+           LIMIT 1) AS section_name,
           ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%prelim%'  AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS prelim_grade,
           ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%midterm%' AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS midterm_grade,
           ROUND(SUM(CASE WHEN LOWER(ge.component_name) LIKE '%final%'   AND ge.approval_status = 'approved' THEN ge.weighted_score ELSE 0 END), 2) AS finals_grade,
@@ -125,6 +167,7 @@ const GradesModel = {
             AND g.course_id = ge.course_id
             AND g.period_id = ge.period_id
         )
+          AND ge.component_name NOT LIKE 'BCC %'
       `;
       const entriesParams = [];
 
@@ -170,7 +213,135 @@ const GradesModel = {
         };
       });
 
-      return [...formattedStoredGrades, ...formattedEntryRows];
+      // BCC entries are a separate grading scheme. Read their submitted raw scores
+      // and apply the same ratings and weights used by the faculty BCC sheet.
+      const [bccEntries] = await pool.query(
+        `SELECT
+           ge.student_id AS student_user_id,
+           ge.course_id,
+           ge.period_id,
+           ge.component_name,
+           ge.raw_score,
+           ge.max_score,
+           ge.approval_status,
+           CONCAT(u.first_name, ' ', u.last_name) AS student_name,
+           u.first_name,
+           u.last_name,
+           sd.student_number AS student_id,
+           c.code AS course_code,
+           c.title AS course_title,
+           c.units,
+           ap.school_year AS period_name,
+           ap.semester AS year,
+           COALESCE(
+             (SELECT sec.section_name FROM sections sec WHERE sec.section_id = ge.section_id LIMIT 1),
+             (SELECT sec.section_name
+              FROM enrollments e
+              INNER JOIN sections sec ON sec.section_id = e.section_id
+              WHERE e.student_id = ge.student_id
+                AND e.course_id = ge.course_id
+                AND e.period_id = ge.period_id
+              LIMIT 1)
+           ) AS section_name
+         FROM grade_entries ge
+         LEFT JOIN users u ON ge.student_id = u.user_id
+         LEFT JOIN student_details sd ON u.user_id = sd.user_id
+         LEFT JOIN courses c ON ge.course_id = c.course_id
+         LEFT JOIN academic_periods ap ON ge.period_id = ap.period_id
+         WHERE ge.component_name IN (${BCC_COMPONENT_NAMES.map(() => "?").join(", ")})
+           ${filters.student_user_id ? "AND ge.student_id = ?" : ""}
+           ${filters.course_id ? "AND ge.course_id = ?" : ""}
+           ${filters.period_id ? "AND ge.period_id = ?" : ""}
+         ORDER BY ge.submitted_at DESC`,
+        [
+          ...BCC_COMPONENT_NAMES,
+          ...(filters.student_user_id ? [filters.student_user_id] : []),
+          ...(filters.course_id ? [filters.course_id] : []),
+          ...(filters.period_id ? [filters.period_id] : []),
+        ],
+      );
+
+      const bccGroups = new Map();
+      bccEntries.forEach((entry) => {
+        const gradeId = `${entry.student_user_id}-${entry.course_id}-${entry.period_id}`;
+        if (!bccGroups.has(gradeId)) {
+          bccGroups.set(gradeId, {
+            ...entry,
+            grade_id: gradeId,
+            source: "bcc_grade_entries",
+            entries: [],
+            prelim_grade: null,
+            midterm_grade: null,
+            finals_grade: null,
+            final_grade: null,
+            remarks: null,
+            status: "submitted",
+          });
+        }
+        bccGroups.get(gradeId).entries.push(entry);
+      });
+
+      const formattedBccGrades = [...bccGroups.values()].map((grade) => {
+        const componentEntries = new Map(grade.entries.map((entry) => [entry.component_name, entry]));
+        const ratingFor = (name, transmute = false) => {
+          const entry = componentEntries.get(name);
+          if (!entry) return null;
+          const rating = transmute
+            ? bccTransmutedRating(entry.raw_score, entry.max_score)
+            : bccPercentageRating(entry.raw_score, entry.max_score);
+          return rating;
+        };
+
+        const quizEntries = [1, 2, 3].map((index) => componentEntries.get(`BCC Quiz / Activity ${index}`));
+        const quizEntered = quizEntries.some((entry) => entry && entry.raw_score !== null && entry.raw_score !== "");
+        const quizScore = quizEntries.reduce((sum, entry) => sum + (Number(entry?.raw_score) || 0), 0);
+        const quizMax = quizEntries.reduce((sum, entry) => sum + (Number(entry?.max_score) || 10), 0);
+        const quizRating = quizEntered ? bccTransmutedRating(quizScore, quizMax) : null;
+        const performanceRating = ratingFor("BCC Performance");
+        const attendanceRating = ratingFor("BCC Attendance");
+        const projectRating = ratingFor("BCC Project");
+        const prelimRating = ratingFor("BCC Prelim Exam", true);
+        const midtermRating = ratingFor("BCC Midterm Exam", true);
+        const finalsRating = ratingFor("BCC Finals Exam", true);
+        const weightedParts = [
+          quizRating === null ? null : quizRating * 0.1,
+          performanceRating === null ? null : performanceRating * 0.1,
+          attendanceRating === null ? null : attendanceRating * 0.1,
+          projectRating === null ? null : projectRating * 0.1,
+          prelimRating === null ? null : prelimRating * 0.2,
+          midtermRating === null ? null : midtermRating * 0.2,
+          finalsRating === null ? null : finalsRating * 0.2,
+        ];
+        const complete = weightedParts.every((part) => part !== null);
+        const finalGrade = complete
+          ? roundGrade(weightedParts.reduce((sum, part) => sum + part, 0))
+          : null;
+        const approved = grade.entries.length > 0
+          && grade.entries.every((entry) => entry.approval_status === "approved");
+
+        return {
+          ...grade,
+          entries: undefined,
+          prelim_grade: prelimRating === null ? null : roundGrade(prelimRating),
+          midterm_grade: midtermRating === null ? null : roundGrade(midtermRating),
+          finals_grade: finalsRating === null ? null : roundGrade(finalsRating),
+          final_grade: finalGrade,
+          remarks: finalGrade === null ? null : finalGrade >= 75 ? "PASSED" : "FAILED",
+          status: approved ? "approved" : "submitted",
+        };
+      });
+
+      const bccGradeKeys = new Set(formattedBccGrades.map(
+        (grade) => `${grade.student_user_id}-${grade.course_id}-${grade.period_id}`,
+      ));
+      const isSupersededByBccEntry = (grade) => bccGradeKeys.has(
+        `${grade.student_user_id}-${grade.course_id}-${grade.period_id}`,
+      );
+      return [
+        ...formattedStoredGrades.filter((grade) => !isSupersededByBccEntry(grade)),
+        ...formattedEntryRows.filter((grade) => !isSupersededByBccEntry(grade)),
+        ...formattedBccGrades,
+      ];
     } catch (error) {
       throw error;
     }
@@ -371,11 +542,15 @@ const GradesModel = {
 
       if (String(id).includes("-")) {
         const [studentId, courseId, periodId] = String(id).split("-");
-        const [res] = await pool.query(
+        const [gradeResult] = await pool.query(
           "DELETE FROM grades WHERE student_user_id = ? AND course_id = ? AND period_id = ?",
           [studentId, courseId, periodId]
         );
-        return res.affectedRows > 0;
+        const [entryResult] = await pool.query(
+          "DELETE FROM grade_entries WHERE student_id = ? AND course_id = ? AND period_id = ?",
+          [studentId, courseId, periodId]
+        );
+        return gradeResult.affectedRows > 0 || entryResult.affectedRows > 0;
       }
 
       return false;

@@ -28,6 +28,7 @@ if (!API_BASE_URL.endsWith("/api")) {
 const MarkAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [courses, setCourses] = useState([]);
+  const [facultyAssignments, setFacultyAssignments] = useState([]);
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
   const [remarks, setRemarks] = useState({});
@@ -63,23 +64,22 @@ const MarkAttendance = () => {
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      // Fetch courses
-      const coursesResponse = await axios.get(`${API_BASE_URL}/course/courses`);
-      let coursesData = coursesResponse.data;
-
-      let normalizedCourses = [];
-      if (Array.isArray(coursesData)) {
-        normalizedCourses = coursesData;
-      } else if (Array.isArray(coursesData.data)) {
-        normalizedCourses = coursesData.data;
-      }
-
-      normalizedCourses = normalizedCourses.map((course) => ({
-        ...course,
-        course_id: course.id || course.course_id,
-      }));
-
-      setCourses(normalizedCourses);
+      const assignmentsResponse = facultyUserId
+        ? await axios.get(`${API_BASE_URL}/faculty-assignments/faculty/${facultyUserId}`)
+        : { data: { data: [] } };
+      const assignmentsData = Array.isArray(assignmentsResponse.data)
+        ? assignmentsResponse.data
+        : assignmentsResponse.data.data || [];
+      setFacultyAssignments(assignmentsData);
+      const assignedCourses = [...new Map(assignmentsData.map((assignment) => [
+        String(assignment.course_id), {
+          course_id: assignment.course_id,
+          id: assignment.course_id,
+          code: assignment.course_code,
+          title: assignment.course_title,
+        },
+      ])).values()];
+      setCourses(assignedCourses);
 
       // Fetch academic periods
       const periodsResponse = await axios.get(
@@ -141,6 +141,12 @@ const MarkAttendance = () => {
         ...section,
         section_id: section.id || section.section_id,
       }));
+
+      const assignedSectionNames = new Set(facultyAssignments
+        .filter((assignment) => String(assignment.course_id) === String(selectedCourse)
+          && String(assignment.academic_period_id) === String(selectedPeriod))
+        .map((assignment) => String(assignment.section || "")));
+      normalizedSections = normalizedSections.filter((section) => assignedSectionNames.has(String(section.section_name || "")));
 
       console.log("Sections for selected course/period:", normalizedSections);
       setSections(normalizedSections);
@@ -408,6 +414,29 @@ const MarkAttendance = () => {
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+          {/* Period Filter */}
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Academic Period *
+            </label>
+            <select
+              value={selectedPeriod}
+              onChange={(e) => {
+                setSelectedPeriod(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              required
+            >
+              <option value="">Select Period</option>
+              {periods.map((period) => (
+                <option key={period.period_id} value={period.period_id}>
+                  {period.school_year} - {period.semester}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Course Filter */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -423,7 +452,10 @@ const MarkAttendance = () => {
               required
             >
               <option value="">Select Course</option>
-              {courses.map((course) => (
+              {courses.filter((course) => facultyAssignments.some((assignment) =>
+                String(assignment.course_id) === String(course.course_id)
+                && String(assignment.academic_period_id) === String(selectedPeriod)
+              )).map((course) => (
                 <option key={course.id} value={course.id}>
                   {course.code} - {course.title}
                 </option>
@@ -448,29 +480,6 @@ const MarkAttendance = () => {
               {sections.map((section) => (
                 <option key={section.section_id} value={section.section_id}>
                   {section.section_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Period Filter */}
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
-              Academic Period *
-            </label>
-            <select
-              value={selectedPeriod}
-              onChange={(e) => {
-                setSelectedPeriod(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              required
-            >
-              <option value="">Select Period</option>
-              {periods.map((period) => (
-                <option key={period.period_id} value={period.period_id}>
-                  {period.school_year} - {period.semester}
                 </option>
               ))}
             </select>

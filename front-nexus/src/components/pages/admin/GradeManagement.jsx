@@ -79,6 +79,7 @@ const GradeManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCourse, setFilterCourse] = useState(null);
   const [filterPeriod, setFilterPeriod] = useState(null);
+  const [filterSection, setFilterSection] = useState(null);
   const [filterStatus, setFilterStatus] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -348,22 +349,27 @@ const GradeManagement = () => {
     });
   };
 
-  // Filter grades
-  const filteredGrades = grades.filter((grade) => {
-    const matchesSearch =
-      grade.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      grade.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      grade.student_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      grade.course_code?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCourse =
-      !filterCourse || grade.course_id === filterCourse.value;
-    const matchesPeriod =
-      !filterPeriod || grade.period_id === filterPeriod.value;
-    const matchesStatus = !filterStatus || grade.status === filterStatus.value;
-
-    return matchesSearch && matchesCourse && matchesPeriod && matchesStatus;
-  });
+  const hasGradeScope = Boolean(filterPeriod && filterCourse && filterSection);
+  const filteredGrades = hasGradeScope
+    ? grades.filter((grade) => {
+        const query = searchTerm.trim().toLowerCase();
+        const matchesSearch = !query || [
+          grade.first_name,
+          grade.last_name,
+          grade.student_name,
+          grade.student_id,
+          grade.course_code,
+          grade.course_title,
+        ].some((value) => String(value ?? "").toLowerCase().includes(query));
+        const matchesCourse = String(grade.course_id) === String(filterCourse.value);
+        const matchesPeriod = String(grade.period_id) === String(filterPeriod.value);
+        const matchesSection = filterSection.value === "__none__"
+          ? !grade.section_name
+          : String(grade.section_name ?? "") === String(filterSection.value);
+        const matchesStatus = !filterStatus || grade.status === filterStatus.value;
+        return matchesSearch && matchesCourse && matchesPeriod && matchesSection && matchesStatus;
+      })
+    : [];
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -377,10 +383,30 @@ const GradeManagement = () => {
       `${student.student_id || student.user_id || "N/A"} - ${student.first_name || ""} ${student.last_name || ""}`.trim(),
   }));
 
-  const courseOptions = courses.map((course) => ({
+  const allCourseOptions = courses.map((course) => ({
     value: course.id || course.course_id,
     label: `${course.code || "N/A"} - ${course.title || "N/A"}`,
   }));
+
+  const courseOptions = filterPeriod
+    ? [...new Map(grades
+        .filter((grade) => String(grade.period_id) === String(filterPeriod.value))
+        .map((grade) => [String(grade.course_id), {
+          value: grade.course_id,
+          label: `${grade.course_code || "N/A"} - ${grade.course_title || "N/A"}`,
+        }])).values()]
+    : [];
+
+  const sectionOptions = filterPeriod && filterCourse
+    ? [...new Set(grades
+        .filter((grade) => String(grade.period_id) === String(filterPeriod.value)
+          && String(grade.course_id) === String(filterCourse.value))
+        .map((grade) => grade.section_name || "__none__"))]
+        .map((section) => ({
+          value: section,
+          label: section === "__none__" ? "Section unavailable" : section,
+        }))
+    : [];
 
   const periodOptions = periods.map((period) => ({
     value: period.period_id || period.id,
@@ -464,16 +490,18 @@ const GradeManagement = () => {
   );
 
   // Calculate statistics
-  const totalGrades = grades.length;
-  const approvedGrades = grades.filter((g) => g.status === "approved").length;
-  const passedStudents = grades.filter((g) => g.remarks === "PASSED").length;
-  const averageGrade =
-    grades.length > 0
-      ? (
-          grades.reduce((sum, g) => sum + (parseFloat(g.final_grade) || 0), 0) /
-          grades.filter((g) => g.final_grade).length
-        ).toFixed(2)
-      : 0;
+  const totalGrades = filteredGrades.length;
+  const approvedGrades = filteredGrades.filter((g) => g.status === "approved").length;
+  const passedStudents = filteredGrades.filter((g) => g.remarks === "PASSED").length;
+  const gradesWithFinal = filteredGrades.filter(
+    (grade) => grade.final_grade !== null
+      && grade.final_grade !== undefined
+      && grade.final_grade !== ""
+      && Number.isFinite(Number(grade.final_grade)),
+  );
+  const averageGrade = gradesWithFinal.length > 0
+    ? (gradesWithFinal.reduce((sum, grade) => sum + Number(grade.final_grade), 0) / gradesWithFinal.length).toFixed(2)
+    : "0.00";
 
   return (
     <div className=" p-3 sm:p-4 transition-colors duration-500">
@@ -532,7 +560,10 @@ const GradeManagement = () => {
                 type="text"
                 placeholder="Search by student name or ID..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full pl-8 pr-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all shadow-inner"
               />
               <Search
@@ -545,10 +576,15 @@ const GradeManagement = () => {
             <div className="flex items-center gap-2">
               <div className="w-40">
                 <Select
-                  options={courseOptions}
-                  value={filterCourse}
-                  onChange={setFilterCourse}
-                  placeholder="Course"
+                  options={periodOptions}
+                  value={filterPeriod}
+                  onChange={(selected) => {
+                    setFilterPeriod(selected);
+                    setFilterCourse(null);
+                    setFilterSection(null);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Select Period"
                   isClearable
                   className="text-sm"
                   classNamePrefix="react-select"
@@ -557,10 +593,31 @@ const GradeManagement = () => {
 
               <div className="w-40">
                 <Select
-                  options={periodOptions}
-                  value={filterPeriod}
-                  onChange={setFilterPeriod}
-                  placeholder="Period"
+                  options={courseOptions}
+                  value={filterCourse}
+                  onChange={(selected) => {
+                    setFilterCourse(selected);
+                    setFilterSection(null);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Select Course"
+                  isDisabled={!filterPeriod}
+                  isClearable
+                  className="text-sm"
+                  classNamePrefix="react-select"
+                />
+              </div>
+
+              <div className="w-40">
+                <Select
+                  options={sectionOptions}
+                  value={filterSection}
+                  onChange={(selected) => {
+                    setFilterSection(selected);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Select Section"
+                  isDisabled={!filterCourse}
                   isClearable
                   className="text-sm"
                   classNamePrefix="react-select"
@@ -571,7 +628,10 @@ const GradeManagement = () => {
                 <Select
                   options={statusOptions}
                   value={filterStatus}
-                  onChange={setFilterStatus}
+                  onChange={(selected) => {
+                    setFilterStatus(selected);
+                    setCurrentPage(1);
+                  }}
                   placeholder="Status"
                   isClearable
                   className="text-sm"
@@ -598,6 +658,7 @@ const GradeManagement = () => {
                   <th className="px-4 py-2.5">Student</th>
                   <th className="px-4 py-2.5">Course</th>
                   <th className="px-4 py-2.5">Period</th>
+                  <th className="px-4 py-2.5">Section</th>
                   <th className="px-4 py-2.5 text-center">Prelim</th>
                   <th className="px-4 py-2.5 text-center">Midterm</th>
                   <th className="px-4 py-2.5 text-center">Finals</th>
@@ -633,6 +694,7 @@ const GradeManagement = () => {
                       <td className="px-4 py-2">
                         {grade.period_name} {grade.year}
                       </td>
+                      <td className="px-4 py-2">{grade.section_name || "-"}</td>
                       <td className="px-4 py-2 text-center">
                         <span
                           className="font-semibold"
@@ -675,13 +737,15 @@ const GradeManagement = () => {
                         <div className="flex items-center justify-end gap-1">
                           {grade.status !== "approved" && (
                             <>
-                              <button
-                                onClick={() => handleEdit(grade)}
-                                className="text-indigo-600 hover:text-indigo-800 transition-colors p-1 rounded-full hover:bg-slate-200"
-                                title="Edit"
-                              >
-                                <Edit size={14} />
-                              </button>
+                              {grade.source !== "bcc_grade_entries" && (
+                                <button
+                                  onClick={() => handleEdit(grade)}
+                                  className="text-indigo-600 hover:text-indigo-800 transition-colors p-1 rounded-full hover:bg-slate-200"
+                                  title="Edit"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleApprove(grade.grade_id)}
                                 className="text-green-600 hover:text-green-800 transition-colors p-1 rounded-full hover:bg-slate-200"
@@ -705,10 +769,12 @@ const GradeManagement = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan="10"
+                      colSpan="11"
                       className="p-4 text-center text-slate-500 italic"
                     >
-                      No grades found matching your search criteria.
+                      {hasGradeScope
+                        ? "No grades found for the selected filters."
+                        : "Select a period, course, and section to view grades."}
                     </td>
                   </tr>
                 )}
@@ -779,8 +845,8 @@ const GradeManagement = () => {
                     Course *
                   </label>
                   <Select
-                    options={courseOptions}
-                    value={courseOptions.find(
+                    options={allCourseOptions}
+                    value={allCourseOptions.find(
                       (o) => o.value === formData.course_id,
                     )}
                     onChange={(option) =>
