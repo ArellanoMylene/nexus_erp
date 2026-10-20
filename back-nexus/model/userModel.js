@@ -3,7 +3,7 @@ import db from "../config/db.js";
 
 const getCurrentDateValue = () => new Date().toISOString().split("T")[0];
 
-const getStudentNumberPrefix = () => `B${String(new Date().getFullYear()).slice(-2)}`;
+const getStudentNumberPrefix = () => "BCC";
 
 const pickValue = (source, ...keys) => {
   for (const key of keys) {
@@ -374,6 +374,37 @@ export const createStudentUser = async (userData) => {
 export const previewNextStudentNumber = async () => {
   return await getNextStudentNumber();
 };
+
+export const assignStudentNumberIfMissing = async (userId) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [rows] = await connection.query(
+      `SELECT student_number FROM student_details WHERE user_id = ? FOR UPDATE`,
+      [userId],
+    );
+    const existingNumber = rows[0]?.student_number;
+    if (existingNumber && String(existingNumber).trim()) {
+      await connection.commit();
+      return existingNumber;
+    }
+
+    const studentNumber = await getNextStudentNumber(connection);
+    await connection.query(
+      `INSERT INTO student_details (user_id, student_number)
+       VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE student_number = VALUES(student_number)`,
+      [userId, studentNumber],
+    );
+    await connection.commit();
+    return studentNumber;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
 export const createEmployeeUser = async (userData) => {
   const connection = await db.getConnection();
   try {
@@ -460,7 +491,14 @@ export const updateStudentUser = async (userId, userData) => {
 
     // 2️⃣ Upsert student_details with full StudentRegistrationForm payload
     const requestedStudentNumber = pickValue(userData, "studentNumber");
-    const studentDetails = buildStudentDetailPayload(userData, requestedStudentNumber);
+    const [existingStudentDetails] = await connection.query(
+      `SELECT student_number FROM student_details WHERE user_id = ? FOR UPDATE`,
+      [userId],
+    );
+    const studentNumber = requestedStudentNumber
+      || existingStudentDetails[0]?.student_number
+      || await getNextStudentNumber(connection);
+    const studentDetails = buildStudentDetailPayload(userData, studentNumber);
     const studentDetailColumns = Object.keys(studentDetails);
     const studentDetailValues = Object.values(studentDetails);
 

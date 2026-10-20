@@ -69,7 +69,7 @@ const Menu = {
         }, */
         { label: "Admission", icons: FileText, link: "/admin/admin_admission" },
         {
-          label: "Enrollment Records",
+          label: "Subject Enrollment Records",
           icons: ClipboardList,
           link: "/admin/admin_enrollment",
         },

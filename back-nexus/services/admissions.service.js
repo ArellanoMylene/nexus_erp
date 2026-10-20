@@ -1,6 +1,12 @@
 // services/admissions.service.js
 import db from "../config/db.js";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 import * as admissionModel from "../model/admissions.model.js";
+import {
+  assignStudentNumberIfMissing,
+  createStudentUser,
+} from "../model/userModel.js";
 import {
   sendAdmissionStatusEmail,
   sendAdmissionSubmittedEmail,
@@ -16,14 +22,59 @@ export const getAdmission = async (id) => {
   return admission;
 };
 
+const ensureStudentAccount = async (admission) => {
+  const email = String(admission.email || "").trim();
+  if (!email) throw new Error("An email address is required to assign a student ID");
+
+  const [existingUsers] = await db.query(
+    `SELECT u.user_id, u.role, sd.student_number
+     FROM users u
+     LEFT JOIN student_details sd ON sd.user_id = u.user_id
+     WHERE u.email = ? COLLATE utf8mb4_unicode_ci
+     LIMIT 1`,
+    [email],
+  );
+  if (existingUsers.length) {
+    if (existingUsers[0].role !== "Student") {
+      throw new Error("This email address is already used by a non-student account");
+    }
+    if (!existingUsers[0].student_number) {
+      existingUsers[0].student_number = await assignStudentNumberIfMissing(existingUsers[0].user_id);
+    }
+    return existingUsers[0];
+  }
+
+  // Applications need a student record for enrollment. Credentials are not
+  // issued here; account access is handled separately from assigning the ID.
+  const passwordHash = await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10);
+  return await createStudentUser({
+    email,
+    passwordHash,
+    firstName: admission.first_name,
+    middleName: admission.middle_name,
+    lastName: admission.last_name,
+    dateOfBirth: admission.date_of_birth,
+    gender: admission.gender,
+    phone: admission.phone,
+    permanentAddress: admission.address,
+    courseProgram: admission.program_applied,
+    yearLevel: admission.year_level || "1st Year",
+    previousSchool: admission.previous_school,
+    yearGraduated: admission.year_graduated,
+    isVerified: false,
+  });
+};
+
 export const addAdmission = async (data) => {
   const admission = await admissionModel.createAdmission(data);
+  await ensureStudentAccount(admission);
+  const linkedAdmission = await getAdmission(admission.admission_id);
   sendAdmissionSubmittedEmail({
-    to: admission.email,
-    firstName: admission.first_name,
-    program: admission.program_applied,
+    to: linkedAdmission.email,
+    firstName: linkedAdmission.first_name,
+    program: linkedAdmission.program_applied,
   }).catch((error) => console.error("Admission email failed:", error.message));
-  return admission;
+  return linkedAdmission;
 };
 
 export const editAdmission = async (id, data, options = {}) => {

@@ -127,6 +127,92 @@ export const addEnrollment = async (data) => {
   return enrollment;
 };
 
+export const addEnrollments = async (data) => {
+  const studentIds = [...new Set((data.student_ids || [data.student_id])
+    .filter((studentId) => studentId !== null && studentId !== undefined && String(studentId).trim() !== "")
+    .map((studentId) => String(studentId)))];
+  const courseIds = [...new Set((data.course_ids || [])
+    .filter((courseId) => courseId !== null && courseId !== undefined && String(courseId).trim() !== "")
+    .map((courseId) => String(courseId)))];
+  if (!studentIds.length) throw new Error("At least one Student ID is required");
+  if (!courseIds.length) throw new Error("At least one Course ID is required");
+
+  const cleanEnrollments = studentIds.flatMap((studentId) => courseIds.map((courseId) =>
+    validateEnrollmentData({
+      ...data,
+      student_id: studentId,
+      course_id: courseId,
+    }),
+  ));
+
+  const existingEnrollments = await enrollmentModel.findExistingEnrollments(
+    studentIds,
+    courseIds,
+    cleanEnrollments[0].period_id,
+  );
+  const duplicates = existingEnrollments.map(
+    ({ student_id, course_id }) => `student ${student_id}, course ${course_id}`,
+  );
+  if (duplicates.length) {
+    const shownDuplicates = duplicates.slice(0, 10).join("; ");
+    const remaining = duplicates.length > 10 ? `; and ${duplicates.length - 10} more` : "";
+    throw new Error(`Some selected student/course combinations are already enrolled: ${shownDuplicates}${remaining}`);
+  }
+
+  const createdEnrollments = await enrollmentModel.createEnrollments(cleanEnrollments);
+  const studentIdPlaceholders = studentIds.map(() => "?").join(", ");
+  try {
+    const [studentRows] = await db.query(
+      `SELECT user_id, email, first_name FROM users WHERE user_id IN (${studentIdPlaceholders})`,
+      studentIds,
+    );
+    for (const student of studentRows) {
+      const studentEnrollments = createdEnrollments.filter(
+        (enrollment) => String(enrollment.student_id) === String(student.user_id),
+      );
+      if (!student.email || !studentEnrollments.length) continue;
+      const courseNames = [...new Set(studentEnrollments.map(
+        (enrollment) => enrollment.course_title || enrollment.course_code,
+      ).filter(Boolean))];
+      sendEnrollmentSubmittedEmail({
+        to: student.email,
+        firstName: student.first_name,
+        course: courseNames.join(", "),
+        schoolYear: studentEnrollments[0].school_year,
+        semester: studentEnrollments[0].semester,
+      }).catch((error) => console.error("Enrollment email failed:", error.message));
+    }
+  } catch (err) {
+    console.error("Error preparing enrollment emails:", err.message);
+  }
+
+  const sectionId = cleanEnrollments[0].section_id;
+  if (sectionId) {
+    await db.query(
+      "UPDATE sections SET current_enrolled = current_enrolled + ? WHERE section_id = ?",
+      [createdEnrollments.length, sectionId],
+    );
+  }
+
+  try {
+    const studentEmails = [...new Set((await db.query(
+      `SELECT email FROM users WHERE user_id IN (${studentIdPlaceholders})`,
+      studentIds,
+    ))[0].map((user) => user.email).filter(Boolean))];
+    if (studentEmails.length) {
+      const emailPlaceholders = studentEmails.map(() => "?").join(", ");
+      await db.query(
+        `UPDATE admissions SET status = 'Enrolled' WHERE email IN (${emailPlaceholders}) AND status = 'Accepted'`,
+        studentEmails,
+      );
+    }
+  } catch (err) {
+    console.error("Error updating admission status:", err);
+  }
+
+  return createdEnrollments;
+};
+
 // Update enrollment
 // section_id is optional here too. If a registrar manually sets/changes
 // a section through the edit form, we still run the same capacity check
@@ -182,13 +268,27 @@ export const listStudentsByAssignment = async (assignmentId) => {
 // --- Sectioning (runs AFTER enrollment) ---
 // Groups unsectioned students and assigns them to sections tied to their program.
 // Ensures BPA students only go to BPA sections, BAHISTO students only to BAHISTO sections, etc.
-export const runSectioning = async ({ course_id, period_id, program_id }) => {
+export const runSectioning = async ({
+  course_id,
+  course_ids,
+  period_id,
+  program_id,
+  year_level,
+  curriculum_type,
+}) => {
   if (!period_id) throw new Error("Academic Period ID is required");
+  if (!year_level) throw new Error("Year Level is required to run sectioning");
+
+  const selectedCourseIds = Array.isArray(course_ids) && course_ids.length
+    ? course_ids
+    : course_id ? [course_id] : [];
 
   const unsectioned = await enrollmentModel.getUnsectionedEnrollments(
-    course_id || null,
+    selectedCourseIds,
     period_id,
     program_id || null,
+    year_level || null,
+    curriculum_type || null,
   );
 
   if (unsectioned.length === 0) {
@@ -196,11 +296,11 @@ export const runSectioning = async ({ course_id, period_id, program_id }) => {
       assigned: [],
       failed: [],
       unassigned: [],
-      summary: { totalUnsectioned: 0, assigned: 0, failed: 0, unassigned: 0 },
+      summary: { totalEnrollments: 0, totalStudents: 0, assigned: 0, failed: 0, unassigned: 0 },
     };
   }
 
-  // Group unsectioned enrollments by program
+  // Group selected enrollment rows by program, then place each student once.
   const enrollmentsByProgram = new Map();
   for (const item of unsectioned) {
     const progKey = item.program_id ? String(item.program_id) : "unspecified";
@@ -213,12 +313,17 @@ export const runSectioning = async ({ course_id, period_id, program_id }) => {
   const assigned = [];
   const failed = [];
   const unassigned = [];
+  const plannedAssignments = [];
+  const sectionsForPeriod = await SectionsModel.getSectionsForPeriod(period_id, null, year_level);
 
   for (const [progKey, studentsInProg] of enrollmentsByProgram.entries()) {
     const progId = progKey === "unspecified" ? null : Number(progKey);
-    const sections = await SectionsModel.getSectionsForPeriod(period_id, progId);
+    const sections = sectionsForPeriod.filter(
+      (section) => String(section.program_id ?? "") === String(progId ?? ""),
+    );
 
-    if (!sections || sections.length === 0) {
+    const activeSections = sections.filter((section) => section.status !== "inactive");
+    if (!activeSections.length) {
       const progLabel = studentsInProg[0]?.program_code || studentsInProg[0]?.student_course || "Unspecified";
       for (const item of studentsInProg) {
         unassigned.push({
@@ -230,39 +335,64 @@ export const runSectioning = async ({ course_id, period_id, program_id }) => {
       continue;
     }
 
-    const enrollmentIds = studentsInProg.map((e) => e.enrollment_id);
-    const idToStudent = new Map(
-      studentsInProg.map((e) => [String(e.enrollment_id), e.student_id]),
-    );
-
-    const { assignments, unassigned: unassignedIds } =
-      SectionsService.computeBalancedAssignment(sections, enrollmentIds);
-
-    for (const assignment of assignments) {
-      const enrollmentId = assignment.id;
-      try {
-        await enrollmentModel.setEnrollmentSection(
-          enrollmentId,
-          assignment.section_id,
+    const enrollmentsByStudent = new Map();
+    for (const enrollment of studentsInProg) {
+      const studentKey = String(enrollment.student_id);
+      if (!enrollmentsByStudent.has(studentKey)) enrollmentsByStudent.set(studentKey, []);
+      enrollmentsByStudent.get(studentKey).push(enrollment);
+    }
+    const validSectionIds = new Set(activeSections.map((section) => String(section.section_id)));
+    // Remove the selected cohort from current section occupancy before
+    // redistributing it, so reruns can correct an earlier uneven split.
+    for (const studentEnrollments of enrollmentsByStudent.values()) {
+      const previousSections = new Set(studentEnrollments
+        .map((enrollment) => String(enrollment.section_id || ""))
+        .filter((sectionId) => sectionId && validSectionIds.has(sectionId)));
+      for (const previousSectionId of previousSections) {
+        const previousSection = activeSections.find(
+          (section) => String(section.section_id) === previousSectionId,
         );
-        await SectionsModel.updateEnrollmentCount(assignment.section_id, true);
-        assigned.push({
-          enrollment_id: enrollmentId,
-          student_id: idToStudent.get(String(enrollmentId)),
-          section_id: assignment.section_id,
-          section_name: assignment.section_name,
-        });
-      } catch (err) {
-        failed.push({ enrollment_id: enrollmentId, reason: err.message });
+        if (previousSection) {
+          previousSection.current_enrolled = Math.max(0, Number(previousSection.current_enrolled || 0) - 1);
+        }
       }
     }
 
-    for (const uId of unassignedIds) {
-      unassigned.push({
-        enrollment_id: uId,
-        student_id: idToStudent.get(String(uId)),
-        reason: "Program sections are full",
-      });
+    const studentIds = [...enrollmentsByStudent.keys()];
+
+    const { assignments, unassigned: unassignedIds } =
+      SectionsService.computeBalancedAssignment(activeSections, studentIds);
+
+    for (const assignment of assignments) {
+      for (const enrollment of enrollmentsByStudent.get(String(assignment.id)) || []) {
+        plannedAssignments.push({
+          enrollment_id: enrollment.enrollment_id,
+          student_id: enrollment.student_id,
+          section_id: assignment.section_id,
+          section_name: assignment.section_name,
+        });
+      }
+    }
+
+    for (const studentId of unassignedIds) {
+      for (const enrollment of enrollmentsByStudent.get(String(studentId)) || []) {
+        unassigned.push({
+          enrollment_id: enrollment.enrollment_id,
+          student_id: enrollment.student_id,
+          reason: "Program sections are full",
+        });
+      }
+    }
+  }
+
+  if (plannedAssignments.length) {
+    try {
+      await enrollmentModel.setEnrollmentSections(plannedAssignments, period_id);
+      assigned.push(...plannedAssignments);
+    } catch (err) {
+      for (const assignment of plannedAssignments) {
+        failed.push({ enrollment_id: assignment.enrollment_id, reason: err.message });
+      }
     }
   }
 
@@ -271,7 +401,8 @@ export const runSectioning = async ({ course_id, period_id, program_id }) => {
     failed,
     unassigned,
     summary: {
-      totalUnsectioned: unsectioned.length,
+      totalEnrollments: unsectioned.length,
+      totalStudents: new Set(unsectioned.map((item) => String(item.student_id))).size,
       assigned: assigned.length,
       failed: failed.length,
       unassigned: unassigned.length,

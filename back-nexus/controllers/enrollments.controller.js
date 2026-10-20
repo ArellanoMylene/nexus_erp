@@ -64,7 +64,10 @@ export const createEnrollment = async (req, res) => {
   try {
     if (!isStudent(req) && !isAdmin(req)) return denyEnrollmentAccess(res);
     const data = isStudent(req) ? { ...req.body, student_id: req.user.userId } : req.body;
-    const enrollment = await enrollmentService.addEnrollment(data);
+    const isAdminCourseBatch = isAdmin(req) && Array.isArray(data.course_ids);
+    const enrollment = isAdminCourseBatch
+      ? await enrollmentService.addEnrollments(data)
+      : await enrollmentService.addEnrollment(data);
     res.status(201).json(enrollment);
   } catch (err) {
     console.error(err);
@@ -121,8 +124,8 @@ export const getStudentsByAssignment = async (req, res) => {
   }
 };
 
-// Run sectioning: takes every enrolled-but-unsectioned student in a
-// course/period and spreads them across that period's sections, evenly.
+// Run sectioning: assigns each student to one section and applies that
+// section to the student's matching course enrollments for the period.
 export const runSectioning = async (req, res) => {
   try {
     if (!isAdmin(req)) return denyEnrollmentAccess(res);

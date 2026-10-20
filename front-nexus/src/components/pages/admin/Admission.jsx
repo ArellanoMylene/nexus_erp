@@ -78,6 +78,27 @@ const formatAcademicPeriod = (period) =>
     ? `${period.school_year || "N/A"} - ${period.semester || "N/A"}`
     : "N/A";
 
+const normalizeProgramKey = (value) => String(value || "")
+  .toLowerCase()
+  .replace(/\byear\s*:\s*\d+.*$/, "")
+  .replace(/\bmajor\s+in\b.*$/, "")
+  .replace(/\b(and|in|of|the)\b/g, "")
+  .replace(/[^a-z0-9]/g, "");
+
+const getConfiguredProgram = (value, programs = []) => {
+  const key = normalizeProgramKey(value);
+  if (!key) return null;
+  return programs.find((program) =>
+    normalizeProgramKey(program.code) === key
+    || normalizeProgramKey(program.name || program.program_name) === key,
+  ) || null;
+};
+
+const getConfiguredProgramName = (value, programs = []) => {
+  const program = getConfiguredProgram(value, programs);
+  return program?.name || program?.program_name || value || "N/A";
+};
+
 // Unique key for an academic period, used for <select> values and matching.
 // Prefers a real id if the API provides one, otherwise falls back to a
 // school_year + semester composite key.
@@ -200,7 +221,7 @@ const ConfirmModal = ({
   );
 };
 
-const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData }) => {
+const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData, programs = [] }) => {
   const [formData, setFormData] = useState({
     first_name: "",
     middle_name: "",
@@ -226,6 +247,18 @@ const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData }) => {
   });
   const [admins, setAdmins] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
+  const programOptions = programs.map((program) => ({
+    value: program.name || program.program_name,
+    label: program.code
+      ? `${program.code} - ${program.name || program.program_name}`
+      : program.name || program.program_name,
+  })).filter((option) => option.value);
+  const matchedProgram = getConfiguredProgram(formData.program_applied, programs);
+  const programValue = matchedProgram
+    ? programOptions.find((option) => option.value === (matchedProgram.name || matchedProgram.program_name))
+    : formData.program_applied
+      ? { value: formData.program_applied, label: `Unmatched: ${formData.program_applied}` }
+      : null;
 
   const documentOptions = [
     { value: "Birth Certificate", label: "Birth Certificate" },
@@ -328,7 +361,15 @@ const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    const configuredProgram = getConfiguredProgram(formData.program_applied, programs);
+    if (!configuredProgram) {
+      toast.error("Please select a configured program before saving.");
+      return;
+    }
+    onSubmit({
+      ...formData,
+      program_applied: configuredProgram.name || configuredProgram.program_name,
+    });
   };
 
   if (!isOpen) return null;
@@ -386,6 +427,17 @@ const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData }) => {
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                   disabled={mode === "view"}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                  Student ID
+                </label>
+                <input
+                  type="text"
+                  value={initialData?.student_number || (mode === "add" ? "Assigned when application is saved" : "Not assigned")}
+                  readOnly
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-50 text-slate-700"
                 />
               </div>
               <div>
@@ -552,20 +604,24 @@ const AdmissionModal = ({ isOpen, onClose, onSubmit, mode, initialData }) => {
                 <label className="block text-xs font-medium text-slate-700 mb-1.5">
                   Program Applied *
                 </label>
-                <input
-                  type="text"
-                  value={formData.program_applied}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      program_applied: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="e.g. BSIT"
+                <Select
+                  value={programValue}
+                  onChange={(selected) => setFormData((prev) => ({
+                    ...prev,
+                    program_applied: selected?.value || "",
+                  }))}
+                  options={programOptions}
+                  placeholder={programOptions.length ? "Select configured program..." : "Loading configured programs..."}
+                  isClearable
+                  isDisabled={mode === "view" || !programOptions.length}
                   required
-                  disabled={mode === "view"}
+                  styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
                 />
+                {formData.program_applied && !matchedProgram && mode !== "view" && (
+                  <p className="text-[11px] text-amber-700 mt-1">
+                    This saved program does not match a configured program. Choose the correct configured program before saving.
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1.5">
@@ -915,7 +971,8 @@ const BulkEnrollModal = ({ isOpen, onClose, admissions, onSubmit }) => {
   const getAdmissionDepartment = (admission) =>
     admission.department_name ||
     admission.department ||
-    programDepartmentMap.get(admission.program_applied) ||
+    getConfiguredProgram(admission.program_applied, programs)?.department_name ||
+    programDepartmentMap.get(getConfiguredProgramName(admission.program_applied, programs)) ||
     "";
 
   // Filter admissions based on criteria
@@ -929,7 +986,7 @@ const BulkEnrollModal = ({ isOpen, onClose, admissions, onSubmit }) => {
     }
 
     if (filterProgram) {
-      match = match && a.program_applied === filterProgram;
+      match = match && normalizeProgramKey(a.program_applied) === normalizeProgramKey(filterProgram);
     }
 
     if (filterDepartment) {
@@ -1229,7 +1286,7 @@ const BulkEnrollModal = ({ isOpen, onClose, admissions, onSubmit }) => {
                             getAcademicPeriodForAdmission(applicant, academicPeriods)
                           )}
                         </td>
-                        <td className="px-3 py-2 text-sm text-slate-600">{applicant.program_applied}</td>
+                        <td className="px-3 py-2 text-sm text-slate-600">{getConfiguredProgramName(applicant.program_applied, programs)}</td>
                         <td className="px-3 py-2 text-sm text-slate-600">{getAdmissionDepartment(applicant) || "N/A"}</td>
                         <td className="px-3 py-2 text-sm text-slate-600">{applicant.year_level || "1st Year"}</td>
                         <td className="px-3 py-2 text-sm">
@@ -1293,6 +1350,7 @@ const BulkEnrollModal = ({ isOpen, onClose, admissions, onSubmit }) => {
 const Admission = () => {
   const [admissions, setAdmissions] = useState([]);
   const [academicPeriods, setAcademicPeriods] = useState([]);
+  const [programs, setPrograms] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(10);
@@ -1334,9 +1392,21 @@ const Admission = () => {
     }
   };
 
+  const fetchPrograms = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/api/programs`);
+      const rows = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      setPrograms(rows);
+    } catch (err) {
+      console.error("Error fetching configured programs:", err);
+      toast.error(getErrorMessage(err, "Failed to load configured programs."));
+    }
+  };
+
   useEffect(() => {
     fetchAdmissions();
     fetchAcademicPeriods();
+    fetchPrograms();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1483,7 +1553,8 @@ const Admission = () => {
         <table className="min-w-full divide-y">
           <thead className="bg-slate-100">
             <tr>
-              <th className="px-3 py-2 text-left text-sm font-semibold">ID</th>
+              <th className="px-3 py-2 text-left text-sm font-semibold">Application ID</th>
+              <th className="px-3 py-2 text-left text-sm font-semibold">Student ID</th>
               <th className="px-3 py-2 text-left text-sm font-semibold">
                 Name
               </th>
@@ -1517,12 +1588,15 @@ const Admission = () => {
                   <td className="px-3 py-2 text-sm">
                     {admission.admission_id}
                   </td>
+                  <td className="px-3 py-2 text-sm font-medium text-indigo-700">
+                    {admission.student_number || "Not assigned"}
+                  </td>
                   <td className="px-3 py-2 text-sm">
                     {admission.first_name} {admission.last_name}
                   </td>
                   <td className="px-3 py-2 text-sm">{admission.email}</td>
                   <td className="px-3 py-2 text-sm">
-                    {admission.program_applied || "N/A"}
+                    {getConfiguredProgramName(admission.program_applied, programs)}
                   </td>
                   <td className="px-3 py-2 text-sm">
                     {admission.year_level || "1st Year"}
@@ -1563,7 +1637,7 @@ const Admission = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={10}
                   className="text-center py-4 text-slate-500 italic"
                 >
                   No admissions found.
@@ -1590,6 +1664,7 @@ const Admission = () => {
         onSubmit={handleSubmit}
         mode={modalMode}
         initialData={currentRecord}
+        programs={programs}
       />
 
       <BulkEnrollModal

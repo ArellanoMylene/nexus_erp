@@ -21,6 +21,13 @@ import {
   Eye,
 } from "lucide-react";
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const YEAR_LEVEL_OPTIONS = [
+  "1st Year",
+  "2nd Year",
+  "3rd Year",
+  "4th Year",
+  "5th Year",
+];
 
 // Turn a raw axios error into a short, human-readable message
 const getErrorMessage = (err, fallback) => {
@@ -157,6 +164,22 @@ const ViewStudentsModal = ({ isOpen, onClose, section }) => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const uniqueStudents = Array.from(
+    (students || []).reduce((byStudent, row) => {
+      const key = String(row.student_id);
+      if (!byStudent.has(key)) {
+        byStudent.set(key, {
+          ...row,
+          subjects: new Set(),
+        });
+      }
+      const student = byStudent.get(key);
+      if (row.course_code || row.course_title) {
+        student.subjects.add(row.course_code || row.course_title);
+      }
+      return byStudent;
+    }, new Map()).values(),
+  ).map((student) => ({ ...student, subject_count: student.subjects.size }));
 
   useEffect(() => {
     if (!isOpen || !section) return;
@@ -230,7 +253,7 @@ const ViewStudentsModal = ({ isOpen, onClose, section }) => {
             </p>
           ) : error ? (
             <p className="text-center text-red-500 py-8 text-sm">{error}</p>
-          ) : students.length === 0 ? (
+          ) : uniqueStudents.length === 0 ? (
             <p className="text-center text-slate-500 italic py-8 text-sm">
               No students enrolled in this section yet.
             </p>
@@ -242,12 +265,12 @@ const ViewStudentsModal = ({ isOpen, onClose, section }) => {
                   <th className="px-3 py-2">Student No.</th>
                   <th className="px-3 py-2">Year Level</th>
                   <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2 text-center">Grades</th>
+                  <th className="px-3 py-2">Enrolled Subjects</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {students.map((s) => (
-                  <tr key={s.enrollment_id} className="text-sm text-slate-700">
+                {uniqueStudents.map((s) => (
+                  <tr key={s.student_id} className="text-sm text-slate-700">
                     <td className="px-3 py-2 font-medium">
                       {s.student_name}
                     </td>
@@ -256,8 +279,8 @@ const ViewStudentsModal = ({ isOpen, onClose, section }) => {
                     <td className="px-3 py-2">
                       <EnrollmentStatusBadge status={s.status} />
                     </td>
-                    <td className="px-3 py-2 text-center">
-                      {s.midterm_grade ?? "-"} / {s.final_grade ?? "-"}
+                    <td className="px-3 py-2">
+                      {s.subject_count}
                     </td>
                   </tr>
                 ))}
@@ -296,6 +319,7 @@ const SubjectSections = () => {
   const [formData, setFormData] = useState({
     program_id: "",
     period_id: "",
+    year_level: "",
     section_name: "",
     room: "",
     max_capacity: 40,
@@ -405,6 +429,10 @@ const SubjectSections = () => {
       toast.error("Please select an Academic Period.");
       return;
     }
+    if (!formData.year_level) {
+      toast.error("Please select a Year Level.");
+      return;
+    }
     if (!formData.section_name?.trim()) {
       toast.error("Please enter a Section Name.");
       return;
@@ -439,6 +467,7 @@ const SubjectSections = () => {
     setFormData({
       program_id: section.program_id || "",
       period_id: section.period_id || "",
+      year_level: section.year_level || "",
       section_name: section.section_name || "",
       room: section.room || "",
       max_capacity: section.max_capacity || 40,
@@ -488,6 +517,7 @@ const SubjectSections = () => {
     setFormData({
       program_id: "",
       period_id: activePeriod ? (activePeriod.id || activePeriod.period_id) : "",
+      year_level: "",
       section_name: "",
       room: "",
       max_capacity: 40,
@@ -703,6 +733,7 @@ const SubjectSections = () => {
                 <tr className="text-left text-xs font-bold uppercase tracking-wider text-slate-700">
                   <th className="px-4 py-2.5">Program Offering</th>
                   <th className="px-4 py-2.5">Section Name</th>
+                  <th className="px-4 py-2.5">Year Level</th>
                   <th className="px-4 py-2.5">Period</th>
                   <th className="px-4 py-2.5">Room</th>
                   <th className="px-4 py-2.5">Capacity</th>
@@ -737,6 +768,7 @@ const SubjectSections = () => {
                             {section.section_name}
                           </div>
                         </td>
+                        <td className="px-4 py-2">{section.year_level || "N/A"}</td>
                         <td className="px-4 py-2">
                           {section.semester} {section.school_year}
                         </td>
@@ -803,7 +835,7 @@ const SubjectSections = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan="7"
+                      colSpan="8"
                       className="p-8 text-center text-slate-500 italic"
                     >
                       No sections found matching your search criteria.
@@ -884,6 +916,25 @@ const SubjectSections = () => {
                           handleSelectChange(option, "period_id")
                         }
                         placeholder="Select Period..."
+                        required
+                        className="react-select-container text-sm"
+                        classNamePrefix="react-select"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Year Level <span className="text-red-500">*</span>
+                      </label>
+                      <Select
+                        options={YEAR_LEVEL_OPTIONS.map((yearLevel) => ({
+                          value: yearLevel,
+                          label: yearLevel,
+                        }))}
+                        value={YEAR_LEVEL_OPTIONS
+                          .map((yearLevel) => ({ value: yearLevel, label: yearLevel }))
+                          .find((option) => option.value === formData.year_level) || null}
+                        onChange={(option) => handleSelectChange(option, "year_level")}
+                        placeholder="Select Year Level..."
                         required
                         className="react-select-container text-sm"
                         classNamePrefix="react-select"

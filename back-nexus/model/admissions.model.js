@@ -29,6 +29,7 @@ export const getAllAdmissions = async () => {
   const [rows] = await db.query(
     `SELECT 
         a.*,
+        sd.student_number AS student_number,
         COALESCE(NULLIF(a.year_level, ''), sd.year_level, '1st Year') AS year_level,
         CONCAT(u.first_name, ' ', u.last_name) AS decision_by_name
      FROM admissions a
@@ -45,6 +46,7 @@ export const getAdmissionById = async (id) => {
   const [rows] = await db.query(
     `SELECT 
         a.*,
+        sd.student_number AS student_number,
         COALESCE(NULLIF(a.year_level, ''), sd.year_level, '1st Year') AS year_level,
         CONCAT(u.first_name, ' ', u.last_name) AS decision_by_name
      FROM admissions a

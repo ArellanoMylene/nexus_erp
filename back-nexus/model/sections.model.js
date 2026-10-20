@@ -82,6 +82,7 @@ const SectionsModel = {
         program_id,
         period_id,
         section_name,
+        year_level,
         room,
         max_capacity,
         schedule_day,
@@ -91,13 +92,14 @@ const SectionsModel = {
 
       const [result] = await pool.query(
         `INSERT INTO sections 
-        (program_id, period_id, section_name, room, max_capacity, current_enrolled, 
+        (program_id, period_id, section_name, year_level, room, max_capacity, current_enrolled,
          schedule_day, schedule_time_start, schedule_time_end)
-        VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
         [
           program_id || null,
           period_id,
           section_name,
+          year_level,
           room || null,
           max_capacity || 40,
           schedule_day || null,
@@ -119,6 +121,7 @@ const SectionsModel = {
         program_id,
         period_id,
         section_name,
+        year_level,
         room,
         max_capacity,
         schedule_day,
@@ -129,7 +132,7 @@ const SectionsModel = {
 
       const [result] = await pool.query(
         `UPDATE sections 
-        SET program_id = ?, period_id = ?, section_name = ?, room = ?, 
+        SET program_id = ?, period_id = ?, section_name = ?, year_level = ?, room = ?,
             max_capacity = ?, schedule_day = ?, schedule_time_start = ?, 
             schedule_time_end = ?, status = ?
         WHERE section_id = ?`,
@@ -137,6 +140,7 @@ const SectionsModel = {
           program_id || null,
           period_id,
           section_name,
+          year_level,
           room || null,
           max_capacity || 40,
           schedule_day || null,
@@ -197,13 +201,20 @@ const SectionsModel = {
 
   // Get raw section rows for a period, used by balancing algorithm.
   // Optionally filter by program_id to balance by program.
-  getSectionsForPeriod: async (periodId, programId = null) => {
+  getSectionsForPeriod: async (periodId, programId = null, yearLevel = null) => {
     try {
       let query = `
-        SELECT s.section_id, s.period_id, s.program_id, s.section_name, s.max_capacity, s.current_enrolled, s.status,
+        SELECT s.section_id, s.period_id, s.program_id, s.section_name, s.year_level, s.max_capacity,
+               COALESCE(ec.current_enrolled, 0) AS current_enrolled, s.status,
                p.code AS program_code, p.name AS program_name
         FROM sections s
         LEFT JOIN programs p ON s.program_id = p.program_id
+        LEFT JOIN (
+          SELECT section_id, period_id, COUNT(DISTINCT student_id) AS current_enrolled
+          FROM enrollments
+          WHERE section_id IS NOT NULL
+          GROUP BY section_id, period_id
+        ) ec ON ec.section_id = s.section_id AND ec.period_id = s.period_id
         WHERE s.period_id = ?
       `;
       const params = [periodId];
@@ -211,6 +222,11 @@ const SectionsModel = {
       if (programId) {
         query += " AND s.program_id = ?";
         params.push(programId);
+      }
+
+      if (yearLevel) {
+        query += " AND s.year_level = ?";
+        params.push(yearLevel);
       }
 
       query += " ORDER BY s.section_name ASC";

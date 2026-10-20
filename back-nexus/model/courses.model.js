@@ -25,21 +25,42 @@ export const getAllCourses = async () => {
      LEFT JOIN users u ON c.instructor_id = u.user_id`
   );
 
-  // Fetch prerequisites for all courses
-  for (const course of rows) {
-    const [prereqs] = await db.query(
-      `SELECT 
-        p.prereq_link_id AS id,
-        p.prereq_course_id,
-        c2.code AS prereq_code,
-        c2.title AS prereq_title,
-        p.is_corequisite
+  // Load prerequisites in one query instead of one query per course. The
+  // course list feeds enrollment and sectioning selectors, so the old N+1
+  // lookup delayed those controls as the curriculum grew.
+  if (rows.length) {
+    const courseIds = rows.map((course) => course.id);
+    const [prerequisites] = await db.query(
+      `SELECT
+         p.course_id,
+         p.prereq_link_id AS id,
+         p.prereq_course_id,
+         c2.code AS prereq_code,
+         c2.title AS prereq_title,
+         p.is_corequisite
        FROM prerequisites p
        JOIN courses c2 ON p.prereq_course_id = c2.course_id
-       WHERE p.course_id = ?`,
-      [course.id]
+       WHERE p.course_id IN (${courseIds.map(() => "?").join(", ")})`,
+      courseIds,
     );
-    course.prerequisites = prereqs;
+
+    const prerequisitesByCourse = new Map();
+    for (const prerequisite of prerequisites) {
+      if (!prerequisitesByCourse.has(prerequisite.course_id)) {
+        prerequisitesByCourse.set(prerequisite.course_id, []);
+      }
+      prerequisitesByCourse.get(prerequisite.course_id).push({
+        id: prerequisite.id,
+        prereq_course_id: prerequisite.prereq_course_id,
+        prereq_code: prerequisite.prereq_code,
+        prereq_title: prerequisite.prereq_title,
+        is_corequisite: prerequisite.is_corequisite,
+      });
+    }
+
+    for (const course of rows) {
+      course.prerequisites = prerequisitesByCourse.get(course.id) || [];
+    }
   }
 
   return rows;

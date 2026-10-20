@@ -219,6 +219,65 @@ export const createEnrollment = async ({
   return getEnrollmentById(result.insertId);
 };
 
+export const createEnrollments = async (enrollments) => {
+  if (!enrollments.length) return [];
+  const connection = await db.getConnection();
+  const values = [];
+  const placeholders = enrollments.map((enrollment) => {
+    values.push(
+      enrollment.student_id,
+      enrollment.course_id,
+      enrollment.period_id,
+      enrollment.section_id,
+      enrollment.year_level,
+      enrollment.enrollment_date,
+      enrollment.status,
+      enrollment.midterm_grade,
+      enrollment.final_grade,
+      enrollment.remarks,
+    );
+    return "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  });
+  try {
+    await connection.beginTransaction();
+    const [result] = await connection.query(
+      `INSERT INTO enrollments
+       (student_id, course_id, period_id, section_id, year_level, enrollment_date, status, midterm_grade, final_grade, remarks)
+       VALUES ${placeholders.join(", ")}`,
+      values,
+    );
+    await connection.commit();
+    const studentIds = [...new Set(enrollments.map(({ student_id }) => student_id))];
+    const courseIds = [...new Set(enrollments.map(({ course_id }) => course_id))];
+    const studentPlaceholders = studentIds.map(() => "?").join(", ");
+    const coursePlaceholders = courseIds.map(() => "?").join(", ");
+    const [rows] = await connection.query(
+      `SELECT e.*, CONCAT(u.first_name, ' ', u.last_name) AS student_name,
+              c.code AS course_code, c.title AS course_title,
+              ap.school_year, ap.semester
+       FROM enrollments e
+       JOIN users u ON e.student_id = u.user_id
+       JOIN courses c ON e.course_id = c.course_id
+       JOIN academic_periods ap ON e.period_id = ap.period_id
+       WHERE e.period_id = ?
+         AND e.student_id IN (${studentPlaceholders})
+         AND e.course_id IN (${coursePlaceholders})
+       ORDER BY e.enrollment_id`,
+      [
+        enrollments[0].period_id,
+        ...studentIds,
+        ...courseIds,
+      ],
+    );
+    return rows;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
 // Update enrollment
 export const updateEnrollment = async (
   id,
@@ -319,28 +378,74 @@ export const checkEnrollmentExists = async (
   return rows.length > 0;
 };
 
+export const findExistingEnrollments = async (studentIds, courseIds, periodId) => {
+  if (!studentIds.length || !courseIds.length) return [];
+  const studentPlaceholders = studentIds.map(() => "?").join(", ");
+  const coursePlaceholders = courseIds.map(() => "?").join(", ");
+  const [rows] = await db.query(
+    `SELECT student_id, course_id FROM enrollments
+     WHERE period_id = ?
+       AND student_id IN (${studentPlaceholders})
+       AND course_id IN (${coursePlaceholders})`,
+    [periodId, ...studentIds, ...courseIds],
+  );
+  return rows;
+};
+
 // Get enrollment_id + student_id for students enrolled in a period (and optionally course/program)
 // who do NOT have a section yet (section_id IS NULL).
-export const getUnsectionedEnrollments = async (course_id, period_id, program_id = null) => {
+export const getUnsectionedEnrollments = async (
+  course_ids,
+  period_id,
+  program_id = null,
+  year_level = null,
+  curriculum_type = null,
+) => {
   let query = `
-    SELECT e.enrollment_id, e.student_id, e.course_id, e.period_id,
+    SELECT e.enrollment_id, e.student_id, e.course_id, e.period_id, e.section_id,
+           COALESCE(NULLIF(e.year_level, ''), sd.year_level) AS year_level,
+           c.year_level AS course_year_level,
            sd.course AS student_course,
            p.program_id, p.code AS program_code, p.name AS program_name
     FROM enrollments e
     LEFT JOIN student_details sd ON e.student_id = sd.user_id
-    LEFT JOIN programs p ON (sd.course = p.code OR sd.course = p.name)
-    WHERE e.period_id = ? AND e.section_id IS NULL
+    LEFT JOIN programs p ON (
+      LOWER(TRIM(sd.course)) = LOWER(TRIM(p.code))
+      OR LOWER(TRIM(sd.course)) = LOWER(TRIM(p.name))
+      OR (p.code = 'BAH' AND LOWER(TRIM(sd.course)) = 'bachelor of arts in history')
+      OR (p.code = 'BPA' AND LOWER(TRIM(sd.course)) IN (
+        'bachelor of public administration',
+        'bachelor of public administration  year: 1'
+      ))
+      OR (p.code = 'BTVTED' AND LOWER(TRIM(sd.course)) =
+        'bachelor of technical vocational teacher education major in computer hardware servicing')
+    )
+    LEFT JOIN courses c ON c.course_id = e.course_id
+    WHERE e.period_id = ?
   `;
   const params = [period_id];
 
-  if (course_id) {
-    query += " AND e.course_id = ?";
-    params.push(course_id);
+  const courseIds = Array.isArray(course_ids)
+    ? course_ids.filter((id) => id !== null && id !== undefined && String(id).trim() !== "")
+    : course_ids ? [course_ids] : [];
+  if (courseIds.length) {
+    query += ` AND e.course_id IN (${courseIds.map(() => "?").join(", ")})`;
+    params.push(...courseIds);
   }
 
   if (program_id) {
-    query += " AND (p.program_id = ? OR sd.course = ?)";
-    params.push(program_id, program_id);
+    query += " AND p.program_id = ?";
+    params.push(program_id);
+  }
+
+  if (year_level) {
+    query += " AND TRIM(COALESCE(c.year_level, '')) = TRIM(?)";
+    params.push(year_level);
+  }
+
+  if (curriculum_type) {
+    query += " AND LOWER(TRIM(COALESCE(c.curriculum_type, ''))) = LOWER(TRIM(?))";
+    params.push(curriculum_type);
   }
 
   const [rows] = await db.query(query, params);
@@ -357,6 +462,42 @@ export const setEnrollmentSection = async (enrollment_id, section_id) => {
     [section_id, enrollment_id],
   );
   return getEnrollmentById(enrollment_id);
+};
+
+export const setEnrollmentSections = async (assignments, periodId) => {
+  if (!assignments.length) return;
+  const connection = await db.getConnection();
+  const enrollmentIds = assignments.map(({ enrollment_id }) => enrollment_id);
+  const enrollmentCase = assignments.map(() => "WHEN ? THEN ?").join(" ");
+  try {
+    await connection.beginTransaction();
+    await connection.query(
+      `UPDATE enrollments
+       SET section_id = CASE enrollment_id ${enrollmentCase} ELSE section_id END
+       WHERE enrollment_id IN (${enrollmentIds.map(() => "?").join(", ")})`,
+      [
+        ...assignments.flatMap(({ enrollment_id, section_id }) => [enrollment_id, section_id]),
+        ...enrollmentIds,
+      ],
+    );
+    await connection.query(
+      `UPDATE sections
+       SET current_enrolled = (
+         SELECT COUNT(DISTINCT e.student_id)
+         FROM enrollments e
+         WHERE e.section_id = sections.section_id
+           AND e.period_id = sections.period_id
+       )
+       WHERE period_id = ?`,
+      [periodId],
+    );
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
 // Get enrolled students by faculty assignment ID

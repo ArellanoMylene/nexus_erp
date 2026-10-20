@@ -32,11 +32,20 @@ const findOptionByValue = (options, value) => {
   );
 };
 
+const ALL_COURSES_VALUE = "__all_courses__";
+const ALL_STUDENTS_VALUE = "__all_students__";
+
 // Form-data mapping for enrollment creation/editing. Includes section_id
 // so that registrars can transfer/change a student's section directly in edit mode.
 const toEnrollmentFormData = (enrollment) => ({
   student_id: enrollment.student_id,
+  student_ids: [enrollment.student_id].filter(Boolean),
+  select_all_students: false,
+  program_id: enrollment.student_program_id || enrollment.section_program_id || null,
   course_id: enrollment.course_id,
+  course_ids: [enrollment.course_id].filter(Boolean),
+  select_all_courses: false,
+  curriculum_type: null,
   period_id: enrollment.period_id,
   section_id: enrollment.section_id || null,
   year_level: enrollment.year_level || "",
@@ -190,11 +199,18 @@ const EnrollmentModal = ({
   students,
   courses,
   periods,
+  programs = [],
   sections = [],
 }) => {
   const [formData, setFormData] = useState({
     student_id: null,
+    student_ids: [],
+    select_all_students: false,
+    program_id: null,
     course_id: null,
+    course_ids: [],
+    select_all_courses: false,
+    curriculum_type: null,
     period_id: null,
     section_id: null,
     year_level: "",
@@ -211,7 +227,13 @@ const EnrollmentModal = ({
     if (!initialData) {
       setFormData({
         student_id: null,
+        student_ids: [],
+        select_all_students: false,
+        program_id: null,
         course_id: null,
+        course_ids: [],
+        select_all_courses: false,
+        curriculum_type: null,
         period_id: null,
         section_id: null,
         year_level: "",
@@ -226,12 +248,45 @@ const EnrollmentModal = ({
     setFormData(toEnrollmentFormData(initialData));
   }, [initialData]);
 
-  // Filter sections by selected academic period and format with capacity status
+  useEffect(() => {
+    if (!isOpen || mode !== "add" || formData.period_id || !periods.length) return;
+    const activePeriod = periods.find((period) => period.is_active) || periods[0];
+    setFormData((prev) => ({ ...prev, period_id: activePeriod.value }));
+  }, [isOpen, mode, periods, formData.period_id]);
+
+  const selectedProgram = findOptionByValue(programs, formData.program_id);
+  const programMatches = (value) => !selectedProgram || [selectedProgram.code, selectedProgram.name]
+    .some((programValue) => programValue && String(programValue).trim().toLowerCase() === String(value || "").trim().toLowerCase());
+  const eligibleStudents = students.filter((student) =>
+    programMatches(student.program)
+    && (!formData.year_level || String(student.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase()),
+  );
+  const eligibleCourses = courses.filter((course) =>
+    (!formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
+    && (!selectedProgram?.department_id || String(course.department_id) === String(selectedProgram.department_id)),
+  );
+  const curriculumOptions = Array.from(new Set(
+    eligibleCourses.map((course) => String(course.curriculum_type || "").trim()).filter(Boolean),
+  )).sort((a, b) => a.localeCompare(b)).map((curriculum) => ({
+    value: curriculum,
+    label: `${curriculum} Curriculum`,
+  }));
+  const filteredCourses = eligibleCourses.filter((course) =>
+    !formData.curriculum_type
+    || String(course.curriculum_type || "").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase(),
+  );
+  const yearLevelOptions = Array.from(new Set([
+    ...eligibleCourses.map((course) => course.year_level),
+    ...eligibleStudents.map((student) => student.year_level),
+  ].map((yearLevel) => String(yearLevel || "").trim()).filter(Boolean)))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((yearLevel) => ({ value: yearLevel, label: yearLevel }));
+  // Filter sections by academic period and program.
   const sectionOptions = (sections || [])
     .filter(
       (s) =>
-        !formData.period_id ||
-        String(s.period_id) === String(formData.period_id),
+        (!formData.period_id || String(s.period_id) === String(formData.period_id))
+        && (!formData.program_id || String(s.program_id) === String(formData.program_id)),
     )
     .map((s) => {
       const isCurrent =
@@ -321,78 +376,126 @@ const EnrollmentModal = ({
         >
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            {/* Student */}
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                Student *
+                Academic Period *
               </label>
               <Select
-                value={findOptionByValue(students, formData.student_id)}
-                onChange={(selected) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    student_id: selected?.value || null,
-                  }))
-                }
-                options={students}
-                placeholder="Select student..."
+                value={findOptionByValue(periods, formData.period_id)}
+                onChange={(selected) => setFormData((prev) => ({ ...prev, period_id: selected?.value || null, section_id: null }))}
+                options={periods}
+                placeholder="Select academic period..."
                 isDisabled={mode === "edit"}
-                required
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    borderColor: "#CBD5E1",
-                    backgroundColor: "#FFFFFF",
-                    fontSize: "0.875rem",
-                    boxShadow: "none",
-                    minHeight: "42px",
-                    "&:hover": {
-                      borderColor: "#CBD5E1",
-                    },
-                    "&:focus-within": {
-                      borderColor: "#4F46E5",
-                      boxShadow: "0 0 0 3px rgba(79, 70, 229, 0.1)",
-                    },
-                  }),
-                  input: (base) => ({
-                    ...base,
-                    color: "#1E293B",
-                  }),
-                  option: (base, state) => ({
-                    ...base,
-                    backgroundColor: state.isSelected ? "#4F46E5" : "#FFFFFF",
-                    color: state.isSelected ? "#FFFFFF" : "#1E293B",
-                    "&:hover": {
-                      backgroundColor: "#EEF2FF",
-                      color: "#1E293B",
-                    },
-                  }),
-                  menu: (base) => ({
-                    ...base,
-                    zIndex: 9999,
-                  }),
-                }}
+                isClearable
+                styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Program *</label>
+                <Select
+                  value={findOptionByValue(programs, formData.program_id)}
+                  onChange={(selected) => setFormData((prev) => ({
+                    ...prev,
+                    program_id: selected?.value || null,
+                    student_id: null,
+                    student_ids: [],
+                    select_all_students: false,
+                    year_level: "",
+                    course_id: null,
+                    course_ids: [],
+                    select_all_courses: false,
+                    curriculum_type: null,
+                    section_id: null,
+                  }))}
+                  options={programs}
+                  placeholder="Select program..."
+                  isDisabled={mode === "edit"}
+                  isClearable
+                  required
+                  styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Year Level *</label>
+                <Select
+                  value={findOptionByValue(yearLevelOptions, formData.year_level)}
+                  onChange={(selected) => setFormData((prev) => ({
+                    ...prev,
+                    year_level: selected?.value || "",
+                    student_id: null,
+                    student_ids: [],
+                    select_all_students: false,
+                    course_id: null,
+                    course_ids: [],
+                    select_all_courses: false,
+                    curriculum_type: null,
+                    section_id: null,
+                  }))}
+                  options={yearLevelOptions}
+                  placeholder={formData.program_id ? "Select year level..." : "Select program first..."}
+                  isDisabled={mode === "edit" || !formData.program_id}
+                  isClearable
+                  styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">Curriculum Type (Optional)</label>
+                <Select
+                  value={findOptionByValue(curriculumOptions, formData.curriculum_type)}
+                  onChange={(selected) => setFormData((prev) => ({
+                    ...prev,
+                    curriculum_type: selected?.value || null,
+                    course_id: null,
+                    course_ids: [],
+                    select_all_courses: false,
+                    section_id: null,
+                  }))}
+                  options={curriculumOptions}
+                  placeholder={formData.year_level ? "All Curricula" : "Select year level first..."}
+                  isDisabled={mode === "edit" || !formData.year_level || !curriculumOptions.length}
+                  isClearable
+                  styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
+                />
+              </div>
+
               {/* Course */}
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1.5">
                   Course *
                 </label>
                 <Select
-                  value={findOptionByValue(courses, formData.course_id)}
-                  onChange={(selected) =>
-                    setFormData((prev) => ({
+                  value={formData.select_all_courses
+                    ? [{ value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` }]
+                    : filteredCourses.filter((course) => formData.course_ids.includes(course.value))}
+                  onChange={(selected) => setFormData((prev) => {
+                    const selectedOptions = selected || [];
+                    const selectAll = selectedOptions.some((course) => course.value === ALL_COURSES_VALUE);
+                    const courseIds = selectAll
+                      ? filteredCourses.map((course) => course.value)
+                      : selectedOptions.map((course) => course.value);
+                    return {
                       ...prev,
-                      course_id: selected?.value || null,
-                    }))
-                  }
-                  options={courses}
-                  placeholder="Select course..."
-                  isDisabled={mode === "edit"}
+                      course_id: courseIds[0] || null,
+                      course_ids: courseIds,
+                      select_all_courses: selectAll,
+                      section_id: null,
+                    };
+                  })}
+                  options={[
+                    { value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` },
+                    ...filteredCourses,
+                  ]}
+                  placeholder={formData.year_level ? "Select one or more courses..." : "Select year level first..."}
+                  isDisabled={mode === "edit" || !formData.year_level}
                   isClearable
+                  isMulti
+                  closeMenuOnSelect={false}
                   styles={{
                     control: (base) => ({
                       ...base,
@@ -430,104 +533,6 @@ const EnrollmentModal = ({
                 />
               </div>
 
-              {/* Academic Period */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Academic Period *
-                </label>
-                <Select
-                  value={findOptionByValue(periods, formData.period_id)}
-                  onChange={(selected) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      period_id: selected?.value || null,
-                    }))
-                  }
-                  options={periods}
-                  placeholder="Select period..."
-                  isDisabled={mode === "edit"}
-                  isClearable
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderColor: "#CBD5E1",
-                      backgroundColor: "#FFFFFF",
-                      fontSize: "0.875rem",
-                      boxShadow: "none",
-                      minHeight: "42px",
-                      "&:hover": {
-                        borderColor: "#CBD5E1",
-                      },
-                      "&:focus-within": {
-                        borderColor: "#4F46E5",
-                        boxShadow: "0 0 0 3px rgba(79, 70, 229, 0.1)",
-                      },
-                    }),
-                    input: (base) => ({
-                      ...base,
-                      color: "#1E293B",
-                    }),
-                    option: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isSelected ? "#4F46E5" : "#FFFFFF",
-                      color: state.isSelected ? "#FFFFFF" : "#1E293B",
-                      "&:hover": {
-                        backgroundColor: "#EEF2FF",
-                        color: "#1E293B",
-                      },
-                    }),
-                    menu: (base) => ({
-                      ...base,
-                      zIndex: 9999,
-                    }),
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Year Level */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Year Level *
-                </label>
-                <select
-                  value={formData.year_level}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      year_level: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
-                >
-                  <option value="">Select...</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                </select>
-              </div>
-
-              {/* Enrollment Date */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Enrollment Date *
-                </label>
-                <input
-                  type="date"
-                  value={formData.enrollment_date}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      enrollment_date: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  required
-                />
-              </div>
             </div>
 
             {/* Section / Section Transfer */}
@@ -556,7 +561,8 @@ const EnrollmentModal = ({
                   }))
                 }
                 options={sectionOptions}
-                placeholder="Select section to assign or transfer..."
+                placeholder={formData.course_ids.length ? "Select section to assign or transfer..." : "Select course first..."}
+                isDisabled={mode === "edit" || !formData.period_id || !formData.program_id || !formData.course_ids.length}
                 isClearable
                 isOptionDisabled={(option) => option.isFull}
                 styles={{
@@ -634,6 +640,62 @@ const EnrollmentModal = ({
                   ? "Changing the section transfers the student and immediately updates section enrollment capacity."
                   : "Leave unassigned if the student will be sectioned in bulk later."}
               </p>
+            </div>
+
+            {/* Choose an admission/student after narrowing the available offerings. */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Student(s) *
+              </label>
+              <Select
+                value={formData.select_all_students
+                  ? [{ value: ALL_STUDENTS_VALUE, label: `All Students (${eligibleStudents.length})` }]
+                  : eligibleStudents.filter((student) => formData.student_ids.includes(student.value))}
+                onChange={(selected) => setFormData((prev) => {
+                  const selectedOptions = selected || [];
+                  const selectAll = selectedOptions.some((student) => student.value === ALL_STUDENTS_VALUE);
+                  const studentIds = selectAll
+                    ? eligibleStudents.map((student) => student.value)
+                    : selectedOptions.map((student) => student.value);
+                  return {
+                    ...prev,
+                    student_id: studentIds[0] || null,
+                    student_ids: studentIds,
+                    select_all_students: selectAll,
+                  };
+                })}
+                options={[
+                  { value: ALL_STUDENTS_VALUE, label: `All Students (${eligibleStudents.length})` },
+                  ...eligibleStudents,
+                ]}
+                placeholder={formData.year_level ? "Select one or more students..." : "Select year level first..."}
+                isDisabled={mode === "edit" || !formData.program_id || !formData.year_level}
+                required
+                isMulti
+                closeMenuOnSelect={false}
+                styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
+              />
+              {formData.program_id && formData.year_level && eligibleStudents.length === 0 && (
+                <p className="text-[11px] text-amber-700 mt-1">
+                  No student records match this program and year level. Check that the admission has a linked student account with the correct program and year level.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Enrollment Date *
+              </label>
+              <input
+                type="date"
+                value={formData.enrollment_date}
+                onChange={(e) => setFormData((prev) => ({
+                  ...prev,
+                  enrollment_date: e.target.value,
+                }))}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
             </div>
 
             {/* Status */}
@@ -756,21 +818,56 @@ const EnrollmentModal = ({
 // Runs AFTER enrollment. Students are automatically grouped into sections
 // that correspond to their academic program offering (e.g. BPA students into
 // BPA sections like BPA - 1A, BAHISTO students into BAHISTO sections like BAHISTO-1A).
-const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs }) => {
+const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, periods, programs }) => {
   const [formData, setFormData] = useState({
     period_id: null,
     program_id: null,
-    course_id: null,
+    year_level: null,
+    curriculum_type: null,
+    course_ids: [],
+    select_all_courses: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const courseYearLevels = () => Array.from(new Set(
+    (courses || [])
+      .map((course) => String(course.year_level || "").trim())
+      .filter(Boolean),
+  )).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+  const yearLevelOptions = courseYearLevels().map((yearLevel) => ({
+    value: yearLevel,
+    label: yearLevel,
+  }));
+  const selectedProgram = findOptionByValue(programs, formData.program_id);
+  const coursesForFilters = courses.filter((course) =>
+    (!formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
+    && (!selectedProgram?.department_id || String(course.department_id) === String(selectedProgram.department_id)),
+  );
+  const curriculumTypeOptions = Array.from(new Set(
+    coursesForFilters
+      .map((course) => String(course.curriculum_type || "").trim())
+      .filter(Boolean),
+  )).sort((a, b) => a.localeCompare(b)).map((curriculumType) => ({
+    value: curriculumType,
+    label: `${curriculumType} Curriculum`,
+  }));
+  const filteredCourses = coursesForFilters.filter((course) =>
+    !formData.curriculum_type
+    || String(course.curriculum_type || "").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase(),
+  );
 
   useEffect(() => {
     if (isOpen) {
       const activePeriod = periods.find((p) => p.is_active);
+      const periodId = activePeriod ? activePeriod.value : (periods[0]?.value || null);
       setFormData({
-        period_id: activePeriod ? activePeriod.value : (periods[0]?.value || null),
+        period_id: periodId,
         program_id: null,
-        course_id: null,
+        year_level: null,
+        curriculum_type: null,
+        course_ids: [],
+        select_all_courses: false,
       });
     }
   }, [isOpen, periods]);
@@ -784,9 +881,16 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
       });
       return;
     }
+    if (!formData.year_level) {
+      toast.error("Please select a course year level before running sectioning.", {
+        position: "top-center",
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await onSubmit(formData);
+      const { select_all_courses, ...sectioningData } = formData;
+      await onSubmit(sectioningData);
     } finally {
       setIsSubmitting(false);
     }
@@ -800,7 +904,7 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden"
+        className="bg-white rounded-xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-slate-50 border-b border-slate-200 px-6 py-4">
@@ -810,7 +914,7 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
                 <Shuffle size={20} className="text-emerald-600" /> Run Program Sectioning
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Evenly distributes unsectioned students into sections tied to their academic program (e.g., BPA-1A, BAHISTO-1A).
+                Evenly balances students by academic program and year level across matching sections.
               </p>
             </div>
             <button
@@ -824,22 +928,46 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-4">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Academic Period <span className="text-red-500">*</span>
               </label>
               <Select
                 value={findOptionByValue(periods, formData.period_id)}
-                onChange={(selected) =>
+                onChange={(selected) => {
                   setFormData((prev) => ({
                     ...prev,
                     period_id: selected?.value || null,
                   }))
-                }
+                }}
                 options={periods}
                 placeholder="Select period..."
                 required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Course Year Level <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={findOptionByValue(yearLevelOptions, formData.year_level)}
+                onChange={(selected) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    year_level: selected?.value || null,
+                    curriculum_type: null,
+                    course_ids: [],
+                    select_all_courses: false,
+                  }))
+                }
+                options={yearLevelOptions}
+                placeholder={coursesLoading
+                  ? "Loading course year levels..."
+                  : yearLevelOptions.length ? "Select Year Level..." : "No year levels returned for courses"}
+                isClearable={false}
+                isDisabled={coursesLoading || !yearLevelOptions.length}
               />
             </div>
 
@@ -853,6 +981,9 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
                   setFormData((prev) => ({
                     ...prev,
                     program_id: selected?.value || null,
+                    curriculum_type: null,
+                    course_ids: [],
+                    select_all_courses: false,
                   }))
                 }
                 options={programs}
@@ -866,23 +997,67 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, periods, programs
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Subject / Course (Optional)
+                Curriculum Type (Optional)
               </label>
               <Select
-                value={findOptionByValue(courses, formData.course_id)}
+                value={findOptionByValue(curriculumTypeOptions, formData.curriculum_type)}
                 onChange={(selected) =>
                   setFormData((prev) => ({
                     ...prev,
-                    course_id: selected?.value || null,
+                    curriculum_type: selected?.value || null,
+                    course_ids: [],
+                    select_all_courses: false,
                   }))
                 }
-                options={courses}
-                placeholder="All Subjects (or select specific course)..."
+                options={curriculumTypeOptions}
+                placeholder={coursesLoading
+                  ? "Loading curriculum types..."
+                  : "All Curricula"}
                 isClearable
+                isDisabled={coursesLoading || !curriculumTypeOptions.length}
               />
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-900">
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Subject / Course (Optional)
+              </label>
+              <Select
+                value={formData.select_all_courses
+                  ? [{ value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` }]
+                  : filteredCourses.filter((course) => formData.course_ids.includes(course.value))}
+                onChange={(selected) =>
+                  setFormData((prev) => {
+                    const selectedOptions = selected || [];
+                    const selectAll = selectedOptions.some((course) => course.value === ALL_COURSES_VALUE);
+                    return {
+                      ...prev,
+                      select_all_courses: selectAll,
+                      course_ids: selectAll
+                        ? filteredCourses.map((course) => course.value)
+                        : selectedOptions.map((course) => course.value),
+                    };
+                  })
+                }
+                options={[
+                  { value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` },
+                  ...filteredCourses,
+                ]}
+                placeholder={formData.year_level
+                  ? `All ${formData.year_level} subjects (or select courses)...`
+                  : "All Subjects (or select courses)..."}
+                isClearable
+                isMulti
+                isDisabled={coursesLoading || !filteredCourses.length}
+              />
+              {formData.year_level && (
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Only courses labeled for {formData.year_level} are shown.
+                </p>
+              )}
+            </div>
+
+            <div className="md:col-span-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-900">
               <span className="font-semibold block mb-0.5">Program Section Matching:</span>
               Students enrolled in <strong>BPA</strong> will only be placed into <strong>BPA</strong> sections, and students in <strong>BAHISTO</strong> into <strong>BAHISTO</strong> sections.
             </div>
@@ -915,6 +1090,7 @@ const EnrollmentRecords = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
   const [periods, setPeriods] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [sections, setSections] = useState([]);
@@ -965,6 +1141,8 @@ const EnrollmentRecords = () => {
           label: `${s.first_name} ${s.last_name} (${
             s.student_number || s.email
           })`,
+          program: s.course || null,
+          year_level: s.year_level || null,
         }));
       setStudents(studentList);
     } catch (err) {
@@ -982,6 +1160,7 @@ const EnrollmentRecords = () => {
           label: `${p.code} - ${p.name}`,
           code: p.code,
           name: p.name,
+          department_id: p.department_id || null,
         }));
       setPrograms(programList);
     } catch (err) {
@@ -1111,6 +1290,7 @@ const EnrollmentRecords = () => {
   };
 
   const fetchCourses = async () => {
+    setCoursesLoading(true);
     try {
       const res = await axios.get(`${API_BASE}/api/course/courses`);
       const courseList = (res.data || [])
@@ -1120,11 +1300,16 @@ const EnrollmentRecords = () => {
           label: `${c.code || c.course_code || "N/A"} - ${
             c.title || c.course_title || "N/A"
           }`,
+          year_level: c.year_level || null,
+          department_id: c.department_id || null,
+          curriculum_type: c.curriculum_type ?? c.curriculumType ?? c.curriculum ?? c.curriculum_name ?? null,
         }));
       setCourses(courseList);
     } catch (err) {
       console.error("Error fetching courses:", err);
       setCourses([]);
+    } finally {
+      setCoursesLoading(false);
     }
   };
 
@@ -1183,7 +1368,13 @@ const EnrollmentRecords = () => {
   );
 
   const handleSubmit = async (data) => {
-    if (!data.student_id || !data.course_id || !data.period_id || !data.year_level) {
+    const studentIds = modalMode === "add"
+      ? [...new Set(data.student_ids || [])]
+      : [data.student_id].filter(Boolean);
+    const courseIds = modalMode === "add"
+      ? [...new Set(data.course_ids || [])]
+      : [data.course_id].filter(Boolean);
+    if (!studentIds.length || !courseIds.length || !data.period_id || !data.year_level || (modalMode === "add" && !data.program_id)) {
       toast.error("Please fill in all required fields.", {
         position: "top-center",
       });
@@ -1194,6 +1385,12 @@ const EnrollmentRecords = () => {
       // Convert empty strings to null for numeric fields and clean section_id
       const cleanData = {
         ...data,
+        student_id: studentIds[0],
+        student_ids: modalMode === "add" ? studentIds : undefined,
+        select_all_students: undefined,
+        course_id: courseIds[0],
+        course_ids: modalMode === "add" ? courseIds : undefined,
+        select_all_courses: undefined,
         section_id: data.section_id || null,
         midterm_grade: data.midterm_grade === "" ? null : parseFloat(data.midterm_grade),
         final_grade: data.final_grade === "" ? null : parseFloat(data.final_grade),
@@ -1201,7 +1398,7 @@ const EnrollmentRecords = () => {
 
       if (modalMode === "add") {
         await axios.post(`${API_BASE}/api/enrollments`, cleanData);
-        toast.success("Enrollment added successfully", {
+        toast.success(`Enrollment added for ${studentIds.length} student(s) and ${courseIds.length} course(s).`, {
           position: "top-center",
         });
       } else {
@@ -1233,28 +1430,35 @@ const EnrollmentRecords = () => {
         data,
       );
       const { summary, failed, unassigned } = res.data;
+      const studentCount = summary.totalStudents ?? summary.totalEnrollments;
 
-      if (summary.totalUnsectioned === 0) {
+      if (summary.totalEnrollments === 0) {
         toast.info(
-          "No unsectioned students found matching the selected criteria.",
+          "No enrollment records found matching the selected criteria.",
           { position: "top-center" },
         );
-      } else {
+      } else if (summary.assigned > 0) {
         toast.success(
-          `Sectioned ${summary.assigned}/${summary.totalUnsectioned} student(s); into their program sections.`,
+          `Sectioned ${summary.assigned}/${summary.totalEnrollments} enrollment(s) for ${studentCount} student(s).`,
           { position: "top-center" },
         );
       }
       if (summary.unassigned > 0) {
+        const missingSections = unassigned.filter((item) => item.reason?.startsWith("No sections available")).length;
+        const fullSections = unassigned.filter((item) => item.reason === "Program sections are full").length;
+        const reasons = [
+          missingSections ? `${missingSections} with no matching program section` : null,
+          fullSections ? `${fullSections} because sections are full` : null,
+        ].filter(Boolean).join("; ");
         toast.warn(
-          `${summary.unassigned} student(s) couldn't be placed (missing or full program sections).`,
+          `${summary.unassigned} enrollment(s) for ${new Set(unassigned.map((item) => String(item.student_id))).size} student(s) couldn't be placed${reasons ? `: ${reasons}` : "."}`,
           { position: "top-center" },
         );
         console.warn("Unassigned students:", unassigned);
       }
       if (summary.failed > 0) {
         toast.error(
-          `${summary.failed} student(s); failed to be sectioned. Check console for details.`,
+          `${summary.failed} enrollment(s) failed to be sectioned. Check console for details.`,
           { position: "top-center" },
         );
         console.error("Sectioning failures:", failed);
@@ -1538,6 +1742,7 @@ const EnrollmentRecords = () => {
         students={students}
         courses={courses}
         periods={periods}
+        programs={programs}
         sections={sections}
       />
 
@@ -1548,6 +1753,7 @@ const EnrollmentRecords = () => {
         courses={courses}
         periods={periods}
         programs={programs}
+        coursesLoading={coursesLoading}
       />
 
       <ConfirmModal
