@@ -9,106 +9,76 @@ const StudentList = () => {
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState("");
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const facultyUserId = localStorage.getItem("userId") || sessionStorage.getItem("userId");
 
   useEffect(() => {
-    fetchCourses();
-    fetchStudents();
-  }, [selectedCourse]);
-
-  const fetchCourses = async () => {
-    // TODO: Replace with actual API
-    setCourses([
-      { id: 1, code: 'CS101', name: 'Introduction to Programming', section: 'A' },
-      { id: 2, code: 'CS102', name: 'Data Structures', section: 'B' },
-      { id: 3, code: 'MATH201', name: 'Calculus II', section: 'A' },
-    ]);
-  };
-
-  const fetchStudents = async () => {
-    try {
-      setLoading(true);
-      // TODO: Replace with actual API
-      // const response = await axios.get(`/api/faculty/students?course=${selectedCourse}`);
-      
-      // Mock data
-      setTimeout(() => {
-        setStudents([
-          {
-            id: 1,
-            studentId: '2024-00001',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'john.doe@example.com',
-            course: 'CS101',
-            section: 'A',
-            program: 'BS Computer Science',
-            yearLevel: '1st Year',
-            status: 'Active',
-            attendance: 95,
-            grade: 88
-          },
-          {
-            id: 2,
-            studentId: '2024-00002',
-            firstName: 'Jane',
-            lastName: 'Smith',
-            email: 'jane.smith@example.com',
-            course: 'CS101',
-            section: 'A',
-            program: 'BS Computer Science',
-            yearLevel: '1st Year',
-            status: 'Active',
-            attendance: 92,
-            grade: 91
-          },
-          {
-            id: 3,
-            studentId: '2024-00003',
-            firstName: 'Michael',
-            lastName: 'Johnson',
-            email: 'michael.j@example.com',
-            course: 'CS102',
-            section: 'B',
-            program: 'BS Computer Science',
-            yearLevel: '2nd Year',
-            status: 'Active',
-            attendance: 88,
-            grade: 85
-          },
-          {
-            id: 4,
-            studentId: '2024-00004',
-            firstName: 'Sarah',
-            lastName: 'Williams',
-            email: 'sarah.w@example.com',
-            course: 'MATH201',
-            section: 'A',
-            program: 'BS Mathematics',
-            yearLevel: '2nd Year',
-            status: 'Active',
-            attendance: 97,
-            grade: 93
-          },
-        ]);
+    const fetchFacultyRoster = async () => {
+      if (!facultyUserId) {
+        setError("User ID not found. Please log in again.");
         setLoading(false);
-      }, 800);
-    } catch (error) {
-      console.error('Error fetching students:', error);
-      setLoading(false);
-    }
-  };
+        return;
+      }
+      try {
+        setLoading(true);
+        setError("");
+        const [response, assignmentsResponse] = await Promise.all([
+          axios.get(`${API_BASE}/api/enrollments/faculty/${facultyUserId}/students`),
+          axios.get(`${API_BASE}/api/faculty-assignments/faculty/${facultyUserId}`),
+        ]);
+        const rows = Array.isArray(response.data?.data) ? response.data.data : [];
+        const assignedCourses = Array.isArray(assignmentsResponse.data?.data)
+          ? assignmentsResponse.data.data
+          : [];
+        const roster = rows.map((row) => ({
+          id: row.enrollment_id || row.id,
+          assignmentId: row.assignment_id,
+          studentId: row.student_id || row.user_id,
+          firstName: row.first_name || "",
+          lastName: row.last_name || "",
+          email: row.email || "",
+          course: row.course_code || "",
+          courseTitle: row.course_title || "",
+          section: row.section || "",
+          program: row.program || "N/A",
+          yearLevel: row.year_level || "N/A",
+          status: row.status || "Enrolled",
+          attendance: null,
+          grade: row.final_grade ?? row.midterm_grade ?? null,
+        }));
+        setStudents(roster);
+        setCourses(assignedCourses.map((assignment) => ({
+          id: assignment.assignment_id,
+          code: assignment.course_code || "",
+          name: assignment.course_title || "",
+          section: assignment.section || "",
+        })));
+      } catch (fetchError) {
+        console.error("Error fetching faculty student roster:", fetchError);
+        setStudents([]);
+        setCourses([]);
+        setError(fetchError.response?.data?.message || "Failed to load students in your assigned courses.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFacultyRoster();
+  }, [API_BASE, facultyUserId]);
 
   const filteredStudents = students.filter(student => {
-    const matchesSearch = 
-      student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const query = searchTerm.toLowerCase();
+    const matchesSearch = [student.studentId, student.firstName, student.lastName, student.email, student.course, student.courseTitle]
+      .some((value) => String(value || "").toLowerCase().includes(query));
     
-    const matchesCourse = selectedCourse === 'all' || student.course === selectedCourse;
+    const matchesCourse = selectedCourse === 'all' || String(student.assignmentId) === selectedCourse;
     
     return matchesSearch && matchesCourse;
   });
+  const gradedStudents = filteredStudents.filter((student) => Number.isFinite(Number(student.grade)) && student.grade !== null);
+  const averageGrade = gradedStudents.length
+    ? Math.round(gradedStudents.reduce((sum, student) => sum + Number(student.grade), 0) / gradedStudents.length)
+    : null;
 
   const handleExportCSV = () => {
     if (!filteredStudents.length) return;
@@ -219,8 +189,8 @@ const StudentList = () => {
             >
               <option value="all">All Courses</option>
               {courses.map((course) => (
-                <option key={course.id} value={course.code}>
-                  {course.code} - Section {course.section}
+                <option key={course.id} value={course.id}>
+                  {course.code} - {course.name} · Section {course.section}
                 </option>
               ))}
             </select>
@@ -245,12 +215,14 @@ const StudentList = () => {
         </div>
       </div>
 
+      {error && <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Students</p>
+              <p className="text-sm text-gray-600">Course Enrollments</p>
               <p className="text-2xl font-bold text-gray-900">{filteredStudents.length}</p>
             </div>
             <Users className="w-8 h-8 text-blue-500" />
@@ -259,12 +231,8 @@ const StudentList = () => {
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Avg Attendance</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {filteredStudents.length > 0 
-                  ? Math.round(filteredStudents.reduce((acc, s) => acc + s.attendance, 0) / filteredStudents.length)
-                  : 0}%
-              </p>
+              <p className="text-sm text-gray-600">Assigned Courses</p>
+              <p className="text-2xl font-bold text-gray-900">{selectedCourse === "all" ? courses.length : 1}</p>
             </div>
             <BookOpen className="w-8 h-8 text-green-500" />
           </div>
@@ -272,11 +240,9 @@ const StudentList = () => {
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Avg Grade</p>
+              <p className="text-sm text-gray-600">Average Grade</p>
               <p className="text-2xl font-bold text-gray-900">
-                {filteredStudents.length > 0
-                  ? Math.round(filteredStudents.reduce((acc, s) => acc + s.grade, 0) / filteredStudents.length)
-                  : 0}
+                {averageGrade ?? "—"}
               </p>
             </div>
             <FileText className="w-8 h-8 text-yellow-500" />
@@ -285,9 +251,9 @@ const StudentList = () => {
         <div className="bg-white rounded-lg shadow p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Active</p>
+              <p className="text-sm text-gray-600">Enrolled</p>
               <p className="text-2xl font-bold text-gray-900">
-                {filteredStudents.filter(s => s.status === 'Active').length}
+                {filteredStudents.filter(s => String(s.status).toLowerCase() === 'enrolled').length}
               </p>
             </div>
             <Users className="w-8 h-8 text-purple-500" />
@@ -306,7 +272,7 @@ const StudentList = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Course</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Program</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Year Level</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Attendance</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Attendance</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Grade</th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase">Actions</th>
@@ -326,35 +292,26 @@ const StudentList = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-medium">{student.course}</span>
-                    <span className="text-gray-500 text-sm"> - Sec {student.section}</span>
+                    <span className="block text-gray-500 text-sm">{student.courseTitle} · Sec {student.section}</span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{student.program}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{student.yearLevel}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                        <div
-                          className={`h-2 rounded-full ${
-                            student.attendance >= 90 ? 'bg-green-500' :
-                            student.attendance >= 75 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${student.attendance}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-medium">{student.attendance}%</span>
+                      <span className="text-sm font-medium">—</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${student.grade === null ? 'bg-gray-100 text-gray-500' :
                       student.grade >= 90 ? 'bg-green-100 text-green-700' :
                       student.grade >= 75 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
                     }`}>
-                      {student.grade}
+                      {student.grade ?? "—"}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      student.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      String(student.status).toLowerCase() === 'enrolled' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                     }`}>
                       {student.status}
                     </span>

@@ -300,6 +300,10 @@ export const listStudentsByAssignment = async (assignmentId) => {
   return await enrollmentModel.getStudentsByAssignment(assignmentId);
 };
 
+export const listStudentsByFaculty = async (facultyUserId) => {
+  return await enrollmentModel.getStudentsByFaculty(facultyUserId);
+};
+
 // --- Sectioning (runs AFTER enrollment) ---
 // Groups unsectioned students and assigns them to sections tied to their program.
 // Ensures BPA students only go to BPA sections, BAHISTO students only to BAHISTO sections, etc.
