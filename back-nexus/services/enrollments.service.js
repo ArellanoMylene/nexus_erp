@@ -156,7 +156,7 @@ export const addEnrollments = async (data) => {
   if (duplicates.length) {
     const shownDuplicates = duplicates.slice(0, 10).join("; ");
     const remaining = duplicates.length > 10 ? `; and ${duplicates.length - 10} more` : "";
-    throw new Error(`Some selected student/course combinations are already enrolled: ${shownDuplicates}${remaining}`);
+    throw new Error(`Some selected student/course combinations are already enrolled: ${shownDuplicates}${remaining}. Use Bulk Edit to update existing enrollments.`);
   }
 
   const createdEnrollments = await enrollmentModel.createEnrollments(cleanEnrollments);
@@ -254,6 +254,41 @@ export const editEnrollment = async (id, data) => {
   return updated;
 };
 
+export const bulkEditEnrollments = async ({ student_ids, course_ids, period_id, updates = {} }) => {
+  if (!period_id) throw new Error("Academic Period is required");
+  if (!Array.isArray(student_ids) || !student_ids.length) throw new Error("Select at least one student");
+  if (!Array.isArray(course_ids) || !course_ids.length) throw new Error("Select at least one course");
+
+  const cleanUpdates = {};
+  if (updates.enrollment_date) cleanUpdates.enrollment_date = updates.enrollment_date;
+  if (updates.status) {
+    const validStatuses = new Set(["Enrolled", "Dropped", "Completed", "Failed"]);
+    if (!validStatuses.has(updates.status)) throw new Error("Invalid enrollment status");
+    cleanUpdates.status = updates.status;
+  }
+  for (const field of ["midterm_grade", "final_grade"]) {
+    if (updates[field] === undefined || updates[field] === null || updates[field] === "") continue;
+    const grade = Number(updates[field]);
+    if (!Number.isFinite(grade) || grade < 0 || grade > 100) {
+      throw new Error(`${field === "midterm_grade" ? "Midterm" : "Final"} Grade must be between 0 and 100`);
+    }
+    cleanUpdates[field] = grade;
+  }
+  if (typeof updates.remarks === "string" && updates.remarks.trim()) {
+    cleanUpdates.remarks = updates.remarks.trim();
+  }
+  if (!Object.keys(cleanUpdates).length) {
+    throw new Error("Enter at least one field to update");
+  }
+
+  return enrollmentModel.bulkUpdateEnrollments({
+    student_ids,
+    course_ids,
+    period_id,
+    updates: cleanUpdates,
+  });
+};
+
 // Delete enrollment
 export const removeEnrollment = async (id) => {
   await getEnrollment(id);
@@ -314,12 +349,16 @@ export const runSectioning = async ({
   const failed = [];
   const unassigned = [];
   const plannedAssignments = [];
-  const sectionsForPeriod = await SectionsModel.getSectionsForPeriod(period_id, null, year_level);
+  // Fetch all sections for the period so legacy sections with a NULL
+  // year_level remain eligible. The migration may not have been able to
+  // infer a year from every existing section name.
+  const sectionsForPeriod = await SectionsModel.getSectionsForPeriod(period_id);
 
   for (const [progKey, studentsInProg] of enrollmentsByProgram.entries()) {
     const progId = progKey === "unspecified" ? null : Number(progKey);
     const sections = sectionsForPeriod.filter(
-      (section) => String(section.program_id ?? "") === String(progId ?? ""),
+      (section) => String(section.program_id ?? "") === String(progId ?? "")
+        && (!section.year_level || String(section.year_level).trim().toLowerCase() === String(year_level).trim().toLowerCase()),
     );
 
     const activeSections = sections.filter((section) => section.status !== "inactive");

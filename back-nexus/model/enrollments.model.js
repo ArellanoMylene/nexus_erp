@@ -21,6 +21,7 @@ export const getAllEnrollments = async (filters = {}) => {
         e.course_id,
         e.section_id,
         s.section_name,
+        s.room AS section_room,
         s.program_id AS section_program_id,
         sp.code AS section_program_code,
         sp.name AS section_program_name,
@@ -42,7 +43,11 @@ export const getAllEnrollments = async (filters = {}) => {
      FROM enrollments e
      JOIN users u ON e.student_id = u.user_id
      LEFT JOIN student_details sd ON e.student_id = sd.user_id
-     LEFT JOIN programs stp ON (sd.course = stp.code OR sd.course = stp.name)
+     LEFT JOIN programs stp ON (
+       LOWER(TRIM(sd.course)) = LOWER(TRIM(stp.code))
+       OR LOWER(TRIM(sd.course)) = LOWER(TRIM(stp.name))
+       OR LOWER(TRIM(sd.course)) LIKE CONCAT(LOWER(TRIM(stp.code)), ' - %')
+     )
      JOIN courses c ON e.course_id = c.course_id
      LEFT JOIN sections s ON e.section_id = s.section_id
      LEFT JOIN programs sp ON s.program_id = sp.program_id
@@ -315,6 +320,57 @@ export const updateEnrollment = async (
   return getEnrollmentById(id);
 };
 
+// Update selected fields on existing student/course enrollments in one term.
+// Target matching is by the chosen students and courses; no rows are inserted.
+export const bulkUpdateEnrollments = async ({ student_ids, course_ids, period_id, updates }) => {
+  const studentIds = [...new Set((student_ids || []).filter(Boolean))];
+  const courseIds = [...new Set((course_ids || []).filter(Boolean))];
+  if (!studentIds.length || !courseIds.length || !period_id) return 0;
+
+  const allowedColumns = new Set([
+    "enrollment_date",
+    "status",
+    "midterm_grade",
+    "final_grade",
+    "remarks",
+  ]);
+  const entries = Object.entries(updates || {}).filter(([column, value]) =>
+    allowedColumns.has(column) && value !== undefined,
+  );
+  if (!entries.length) return 0;
+
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+    const [rows] = await connection.query(
+      `SELECT enrollment_id FROM enrollments
+       WHERE period_id = ?
+         AND student_id IN (${studentIds.map(() => "?").join(", ")})
+         AND course_id IN (${courseIds.map(() => "?").join(", ")})`,
+      [period_id, ...studentIds, ...courseIds],
+    );
+    const enrollmentIds = rows.map((row) => row.enrollment_id);
+    if (!enrollmentIds.length) {
+      await connection.commit();
+      return 0;
+    }
+
+    const setClause = entries.map(([column]) => `${column} = ?`).join(", ");
+    await connection.query(
+      `UPDATE enrollments SET ${setClause}
+       WHERE enrollment_id IN (${enrollmentIds.map(() => "?").join(", ")})`,
+      [...entries.map(([, value]) => value), ...enrollmentIds],
+    );
+    await connection.commit();
+    return enrollmentIds.length;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
 // Delete enrollment
 export const deleteEnrollment = async (id) => {
   const conn = await db.getConnection();
@@ -411,6 +467,7 @@ export const getUnsectionedEnrollments = async (
     LEFT JOIN student_details sd ON e.student_id = sd.user_id
     LEFT JOIN programs p ON (
       LOWER(TRIM(sd.course)) = LOWER(TRIM(p.code))
+      OR LOWER(TRIM(sd.course)) LIKE CONCAT(LOWER(TRIM(p.code)), ' - %')
       OR LOWER(TRIM(sd.course)) = LOWER(TRIM(p.name))
       OR (p.code = 'BAH' AND LOWER(TRIM(sd.course)) = 'bachelor of arts in history')
       OR (p.code = 'BPA' AND LOWER(TRIM(sd.course)) IN (
@@ -439,11 +496,20 @@ export const getUnsectionedEnrollments = async (
   }
 
   if (year_level) {
-    query += " AND TRIM(COALESCE(c.year_level, '')) = TRIM(?)";
+    query += ` AND TRIM(COALESCE(
+      NULLIF(e.year_level, ''),
+      NULLIF(c.year_level, ''),
+      NULLIF(sd.year_level, ''),
+      ''
+    )) = TRIM(?)`;
     params.push(year_level);
   }
 
-  if (curriculum_type) {
+  // An empty course list represents "All Courses". In that mode, the picker
+  // uses curriculum_type to show the program's curriculum, while sectioning
+  // must also include shared courses whose course row has a different or
+  // missing curriculum label.
+  if (curriculum_type && courseIds.length) {
     query += " AND LOWER(TRIM(COALESCE(c.curriculum_type, ''))) = LOWER(TRIM(?))";
     params.push(curriculum_type);
   }

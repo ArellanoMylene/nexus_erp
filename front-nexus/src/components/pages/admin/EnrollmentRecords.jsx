@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,8 +11,10 @@ import {
   Pencil,
   Trash2,
   FileDown,
+  Loader2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Shuffle,
 } from "lucide-react";
 import {
@@ -23,6 +25,34 @@ const toDateInputValue = (value) => {
   if (!value) return "";
   const stringValue = String(value);
   return stringValue.includes("T") ? stringValue.split("T")[0] : stringValue;
+};
+
+const calculateAge = (value) => {
+  const dateValue = toDateInputValue(value);
+  if (!dateValue) return "";
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const birthDate = new Date(year, month - 1, day);
+  if (Number.isNaN(birthDate.getTime())) return "";
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  if (
+    today.getMonth() < birthDate.getMonth()
+    || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+  ) age -= 1;
+  return age >= 0 ? String(age) : "";
+};
+
+const formatBirthday = (value) => {
+  const dateValue = toDateInputValue(value);
+  if (!dateValue) return "";
+  const [year, month, day] = dateValue.split("-");
+  return year && month && day ? `${month}/${day}/${year}` : dateValue;
+};
+
+const formatPwdStatus = (value) => {
+  if (value === true || value === 1 || value === "1") return "Yes";
+  if (value === false || value === 0 || value === "0") return "No";
+  return value || "";
 };
 
 const findOptionByValue = (options, value) => {
@@ -237,8 +267,8 @@ const EnrollmentModal = ({
         period_id: null,
         section_id: null,
         year_level: "",
-        enrollment_date: new Date().toISOString().split("T")[0],
-        status: "Enrolled",
+        enrollment_date: mode === "bulk-edit" ? "" : new Date().toISOString().split("T")[0],
+        status: mode === "bulk-edit" ? "" : "Enrolled",
         midterm_grade: "",
         final_grade: "",
         remarks: "",
@@ -246,15 +276,17 @@ const EnrollmentModal = ({
       return;
     }
     setFormData(toEnrollmentFormData(initialData));
-  }, [initialData]);
+  }, [initialData, mode, isOpen]);
 
   useEffect(() => {
-    if (!isOpen || mode !== "add" || formData.period_id || !periods.length) return;
+    if (!isOpen || mode === "edit" || formData.period_id || !periods.length) return;
     const activePeriod = periods.find((period) => period.is_active) || periods[0];
     setFormData((prev) => ({ ...prev, period_id: activePeriod.value }));
   }, [isOpen, mode, periods, formData.period_id]);
 
   const selectedProgram = findOptionByValue(programs, formData.program_id);
+  const selectedPeriod = findOptionByValue(periods, formData.period_id);
+  const selectedSemester = String(selectedPeriod?.semester || "").trim().toLowerCase();
   const programMatches = (value) => !selectedProgram || [selectedProgram.code, selectedProgram.name]
     .some((programValue) => programValue && String(programValue).trim().toLowerCase() === String(value || "").trim().toLowerCase());
   const eligibleStudents = students.filter((student) =>
@@ -263,6 +295,7 @@ const EnrollmentModal = ({
   );
   const eligibleCourses = courses.filter((course) =>
     (!formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
+    && (!selectedSemester || String(course.semester_offer || "").trim().toLowerCase() === selectedSemester)
     && (!selectedProgram?.department_id || String(course.department_id) === String(selectedProgram.department_id)),
   );
   const curriculumOptions = Array.from(new Set(
@@ -351,9 +384,17 @@ const EnrollmentModal = ({
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-lg font-bold text-slate-800">
-                {mode === "add" ? "New Enrollment" : "Edit Enrollment / Section Transfer"}
+                {mode === "add"
+                  ? "New Enrollment"
+                  : mode === "bulk-edit"
+                    ? "Bulk Edit Existing Enrollments"
+                    : "Edit Enrollment / Section Transfer"}
               </h2>
-              {mode === "edit" && (
+              {mode === "bulk-edit" ? (
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Select existing students and courses. Only fields you fill in will be updated; no enrollments will be created.
+                </p>
+              ) : mode === "edit" && (
                 <p className="text-xs text-slate-500 mt-0.5">
                   Update student details or transfer student to another section.
                 </p>
@@ -382,7 +423,14 @@ const EnrollmentModal = ({
               </label>
               <Select
                 value={findOptionByValue(periods, formData.period_id)}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, period_id: selected?.value || null, section_id: null }))}
+                onChange={(selected) => setFormData((prev) => ({
+                  ...prev,
+                  period_id: selected?.value || null,
+                  course_id: null,
+                  course_ids: [],
+                  select_all_courses: false,
+                  section_id: null,
+                }))}
                 options={periods}
                 placeholder="Select academic period..."
                 isDisabled={mode === "edit"}
@@ -467,7 +515,7 @@ const EnrollmentModal = ({
               {/* Course */}
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                  Course *
+                  {mode === "bulk-edit" ? "Existing Course(s) *" : "Course *"}
                 </label>
                 <Select
                   value={formData.select_all_courses
@@ -535,7 +583,7 @@ const EnrollmentModal = ({
 
             </div>
 
-            {/* Section / Section Transfer */}
+            {mode !== "bulk-edit" && (
             <div className="p-3.5 rounded-lg border border-slate-200 bg-slate-50/70">
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-semibold text-slate-700">
@@ -641,11 +689,12 @@ const EnrollmentModal = ({
                   : "Leave unassigned if the student will be sectioned in bulk later."}
               </p>
             </div>
+            )}
 
             {/* Choose an admission/student after narrowing the available offerings. */}
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                Student(s) *
+                {mode === "bulk-edit" ? "Existing Student(s) *" : "Student(s) *"}
               </label>
               <Select
                 value={formData.select_all_students
@@ -684,7 +733,7 @@ const EnrollmentModal = ({
 
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                Enrollment Date *
+                {mode === "bulk-edit" ? "Enrollment Date (Optional)" : "Enrollment Date *"}
               </label>
               <input
                 type="date"
@@ -694,7 +743,7 @@ const EnrollmentModal = ({
                   enrollment_date: e.target.value,
                 }))}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                required
+                required={mode !== "bulk-edit"}
               />
             </div>
 
@@ -713,6 +762,7 @@ const EnrollmentModal = ({
                 }
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
+                {mode === "bulk-edit" && <option value="">No change</option>}
                 <option value="Enrolled">Enrolled</option>
                 <option value="Dropped">Dropped</option>
                 <option value="Completed">Completed</option>
@@ -799,9 +849,11 @@ const EnrollmentModal = ({
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting
-                  ? "Saving..."
+                  ? mode === "bulk-edit" ? "Updating..." : "Saving..."
                   : mode === "add"
                     ? "Create Enrollment"
+                    : mode === "bulk-edit"
+                      ? "Update Existing Matches"
                     : isTransferring
                       ? "Save & Transfer Section"
                       : "Update Enrollment"}
@@ -890,6 +942,11 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
     setIsSubmitting(true);
     try {
       const { select_all_courses, ...sectioningData } = formData;
+      // The picker shows the program's curriculum courses. When "All Courses"
+      // is selected, omit that list so the backend sections every matching
+      // year/curriculum enrollment for those students, including GE courses
+      // owned by another department.
+      if (select_all_courses) sectioningData.course_ids = [];
       await onSubmit(sectioningData);
     } finally {
       setIsSubmitting(false);
@@ -1052,7 +1109,7 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
               />
               {formData.year_level && (
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Only courses labeled for {formData.year_level} are shown.
+                  Showing this program's {formData.year_level} courses. All Courses also sections shared subjects enrolled by matching students.
                 </p>
               )}
             </div>
@@ -1106,6 +1163,10 @@ const EnrollmentRecords = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [sectioningModalOpen, setSectioningModalOpen] = useState(false);
   const [bulkExporting, setBulkExporting] = useState(false);
+  const [bulkExportProgress, setBulkExportProgress] = useState(null);
+  const [singleExportingId, setSingleExportingId] = useState(null);
+  const [expandedStudentIds, setExpandedStudentIds] = useState(() => new Set());
+  const invoiceCacheRef = useRef(new Map());
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -1143,6 +1204,29 @@ const EnrollmentRecords = () => {
           })`,
           program: s.course || null,
           year_level: s.year_level || null,
+          student_number: s.student_number || "",
+          full_name: `${s.first_name || ""} ${s.last_name || ""}`.trim(),
+          address: s.permanent_address || s.permanentAddress || s.mailing_address || s.mailingAddress || [
+            s.permanent_sitio,
+            s.permanent_barangay,
+            s.permanent_city_municipality,
+            s.permanent_province,
+          ].filter(Boolean).join(", ") || [
+            s.present_sitio,
+            s.present_barangay,
+            s.present_city_municipality,
+            s.present_province,
+          ].filter(Boolean).join(", ") || s.student_details?.mailing_address || "",
+          birthday: formatBirthday(s.date_of_birth || s.birthday || s.dateOfBirth),
+          age: s.age || calculateAge(s.date_of_birth || s.birthday || s.dateOfBirth),
+          gender: s.gender || "",
+          civil_status: s.civil_status || s.civilStatus || s.student_details?.civil_status || "",
+          religion: s.religion || s.student_details?.religion || "",
+          pwd: formatPwdStatus(s.is_pwd ?? s.pwd),
+          nationality: s.nationality || s.citizenship || "",
+          indigenous_people: s.indigenous_people || "",
+          phone: s.phone || "",
+          email: s.email || "",
         }));
       setStudents(studentList);
     } catch (err) {
@@ -1201,49 +1285,77 @@ const EnrollmentRecords = () => {
   };
 
   const getRegistrationFormDetails = async (enrollment) => {
-    // Student profile
-    let studentInfo = {};
-    try {
-      const res = await api.get(`/api/users/${enrollment.student_id}`);
-      const u = res.data;
-      studentInfo = {
-        student_number: u.student_number,
-        full_name: `${u.first_name} ${u.last_name}`,
-        address: u.address || "",
-        birthday: u.birthday || "",
-        age: u.age || "",
-        gender: u.gender || "",
-        civil_status: u.civil_status || "",
-        religion: u.religion || "",
-        nationality: u.nationality || "",
-        cell_phone: u.phone || "",
-        email: u.email || "",
-        program_year: `${u.program || enrollment.student_course || "N/A"} / ${enrollment.year_level || ""}`,
-      };
-    } catch {
-      // If the student profile fails to load, proceed with an empty
-      // studentInfo rather than failing the whole export.
-    }
+    // Use the already-loaded enrollment rows as the source of truth for the
+    // student's subjects. Fetching the same schedule once per PDF page made
+    // large filtered exports intermittently produce empty course tables.
+    const subjects = enrollments
+      .filter((row) =>
+        String(row.student_id) === String(enrollment.student_id)
+        && String(row.period_id) === String(enrollment.period_id),
+      )
+      .map((row) => ({
+        subject_code: row.course_code || "N/A",
+        subject_name: row.course_title || row.course_name || "N/A",
+        units: Number(row.units) || 3,
+        section_code: row.section_name || row.section_code || "",
+        room: row.section_room || row.room || "",
+      }));
 
-    // Invoice for this student/period
-    let invoice = {};
-    try {
-      const res = await api.get(`/api/invoices`, {
+    // Use the student list already loaded for this screen instead of making
+    // one extra API request for every exported student.
+    const u = students.find((student) => String(student.value) === String(enrollment.student_id)) || {};
+    const program = [
+      enrollment.student_program_code,
+      enrollment.section_program_code,
+      enrollment.student_program_name,
+      enrollment.section_program_name,
+      enrollment.student_course,
+      u.program,
+    ]
+      .map((value) => String(value || "").trim())
+      .find((value) => value && !/^(n\/?a|general)$/i.test(value));
+    const studentInfo = {
+      student_number: u.student_number || enrollment.student_number || "",
+      full_name: u.full_name || enrollment.student_name || "",
+      address: u.address || "",
+      birthday: u.birthday || "",
+      age: u.age || "",
+      gender: u.gender || "",
+      civil_status: u.civil_status || "",
+      religion: u.religion || "",
+      pwd: u.pwd || "",
+      nationality: u.nationality || "",
+      indigenous_people: u.indigenous_people || "",
+      cell_phone: u.phone || "",
+      email: u.email || "",
+      program_year: `${program || "N/A"} / ${enrollment.year_level || u.year_level || ""}`,
+    };
+
+    // The invoice endpoint returns every invoice for a period. Cache that
+    // response once per period and reuse it for each student in the export.
+    const periodKey = String(enrollment.period_id);
+    if (!invoiceCacheRef.current.has(periodKey)) {
+      const invoicesRequest = api.get(`/api/invoices`, {
         params: { academic_period_id: enrollment.period_id },
-      });
-      const invoices = res.data?.data || res.data || [];
-      invoice =
-        invoices.find(
-          (inv) => String(inv.student_id) === String(enrollment.student_id),
-        ) || {};
-    } catch {
-      // No invoice found/available - export continues without it.
+      })
+        .then((res) => res.data?.data || res.data || [])
+        .catch((err) => {
+          console.error("Failed to load invoices for registration PDF:", err);
+          return [];
+        });
+      invoiceCacheRef.current.set(periodKey, invoicesRequest);
     }
+    const invoices = await invoiceCacheRef.current.get(periodKey);
+    const invoice = invoices.find(
+      (inv) => String(inv.student_id) === String(enrollment.student_id),
+    ) || {};
 
-    return { enrollment, studentInfo, invoice };
+    return { enrollment, studentInfo, invoice, subjects };
   };
 
   const handleExportPDF = async (enrollment) => {
+    if (singleExportingId || bulkExporting) return;
+    setSingleExportingId(enrollment.enrollment_id);
     try {
       const [currentUser, form] = await Promise.all([
         getRegistrarInfo(),
@@ -1254,29 +1366,38 @@ const EnrollmentRecords = () => {
         form.studentInfo,
         currentUser,
         form.invoice,
+        { subjects: form.subjects },
       );
     } catch (err) {
       console.error("Error exporting registration form:", err);
       toast.error("Failed to generate the registration form PDF.", {
         position: "top-center",
       });
+    } finally {
+      setSingleExportingId(null);
     }
   };
 
   const handleBulkExportPDF = async () => {
-    if (!filtered.length || bulkExporting) return;
+    if (!filteredExportRows.length || bulkExporting) return;
     setBulkExporting(true);
+    setBulkExportProgress({ phase: "preparing", current: 0, total: filteredExportRows.length });
     try {
       const currentUser = await getRegistrarInfo();
       const forms = [];
-      for (const enrollment of filtered) {
+      for (let index = 0; index < filteredExportRows.length; index += 1) {
+        const enrollment = filteredExportRows[index];
         forms.push({
           ...(await getRegistrationFormDetails(enrollment)),
           currentUser,
         });
+        setBulkExportProgress({ phase: "preparing", current: index + 1, total: filteredExportRows.length });
       }
-      await exportRegistrationFormsPDF(forms);
-      toast.success(`Downloaded ${forms.length} registration forms in one PDF.`, {
+      setBulkExportProgress({ phase: "generating", current: 0, total: forms.length });
+      await exportRegistrationFormsPDF(forms, (current, total) => {
+        setBulkExportProgress({ phase: "generating", current, total });
+      });
+      toast.success(`Downloaded forms for ${forms.length} student(s) in one PDF.`, {
         position: "top-center",
       });
     } catch (err) {
@@ -1286,6 +1407,7 @@ const EnrollmentRecords = () => {
       });
     } finally {
       setBulkExporting(false);
+      setBulkExportProgress(null);
     }
   };
 
@@ -1303,6 +1425,7 @@ const EnrollmentRecords = () => {
           year_level: c.year_level || null,
           department_id: c.department_id || null,
           curriculum_type: c.curriculum_type ?? c.curriculumType ?? c.curriculum ?? c.curriculum_name ?? null,
+          semester_offer: c.semester_offer || null,
         }));
       setCourses(courseList);
     } catch (err) {
@@ -1321,6 +1444,7 @@ const EnrollmentRecords = () => {
         .map((p) => ({
           value: p.id || p.period_id,
           label: `${p.school_year || "N/A"} - ${p.semester || "N/A"}`,
+          semester: p.semester || null,
           is_active: p.is_active,
         }));
       setPeriods(periodList);
@@ -1361,13 +1485,94 @@ const EnrollmentRecords = () => {
     return matchSearch && matchStatus && matchProgram;
   });
 
-  const totalPages = Math.ceil(filtered.length / rowsPerPage);
-  const displayed = filtered.slice(
+  // Keep the table and export filters student-based. A matching course row
+  // selects that student, then the visible group contains all their courses.
+  const matchingEnrollmentByStudent = new Map();
+  for (const enrollment of filtered) {
+    const studentKey = String(enrollment.student_id);
+    if (!matchingEnrollmentByStudent.has(studentKey)) {
+      matchingEnrollmentByStudent.set(studentKey, enrollment);
+    }
+  }
+  const studentGroupsById = new Map();
+  for (const enrollment of enrollments) {
+    const studentKey = String(enrollment.student_id);
+    if (!matchingEnrollmentByStudent.has(studentKey)) continue;
+    if (!studentGroupsById.has(studentKey)) {
+      studentGroupsById.set(studentKey, {
+        student_id: enrollment.student_id,
+        student_name: enrollment.student_name,
+        student_number: enrollment.student_number,
+        student_program_code: enrollment.student_program_code,
+        student_course: enrollment.student_course,
+        matching_enrollment: matchingEnrollmentByStudent.get(studentKey),
+        enrollments: [],
+      });
+    }
+    studentGroupsById.get(studentKey).enrollments.push(enrollment);
+  }
+  const studentGroups = Array.from(studentGroupsById.values());
+  const filteredExportRows = studentGroups.map((group) => group.matching_enrollment);
+  const totalPages = Math.ceil(studentGroups.length / rowsPerPage);
+  const displayed = studentGroups.slice(
     (page - 1) * rowsPerPage,
     page * rowsPerPage,
   );
 
+  const toggleStudentExpanded = (studentId) => {
+    setExpandedStudentIds((current) => {
+      const next = new Set(current);
+      const key = String(studentId);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
   const handleSubmit = async (data) => {
+    if (modalMode === "bulk-edit") {
+      const studentIds = [...new Set(data.student_ids || [])];
+      const courseIds = [...new Set(data.course_ids || [])];
+      if (!studentIds.length || !courseIds.length || !data.period_id || !data.program_id || !data.year_level) {
+        toast.error("Select an academic period, program, year level, students, and courses to target.", {
+          position: "top-center",
+        });
+        return;
+      }
+
+      const updates = {};
+      if (data.enrollment_date) updates.enrollment_date = data.enrollment_date;
+      if (data.status) updates.status = data.status;
+      if (data.midterm_grade !== "") updates.midterm_grade = data.midterm_grade;
+      if (data.final_grade !== "") updates.final_grade = data.final_grade;
+      if (String(data.remarks || "").trim()) updates.remarks = data.remarks;
+      if (!Object.keys(updates).length) {
+        toast.error("Enter at least one field to update.", { position: "top-center" });
+        return;
+      }
+
+      try {
+        const res = await axios.put(`${API_BASE}/api/enrollments/bulk`, {
+          student_ids: studentIds,
+          course_ids: courseIds,
+          period_id: data.period_id,
+          updates,
+        });
+        if (res.data.updated > 0) {
+          toast.success(`Updated ${res.data.updated} existing enrollment(s).`, { position: "top-center" });
+        } else {
+          toast.info("No existing enrollments matched the selected students, courses, and period.", { position: "top-center" });
+        }
+        fetchEnrollments();
+        setModalOpen(false);
+        setCurrentRecord(null);
+      } catch (err) {
+        console.error("Error bulk updating enrollments:", err);
+        toast.error(getErrorMessage(err, "Failed to bulk update enrollments."), { position: "top-center" });
+      }
+      return;
+    }
+
     const studentIds = modalMode === "add"
       ? [...new Set(data.student_ids || [])]
       : [data.student_id].filter(Boolean);
@@ -1575,20 +1780,30 @@ const EnrollmentRecords = () => {
           />
           <button
             onClick={handleBulkExportPDF}
-            disabled={!filtered.length || bulkExporting}
+            disabled={!filteredExportRows.length || bulkExporting || Boolean(singleExportingId)}
             className="px-4 py-2 bg-emerald-700 text-white rounded-md flex items-center gap-2 hover:bg-emerald-800 text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             title="Download registration forms for all filtered enrollment records"
           >
-            <FileDown size={16} />
             {bulkExporting
-              ? "Preparing PDFs..."
-              : `Download Filtered PDFs (${filtered.length})`}
+              ? <Loader2 size={16} className="animate-spin" />
+              : <FileDown size={16} />}
+            {bulkExporting
+              ? bulkExportProgress?.phase === "generating"
+                ? `Generating PDF ${bulkExportProgress.current}/${bulkExportProgress.total}...`
+                : `Preparing ${bulkExportProgress?.current || 0}/${bulkExportProgress?.total || filteredExportRows.length}...`
+              : `Download Student PDFs (${filteredExportRows.length})`}
           </button>
           <button
             onClick={() => setSectioningModalOpen(true)}
             className="px-4 py-2 bg-emerald-600 text-white rounded-md flex items-center gap-2 hover:bg-emerald-700 text-sm font-medium shadow-sm"
           >
             <Shuffle size={16} /> Run Sectioning
+          </button>
+          <button
+            onClick={() => openModal("bulk-edit")}
+            className="px-4 py-2 bg-amber-600 text-white rounded-md flex items-center gap-2 hover:bg-amber-700 text-sm font-medium shadow-sm"
+          >
+            <Pencil size={15} /> Bulk Edit
           </button>
           <button
             onClick={() => openModal("add")}
@@ -1598,6 +1813,40 @@ const EnrollmentRecords = () => {
           </button>
         </div>
       </div>
+
+      {bulkExporting && bulkExportProgress && (
+        <div className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3" role="status" aria-live="polite" aria-busy="true">
+          <div className="mb-2 flex items-center justify-between gap-3 text-sm text-emerald-900">
+            <span className="flex items-center gap-2">
+              <Loader2 size={16} className="animate-spin" />
+              {bulkExportProgress.phase === "preparing"
+                ? `Preparing registration forms: ${bulkExportProgress.current} of ${bulkExportProgress.total}`
+                : `Building PDF: ${bulkExportProgress.current} of ${bulkExportProgress.total}`}
+            </span>
+            <span>{bulkExportProgress.total
+              ? Math.round((bulkExportProgress.current / bulkExportProgress.total) * 100)
+              : 0}%</span>
+          </div>
+          <div
+            className="h-2 overflow-hidden rounded-full bg-emerald-100"
+            role="progressbar"
+            aria-label="PDF download progress"
+            aria-valuemin={0}
+            aria-valuemax={bulkExportProgress.total}
+            aria-valuenow={bulkExportProgress.current}
+          >
+            <div
+              className="h-full rounded-full bg-emerald-600 transition-all duration-200"
+              style={{ width: `${bulkExportProgress.total
+                ? Math.min(100, (bulkExportProgress.current / bulkExportProgress.total) * 100)
+                : 0}%` }}
+            />
+          </div>
+          {bulkExportProgress.phase === "generating" && (
+            <p className="mt-2 text-xs text-emerald-800">Keep this page open until the download starts.</p>
+          )}
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded border bg-white">
         <table className="min-w-full divide-y divide-slate-200">
@@ -1637,85 +1886,149 @@ const EnrollmentRecords = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-slate-100">
-            {displayed.length > 0 ? (
-              displayed.map((enrollment) => (
-                <tr
-                  key={enrollment.enrollment_id}
-                  className="hover:bg-slate-50 text-sm"
-                >
-                  <td className="px-3 py-2 font-mono text-xs text-slate-500">
-                    #{enrollment.enrollment_id}
-                  </td>
-                  <td className="px-3 py-2">
-                    <div className="font-medium text-slate-900">{enrollment.student_name}</div>
-                    {enrollment.student_number && (
-                      <div className="text-xs text-slate-500">{enrollment.student_number}</div>
-                    )}
-                  </td>
-                  <td className="px-3 py-2">
-                    <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold text-xs">
-                      {enrollment.student_program_code || enrollment.student_course || "General"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2">
-                    <div className="font-medium text-slate-800">{enrollment.course_code}</div>
-                    <div className="text-xs text-slate-500 truncate max-w-[180px]">{enrollment.course_title}</div>
-                  </td>
-                  <td className="px-3 py-2 text-xs text-slate-600">
-                    {enrollment.school_year && enrollment.semester
-                      ? `${enrollment.school_year} · ${enrollment.semester}`
-                      : "N/A"}
-                  </td>
-                  <td className="px-3 py-2 text-xs">
-                    {enrollment.year_level || "N/A"}
-                  </td>
-                  <td className="px-3 py-2 font-semibold">
-                    <SectionBadge sectionName={enrollment.section_name} />
-                  </td>
-                  <td className="px-3 py-2 text-xs text-slate-600">
-                    {toDateInputValue(enrollment.enrollment_date) || "N/A"}
-                  </td>
-                  <td className="px-3 py-2">
-                    <StatusBadge status={enrollment.status} />
-                  </td>
-                  <td className="px-3 py-2 text-center text-xs">
-                    {enrollment.midterm_grade || "-"} /{" "}
-                    {enrollment.final_grade || "-"}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="flex justify-end gap-2">
+            {displayed.length > 0 ? displayed.map((group) => {
+              const enrollment = group.matching_enrollment;
+              const studentKey = String(group.student_id);
+              const expanded = expandedStudentIds.has(studentKey);
+              const courseCodes = [...new Set(group.enrollments.map((row) => row.course_code).filter(Boolean))];
+              const periods = [...new Set(group.enrollments
+                .map((row) => row.school_year && row.semester ? `${row.school_year} · ${row.semester}` : null)
+                .filter(Boolean))];
+              const yearLevels = [...new Set(group.enrollments.map((row) => row.year_level).filter(Boolean))];
+              const sectionsForStudent = [...new Set(group.enrollments.map((row) => row.section_name || "Unsectioned"))];
+              const statuses = [...new Set(group.enrollments.map((row) => row.status).filter(Boolean))];
+              const isExporting = String(singleExportingId) === String(enrollment.enrollment_id);
+
+              return (
+                <React.Fragment key={studentKey}>
+                  <tr className="hover:bg-slate-50 text-sm">
+                    <td className="px-3 py-2 font-mono text-xs text-slate-500">
+                      #{group.student_number || group.student_id}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="font-medium text-slate-900">{group.student_name}</div>
+                      {group.student_number && <div className="text-xs text-slate-500">{group.student_number}</div>}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold text-xs">
+                        {group.student_program_code || group.student_course || "General"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
                       <button
-                        onClick={() => openModal("edit", enrollment)}
-                        className="text-indigo-600 hover:text-indigo-800 p-1 hover:bg-slate-100 rounded"
-                        title="Edit Record"
+                        type="button"
+                        onClick={() => toggleStudentExpanded(group.student_id)}
+                        className="flex items-center gap-1 text-left font-medium text-indigo-700 hover:text-indigo-900"
+                        aria-expanded={expanded}
                       >
-                        <Pencil size={15} />
+                        {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                        {courseCodes.length} course(s)
                       </button>
-                      <button
-                        onClick={() => handleDelete(enrollment.enrollment_id)}
-                        className="text-red-600 hover:text-red-800 p-1 hover:bg-slate-100 rounded"
-                        title="Delete Record"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleExportPDF(enrollment)}
-                        className="text-emerald-600 hover:text-emerald-800 p-1 hover:bg-slate-100 rounded"
-                        title="Download Registration Form"
-                      >
-                        <FileDown size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
+                      <div className="mt-0.5 max-w-[200px] truncate text-xs text-slate-500">
+                        {courseCodes.slice(0, 3).join(", ")}{courseCodes.length > 3 ? ", …" : ""}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-xs text-slate-600">
+                      {periods[0] || "N/A"}{periods.length > 1 ? ` +${periods.length - 1} more` : ""}
+                    </td>
+                    <td className="px-3 py-2 text-xs">{yearLevels.join(", ") || "N/A"}</td>
+                    <td className="px-3 py-2 text-xs font-semibold">
+                      {sectionsForStudent.join(", ")}
+                    </td>
+                    <td className="px-3 py-2 text-xs text-slate-600">
+                      {toDateInputValue(enrollment.enrollment_date) || "N/A"}
+                    </td>
+                    <td className="px-3 py-2">
+                      {statuses.length === 1
+                        ? <StatusBadge status={statuses[0]} />
+                        : <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">Mixed</span>}
+                    </td>
+                    <td className="px-3 py-2 text-center text-xs">
+                      {group.enrollments.length === 1
+                        ? `${enrollment.midterm_grade || "-"} / ${enrollment.final_grade || "-"}`
+                        : <button type="button" onClick={() => toggleStudentExpanded(group.student_id)} className="text-indigo-700 hover:underline">Per course</button>}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleStudentExpanded(group.student_id)}
+                          className="rounded p-1 text-slate-600 hover:bg-slate-100"
+                          title={expanded ? "Hide courses" : "Manage courses"}
+                          aria-label={expanded ? "Hide courses" : "Manage courses"}
+                        >
+                          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleExportPDF(enrollment)}
+                          disabled={bulkExporting || Boolean(singleExportingId)}
+                          className="rounded p-1 text-emerald-600 hover:bg-slate-100 hover:text-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+                          title={isExporting ? "Generating registration form..." : "Download Registration Form"}
+                          aria-label={isExporting ? "Generating registration form" : "Download registration form"}
+                        >
+                          {isExporting ? <Loader2 size={15} className="animate-spin" /> : <FileDown size={15} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expanded && (
+                    <tr key={`${studentKey}-courses`} className="bg-slate-50">
+                      <td colSpan={11} className="px-6 py-3">
+                        <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+                          <table className="min-w-full text-xs">
+                            <thead className="bg-slate-100 text-slate-700">
+                              <tr>
+                                <th className="px-3 py-2 text-left">Course</th>
+                                <th className="px-3 py-2 text-left">Period / Year</th>
+                                <th className="px-3 py-2 text-left">Section</th>
+                                <th className="px-3 py-2 text-left">Status</th>
+                                <th className="px-3 py-2 text-left">Grades</th>
+                                <th className="px-3 py-2 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {group.enrollments.map((courseEnrollment) => (
+                                <tr key={courseEnrollment.enrollment_id}>
+                                  <td className="px-3 py-2">
+                                    <span className="font-medium">{courseEnrollment.course_code}</span>
+                                    <span className="ml-2 text-slate-500">{courseEnrollment.course_title}</span>
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    {courseEnrollment.school_year} · {courseEnrollment.semester} · {courseEnrollment.year_level || "N/A"}
+                                  </td>
+                                  <td className="px-3 py-2"><SectionBadge sectionName={courseEnrollment.section_name} /></td>
+                                  <td className="px-3 py-2"><StatusBadge status={courseEnrollment.status} /></td>
+                                  <td className="px-3 py-2">
+                                    {courseEnrollment.midterm_grade || "-"} / {courseEnrollment.final_grade || "-"}
+                                  </td>
+                                  <td className="px-3 py-2 text-right">
+                                    <div className="flex justify-end gap-2">
+                                      <button type="button" onClick={() => openModal("edit", courseEnrollment)} className="rounded p-1 text-indigo-600 hover:bg-slate-100" title="Edit enrollment">
+                                        <Pencil size={14} />
+                                      </button>
+                                      <button type="button" onClick={() => handleDelete(courseEnrollment.enrollment_id)} className="rounded p-1 text-red-600 hover:bg-slate-100" title="Delete enrollment">
+                                        <Trash2 size={14} />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            }) : (
               <tr>
                 <td
                   colSpan={11}
                   className="text-center py-8 text-slate-500 italic"
                 >
-                  No enrollment records found.
+                  No students found for these filters.
                 </td>
               </tr>
             )}
@@ -1727,7 +2040,7 @@ const EnrollmentRecords = () => {
         currentPage={page}
         totalPages={totalPages}
         setPage={setPage}
-        totalItems={filtered.length}
+        totalItems={studentGroups.length}
       />
 
       <EnrollmentModal

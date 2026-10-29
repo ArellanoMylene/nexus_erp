@@ -2,7 +2,7 @@
  * exportRegistrationForm.js
  * Baco Community College – Official Registration Form PDF Exporter
  *
- * Page size: 8.5 x 11 inch (Letter) — unit: points (pt)
+ * Page size: 8.5 x 13 inch (Long bond paper) — unit: points (pt)
  * 1 inch = 72 pt
  */
 
@@ -17,7 +17,7 @@ const HEADER_IMG_FORMAT = "JPEG";
 
 // ─── Page / Layout constants (all in pt) ─────────────────────────────────────
 const PW     = 8.5 * 72;  // 612 pt
-const PH     = 11  * 72;  // 792 pt
+const PH     = 13  * 72;  // 936 pt
 const ML     = 10;
 const MR     = PW - 10;
 const BODY_W = MR - ML;   // 592 pt
@@ -256,9 +256,11 @@ function drawCopy(doc, data, startY, isCopy, headerImg) {
   const TBL_RIGHT = MR - GAP - ASS_W;
   const TBL_W     = TBL_RIGHT - ML;   // ~337 pt
 
-  const CW    = [70, 110, 30, 100, 27]; // must sum to TBL_W (337)
+  const CW    = [65, 100, 30, 100, 42]; // must sum to TBL_W (337)
   const HDR_H = 18;
-  const ROW_H = 11;
+  const ROW_H = 8.5;
+  const ROW_FS = 6.3;
+  const ROW_LINE_H = ROW_FS * 1.15;
 
   const hdrs = [
     "Subject Code",
@@ -287,9 +289,11 @@ function drawCopy(doc, data, startY, isCopy, headerImg) {
       safe(s.subject_name),
       CW[1] - 4,
     );
+    const roomLines = doc.splitTextToSize(safe(s.room), CW[4] - 4);
     const rowHeight = Math.max(
       ROW_H,
-      descriptionLines.length * 7.5 * 1.15 + 4,
+      descriptionLines.length * ROW_LINE_H + 1.5,
+      roomLines.length * ROW_LINE_H + 1.5,
     );
     cx = ML;
     const rowCells = [
@@ -297,10 +301,10 @@ function drawCopy(doc, data, startY, isCopy, headerImg) {
       { text: descriptionLines, align: "center" },
       { text: s.units > 0 ? String(s.units) : "", align: "center" },
       { text: (!isCopy && safe(s.section_code)) || "", align: "center" },
-      { text: safe(s.room), align: "center" },
+      { text: roomLines, align: "center" },
     ];
     rowCells.forEach((rc, ci) => {
-      cell(doc, rc.text, cx, y, CW[ci], rowHeight, { align: "center", fontSize: 7.5, valign: "middle" });
+      cell(doc, rc.text, cx, y, CW[ci], rowHeight, { align: "center", fontSize: ROW_FS, padding: 1, valign: "middle" });
       cx += CW[ci];
     });
     y += rowHeight;
@@ -414,15 +418,13 @@ function drawCopy(doc, data, startY, isCopy, headerImg) {
   doc.setFontSize(8);
   doc.text(registrarTitle, PW / 2, sigY + 9, { align: "center" });
 
-  if (isCopy) {
-    doc.setDrawColor(80, 80, 80);
-    doc.setLineWidth(0.75);
-    doc.rect(MR - 72, sigY - 10, 70, 18, "S");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.text("Student Copy", MR - 37, sigY + 2, { align: "center" });
-    doc.setDrawColor(0);
-  }
+  doc.setDrawColor(80, 80, 80);
+  doc.setLineWidth(0.75);
+  doc.rect(MR - 72, sigY - 10, 70, 18, "S");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text(isCopy ? "Student Copy" : "Registrar Copy", MR - 37, sigY + 2, { align: "center" });
+  doc.setDrawColor(0);
 
   return sigY + 18;
 }
@@ -452,10 +454,9 @@ export async function exportRegistrationFormPDF(
   const discountAmount    = Number(invoice.discount_amount)    || 0;
   const scholarshipAmount = Number(invoice.scholarship_amount) || 0;
 
-  const subjects = await fetchStudentSubjects(
-    enrollment.student_id,
-    enrollment.period_id,
-  );
+  const subjects = Array.isArray(options.subjects)
+    ? options.subjects
+    : await fetchStudentSubjects(enrollment.student_id, enrollment.period_id);
 
   const registrar      = currentUser.full_name || currentUser.name || "MARICRIS R. AMORADO, LPT";
   const registrarTitle = currentUser.position  || currentUser.role || "Registrar I";
@@ -473,7 +474,7 @@ export async function exportRegistrationFormPDF(
     nationality:      studentInfo.nationality    || "",
     courseYear:
       studentInfo.program_year ||
-      `${studentInfo.program || "N/A"} / ${enrollment.year_level || ""}`,
+      `${studentInfo.program || enrollment.student_program_code || enrollment.section_program_code || enrollment.student_course || "N/A"} / ${enrollment.year_level || ""}`,
     indigenousPeople: studentInfo.indigenous_people || "-",
     cellPhone:        studentInfo.cell_phone     || "",
     email:            studentInfo.email          || "",
@@ -512,17 +513,14 @@ export async function exportRegistrationFormPDF(
   }
   if (addPage) doc.addPage([PW, PH], "portrait");
 
-  // Copy 1: Office copy
-  const divY = drawCopy(doc, formData, 10, false, headerImg);
-
-  // Dashed cut line
+  // Keep both detachable copies together on one page.
+  drawCopy(doc, formData, 10, false, headerImg);
+  const cutLineY = PH / 2;
   doc.setLineWidth(0.6);
   doc.setLineDash([4, 3]);
-  doc.line(ML - 8, divY + 6, MR + 8, divY + 6);
+  doc.line(ML - 8, cutLineY, MR + 8, cutLineY);
   doc.setLineDash([]);
-
-  // Copy 2: Student copy
-  drawCopy(doc, formData, divY + 16, true, headerImg);
+  drawCopy(doc, formData, cutLineY + 12, true, headerImg);
 
   const safeName =
     formData.studentName
@@ -532,8 +530,8 @@ export async function exportRegistrationFormPDF(
   return doc;
 }
 
-/** Export several registration forms into one PDF, one enrollment per page. */
-export async function exportRegistrationFormsPDF(forms = []) {
+/** Export several student registration forms into one PDF, one page per student. */
+export async function exportRegistrationFormsPDF(forms = [], onProgress = null) {
   if (!forms.length) throw new Error("No enrollment forms to export.");
 
   let headerImg = null;
@@ -545,14 +543,20 @@ export async function exportRegistrationFormsPDF(forms = []) {
 
   let doc = null;
   for (let i = 0; i < forms.length; i += 1) {
-    const { enrollment, studentInfo, currentUser, invoice } = forms[i];
+    const { enrollment, studentInfo, currentUser, invoice, subjects } = forms[i];
     doc = await exportRegistrationFormPDF(
       enrollment,
       studentInfo,
       currentUser,
       invoice,
-      { doc, headerImg, addPage: i > 0, save: false },
+      { doc, headerImg, addPage: i > 0, save: false, subjects },
     );
+    onProgress?.(i + 1, forms.length);
+    // Let React repaint the progress indicator during large synchronous
+    // jsPDF batches instead of showing only the final state.
+    if ((i + 1) % 4 === 0 || i === forms.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
   }
 
   doc.save("BCC_RegistrationForms_Filtered.pdf");
