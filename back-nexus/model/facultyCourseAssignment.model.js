@@ -44,6 +44,7 @@ const FacultyCourseAssignment = {
  JOIN sections enrolled_section ON e.section_id = enrolled_section.section_id
  WHERE e.period_id = fca.academic_period_id
  AND enrolled_section.section_id = s.section_id
+ AND e.course_id = fca.course_id
  AND e.status = 'Enrolled'
 ) AS current_enrolled
             FROM faculty_course_assignments fca

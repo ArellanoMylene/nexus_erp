@@ -135,6 +135,28 @@ export const getStudentsByAssignment = async (req, res) => {
   }
 };
 
+// Get all enrolled students in the logged-in faculty member's assigned courses.
+export const getStudentsByFaculty = async (req, res) => {
+  try {
+    if (!canReviewEnrollments(req)) return denyEnrollmentAccess(res);
+    const { facultyId } = req.params;
+    const isOwnFacultyRoster =
+      String(req.user?.role || "").toLowerCase() === "faculty"
+      && String(req.user?.userId) === String(facultyId);
+    if (!isAdmin(req) && !isOwnFacultyRoster) return denyEnrollmentAccess(res);
+
+    const students = await enrollmentService.listStudentsByFaculty(facultyId);
+    res.json({ success: true, data: students });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch faculty course rosters",
+      error: err.message,
+    });
+  }
+};
+
 // Run sectioning: assigns each student to one section and applies that
 // section to the student's matching course enrollments for the period.
 export const runSectioning = async (req, res) => {

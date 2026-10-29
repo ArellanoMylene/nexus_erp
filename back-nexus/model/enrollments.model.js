@@ -584,8 +584,52 @@ export const getStudentsByAssignment = async (assignmentId) => {
      JOIN users u ON e.student_id = u.user_id
      LEFT JOIN student_details sd ON e.student_id = sd.user_id
      WHERE fca.assignment_id = ?
+       AND e.status = 'Enrolled'
      ORDER BY sd.student_number ASC`,
     [assignmentId],
+  );
+  return rows;
+};
+
+// Get the enrolled roster across all courses assigned to one faculty member.
+export const getStudentsByFaculty = async (facultyUserId) => {
+  const [rows] = await db.query(
+    `SELECT
+        e.enrollment_id AS id,
+        e.enrollment_id,
+        e.student_id AS user_id,
+        COALESCE(sd.student_number, CAST(u.user_id AS CHAR)) AS student_id,
+        u.first_name,
+        u.last_name,
+        CONCAT_WS(' ', u.first_name, u.last_name) AS name,
+        u.email,
+        u.phone,
+        fca.assignment_id,
+        fca.course_id,
+        c.code AS course_code,
+        c.title AS course_title,
+        fca.section,
+        COALESCE(p.code, sd.course, 'N/A') AS program,
+        COALESCE(e.year_level, sd.year_level, 'N/A') AS year_level,
+        e.status,
+        e.midterm_grade,
+        e.final_grade
+     FROM faculty_course_assignments fca
+     JOIN enrollments e
+       ON e.course_id = fca.course_id
+      AND e.period_id = fca.academic_period_id
+      AND e.status = 'Enrolled'
+     JOIN sections s
+       ON s.section_id = e.section_id
+      AND s.period_id = e.period_id
+      AND s.section_name = fca.section
+     JOIN users u ON u.user_id = e.student_id
+     LEFT JOIN student_details sd ON sd.user_id = e.student_id
+     JOIN courses c ON c.course_id = e.course_id
+     LEFT JOIN programs p ON p.program_id = s.program_id
+     WHERE fca.faculty_user_id = ?
+     ORDER BY c.code, fca.section, sd.student_number, u.last_name, u.first_name`,
+    [facultyUserId],
   );
   return rows;
 };

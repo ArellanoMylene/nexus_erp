@@ -9,6 +9,7 @@ import {
   updateEnrollment,
   deleteEnrollment,
   getStudentsByAssignment,
+  getStudentsByFaculty,
 runSectioning
 } from "../controllers/enrollments.controller.js";
 
@@ -32,5 +33,6 @@ router.delete("/enrollments/:id", deleteEnrollment);
 
 // Get students by faculty assignment ID - MUST be before export
 router.get('/enrollments/assignment/:assignmentId/students', getStudentsByAssignment);
+router.get('/enrollments/faculty/:facultyId/students', getStudentsByFaculty);
 
 export default router;
