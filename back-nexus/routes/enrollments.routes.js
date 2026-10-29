@@ -5,6 +5,7 @@ import {
   getEnrollmentsByStudent,
   getEnrollmentById,
   createEnrollment,
+  bulkUpdateEnrollments,
   updateEnrollment,
   deleteEnrollment,
   getStudentsByAssignment,
@@ -25,6 +26,7 @@ router.post("/enrollments/run-sectioning",runSectioning);
 router.get("/enrollments/student/:studentId", getEnrollmentsByStudent);
 router.get("/enrollments/:id", getEnrollmentById);
 router.post("/enrollments", createEnrollment);
+router.put("/enrollments/bulk", bulkUpdateEnrollments);
 router.put("/enrollments/:id", updateEnrollment);
 router.delete("/enrollments/:id", deleteEnrollment);
 

@@ -88,6 +88,17 @@ export const updateEnrollment = async (req, res) => {
   }
 };
 
+export const bulkUpdateEnrollments = async (req, res) => {
+  try {
+    if (!isAdmin(req)) return denyEnrollmentAccess(res);
+    const updated = await enrollmentService.bulkEditEnrollments(req.body);
+    res.json({ updated });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
 // Delete enrollment
 export const deleteEnrollment = async (req, res) => {
   try {
