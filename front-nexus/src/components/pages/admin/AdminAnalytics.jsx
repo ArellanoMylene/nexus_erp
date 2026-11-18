@@ -34,7 +34,8 @@ function getProgramName(r, i) {
 /** Linear-regression forecast — no TF.js needed */
 function linearPredict(ys) {
   const n = ys.length;
-  if (n < 2) return null;
+  if (n === 1) return { value: Math.max(0, Math.round(ys[0])), confidence: 0, limitedData: true };
+  if (n < 1) return null;
   let sx = 0, sy = 0, sxy = 0, sxx = 0;
   ys.forEach((y, i) => { sx += i; sy += y; sxy += i * y; sxx += i * i; });
   const denom = n * sxx - sx * sx || 1;
@@ -44,7 +45,7 @@ function linearPredict(ys) {
   const mae = ys.reduce((acc, y, i) => acc + Math.abs(y - (m * i + b)), 0) / n;
   const meanY = sy / n || 1;
   const confidence = Math.max(0, Math.min(100, Math.round((1 - mae / meanY) * 100)));
-  return { value: predY, confidence };
+  return { value: predY, confidence, limitedData: false };
 }
 
 // ─── subcomponents ──────────────────────────────────────────────────────────
@@ -102,13 +103,24 @@ function ProgramList({ data }) {
 function InsightList({ trends, prog }) {
   const ys = trends.map(getY);
   const n = ys.length;
-  if (n < 2) return null;
+  if (!n) return <div className="flex h-full min-h-28 items-center justify-center px-6 text-center text-sm text-slate-500">No enrollment data is available for insights yet.</div>;
+
+  const topProg = [...prog].sort((a, b) => getY(b) - getY(a))[0];
+  if (n === 1) {
+    const topShare = topProg ? Math.round((getY(topProg) / (ys[0] || 1)) * 100) : 0;
+    return (
+      <div className="insight-list">
+        <div className="insight-item" style={{ background: "#E6F1FB" }}><div className="insight-dot" style={{ background: "#185FA5" }} /><div className="insight-text"><strong>{getLabel(trends[0], 0)}</strong> has {ys[0].toLocaleString()} enrolled students.</div></div>
+        {topProg && <div className="insight-item" style={{ background: "#EAF3DE" }}><div className="insight-dot" style={{ background: "#3B6D11" }} /><div className="insight-text"><strong>{getProgramName(topProg, 0)}</strong> is the largest program with {getY(topProg).toLocaleString()} students ({topShare}% of this period).</div></div>}
+        <div className="insight-item" style={{ background: "#FEF3E2" }}><div className="insight-dot" style={{ background: "#BA7517" }} /><div className="insight-text">Add another academic period to see enrollment growth and period comparisons.</div></div>
+      </div>
+    );
+  }
 
   const recentGrowth = n >= 2
     ? Math.round(((ys[n - 1] - ys[n - 2]) / (ys[n - 2] || 1)) * 100) : 0;
 
   const total = ys.reduce((a, b) => a + b, 0);
-  const topProg = [...prog].sort((a, b) => getY(b) - getY(a))[0];
   const topShare = topProg ? Math.round((getY(topProg) / (total || 1)) * 100) : 0;
 
   const half = Math.floor(n / 2);
@@ -148,13 +160,14 @@ function PredictionBanner({ pred }) {
   return (
     <div className="pred-banner">
       <div>
-        <div className="pred-label">AI forecast · next period</div>
+        <div className="pred-label">{pred.limitedData ? "Baseline estimate · next period" : "AI forecast · next period"}</div>
         <div className="pred-value">{pred.value.toLocaleString()}</div>
+        {pred.limitedData && <div className="pred-label">Carries forward the latest count; more periods are needed for a trend forecast.</div>}
       </div>
       <div className="pred-conf">
         <div className="pred-conf-header">
-          <span>Confidence</span>
-          <span>{pred.confidence}%</span>
+          <span>{pred.limitedData ? "Data points" : "Confidence"}</span>
+          <span>{pred.limitedData ? "1 period" : `${pred.confidence}%`}</span>
         </div>
         <div className="pred-conf-bg">
           <div className="pred-conf-fill" style={{ width: `${pred.confidence}%` }} />
@@ -264,7 +277,6 @@ const AdminAnalytics = () => {
   const [loadError, setLoadError] = useState(false);
   const [trends, setTrends] = useState([]);
   const [prog, setProg] = useState([]);
-  const [admissionsCount, setAdmissionsCount] = useState(null);
   const [prediction, setPrediction] = useState(null);
   const [chartView, setChartView] = useState("area"); // "area" | "bar"
   const [activeTab, setActiveTab] = useState("enrollment"); // "enrollment" | "dropout"
@@ -280,10 +292,9 @@ const AdminAnalytics = () => {
       setLoading(true);
       setLoadError(false);
       try {
-        const [tr, pr, st, dropout] = await Promise.all([
+        const [tr, pr, dropout] = await Promise.all([
           api.get("/api/reports/enrollment-trends"),
           api.get("/api/reports/enrollment-by-program"),
-          api.get("/api/reports/statistics"),
           api.get("/api/reports/dropout-analytics"),
         ]);
         if (!mounted) return;
@@ -293,18 +304,17 @@ const AdminAnalytics = () => {
         const d = dropout.data?.data || {};
         setTrends(t);
         setProg(p);
-        setAdmissionsCount(Number(st.data?.data?.admissions?.enrolled || 0));
         setDropoutByProgram(Array.isArray(d.byProgram) ? d.byProgram : []);
         setDropoutTrends(Array.isArray(d.trends) ? d.trends : []);
         setDropoutReasons(Array.isArray(d.reasons) ? d.reasons : []);
-        if (t.length >= 3) setPrediction(linearPredict(t.map(getY)));
+        setPrediction(t.length ? linearPredict(t.map(getY)) : null);
       } catch (error) {
         console.error("Failed to load admin analytics:", error);
         if (mounted) {
           setLoadError(true);
           setTrends([]);
           setProg([]);
-          setAdmissionsCount(0);
+          setPrediction(null);
           setDropoutByProgram([]);
           setDropoutTrends([]);
           setDropoutReasons([]);
@@ -320,7 +330,7 @@ const AdminAnalytics = () => {
   // ── derived enrollment data ──────────────────────────────────────────────
   const ys = trends.map(getY);
   const seriesTotal = ys.reduce((a, b) => a + b, 0);
-  const total = admissionsCount !== null ? admissionsCount : seriesTotal;
+  const total = seriesTotal;
   const avg = Math.round(total / (ys.length || 1));
   const peakIdx = ys.indexOf(Math.max(...ys, 0));
   const half = Math.floor(ys.length / 2);
@@ -387,7 +397,7 @@ const AdminAnalytics = () => {
         {activeTab === "enrollment" && (
           <>
             <div className="kpi-grid">
-              <KpiCard label="Total enrolled" value={total.toLocaleString()} sub={`${pctChange >= 0 ? "+" : ""}${pctChange}% vs prior half`} subColor={pctChange >= 0 ? "#3B6D11" : "#A32D2D"} />
+              <KpiCard label="Total enrolled" value={total.toLocaleString()} sub={trends.length < 2 ? "First period recorded" : `${pctChange >= 0 ? "+" : ""}${pctChange}% vs prior half`} subColor={pctChange >= 2 ? "#3B6D11" : pctChange <= -2 ? "#A32D2D" : "#6b7280"} />
               <KpiCard label="Active programs" value={prog.length} sub="tracked programs" />
               <KpiCard label="Avg per period" value={avg.toLocaleString()} sub="enrollments / period" />
               <KpiCard label="Peak period" value={trends[peakIdx] ? getLabel(trends[peakIdx], peakIdx) : "—"} sub={ys.length ? `${Math.max(...ys).toLocaleString()} enrollments` : ""} />
@@ -403,23 +413,24 @@ const AdminAnalytics = () => {
                   ))}
                 </div>
                 <div className="legend-row">
-                  <span className="legend-item"><span className="legend-swatch" style={{ background: "#185FA5" }} />Actual</span>
+                  <span className="legend-item"><span className="legend-swatch" style={{ background: "#0F766E" }} />Actual</span>
                   <span className="legend-item"><span className="legend-swatch legend-swatch-dashed" />Forecast</span>
                 </div>
+                <div className="rounded-xl border border-slate-100 bg-white p-2">
                 <ResponsiveContainer width="100%" height={220}>
                   {chartView === "area" ? (
                     <AreaChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
                       <defs>
                         <linearGradient id="gradActual" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#185FA5" stopOpacity={0.18} />
-                          <stop offset="95%" stopColor="#185FA5" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#10B981" stopOpacity={0.42} />
+                          <stop offset="95%" stopColor="#A7F3D0" stopOpacity={0.06} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" />
                       <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} allowDecimals={false} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Area type="monotone" dataKey="actual" name="Actual" stroke="#185FA5" strokeWidth={2} fill="url(#gradActual)" dot={{ r: 3, fill: "#185FA5" }} connectNulls={false} />
+                      <Area type="monotone" dataKey="actual" name="Actual" stroke="#0F766E" strokeWidth={2.5} fill="url(#gradActual)" dot={{ r: 4, fill: "#0F766E", stroke: "#FFFFFF", strokeWidth: 2 }} activeDot={{ r: 6 }} connectNulls={false} />
                       <Line type="monotone" dataKey="forecast" name="Forecast" stroke="#BA7517" strokeWidth={2} strokeDasharray="6 4" dot={{ r: 5, fill: "#BA7517" }} connectNulls={false} />
                     </AreaChart>
                   ) : (
@@ -433,6 +444,7 @@ const AdminAnalytics = () => {
                     </BarChart>
                   )}
                 </ResponsiveContainer>
+                </div>
                 <PredictionBanner pred={prediction} />
               </SectionCard>
 
@@ -443,24 +455,26 @@ const AdminAnalytics = () => {
 
             <div className="bottom-grid">
               <SectionCard title="Period-over-period change">
-                <ResponsiveContainer width="100%" height={190}>
-                  <BarChart data={changeData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip content={<CustomTooltip />} formatter={(v) => [v > 0 ? `+${v}` : v, "Change"]} />
-                    <ReferenceLine y={0} stroke="rgba(128,128,128,0.3)" />
-                    <Bar dataKey="delta" name="Change" radius={[3, 3, 0, 0]}>
-                      {changeData.map((entry, i) => (
-                        <Cell key={i} fill={entry.delta >= 0 ? "rgba(59,109,17,0.75)" : "rgba(163,45,45,0.75)"} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                {changeData.length ? (
+                  <ResponsiveContainer width="100%" height={190}>
+                    <BarChart data={changeData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,128,0.12)" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                      <Tooltip content={<CustomTooltip />} formatter={(v) => [v > 0 ? `+${v}` : v, "Change"]} />
+                      <ReferenceLine y={0} stroke="rgba(128,128,128,0.3)" />
+                      <Bar dataKey="delta" name="Change" radius={[3, 3, 0, 0]}>
+                        {changeData.map((entry, i) => (
+                          <Cell key={i} fill={entry.delta >= 0 ? "rgba(59,109,17,0.75)" : "rgba(163,45,45,0.75)"} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : <div className="flex h-[190px] items-center justify-center px-6 text-center text-sm text-slate-500">Period comparisons will appear when enrollment data is available for another academic period.</div>}
               </SectionCard>
 
               <SectionCard title="Key insights">
-                {trends.length >= 2 && prog.length > 0 && (
+                {trends.length > 0 && prog.length > 0 && (
                   <InsightList trends={trends} prog={prog} />
                 )}
               </SectionCard>

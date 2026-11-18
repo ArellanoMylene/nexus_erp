@@ -88,11 +88,11 @@ const Menu = {
           icons: FileText,
           link: "/admin/admin_id_generator",
         }, */
-        {
+        /* {
           label: "Clearance Processing",
           icons: CheckSquare,
           link: "/admin/admin_clearance_processing",
-        },
+        }, */
       ],
     },
     {
@@ -114,11 +114,11 @@ const Menu = {
           icons: ClipboardList,
           link: "/admin/admin_faculty_advisory_assignment",
         }, */
-        {
+        /* {
           label: "Faculty Evaluation",
           icons: CheckSquare,
           link: "/admin/admin_faculty_evaluation",
-        },
+        }, */
         /*  {
           label: "Faculty Scheduling",
           icons: Calendar,
@@ -155,11 +155,11 @@ const Menu = {
           icons: CheckSquare,
           link: "/admin/admin_grademanagement",
         },
-        {
+        /* {
           label: "Syllabus Repository",
           icons: Book,
           link: "/admin/admin_syllabus_repository",
-        },
+        }, */
       ],
     },
     /*  {
@@ -202,11 +202,11 @@ const Menu = {
           icons: CheckSquare,
           link: "/admin/admin_grade_entry",
         }, */
-        {
+       /*  {
           label: "Grade Computation Setup",
           icons: FileText,
           link: "/admin/admin_grade_computation",
-        },
+        }, */
         /*  {
           label: "Exam Schedule Builder",
           icons: CalendarCheck,

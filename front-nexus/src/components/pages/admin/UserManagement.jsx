@@ -851,7 +851,7 @@ function UserManagement() {
   const [query,      setQuery]      = useState("");
   const [filterRole, setFilterRole] = useState("");
   const [page,       setPage]       = useState(1);
-  const pageSize = 6;
+  const pageSize = 10;
 
   /* ── Helpers ── */
   function getInitialFormState(role) {
@@ -1392,21 +1392,18 @@ const handleRoleChange = (e) => {
 
       <div className="flex flex-col sm:flex-row justify-between items-center mt-3 text-sm text-slate-700">
         <span className="text-xs sm:text-sm">
-          Showing <span className="font-semibold">{(page - 1) * pageSize + 1}</span>–
+          Showing <span className="font-semibold">{filteredSorted.length ? (page - 1) * pageSize + 1 : 0}</span>–
           <span className="font-semibold">{Math.min(page * pageSize, filteredSorted.length)}</span> of{" "}
           <span className="font-semibold">{filteredSorted.length}</span> users
         </span>
-        <div className="flex gap-1 mt-2 sm:mt-0">
+        <div className="flex items-center gap-2 mt-2 sm:mt-0">
           <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
             className="p-1.5 rounded border border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100">
             <ChevronLeft size={16} className="text-slate-600" />
           </button>
-          {[...Array(pageCount)].map((_, i) => (
-            <button key={i + 1} onClick={() => setPage(i + 1)}
-              className={`px-3 py-1.5 text-xs rounded border transition-colors ${page === i + 1 ? "bg-indigo-600 text-white border-indigo-600" : "border-slate-300 text-slate-700 hover:bg-slate-100"}`}>
-              {i + 1}
-            </button>
-          ))}
+          <span className="min-w-[5.5rem] text-center text-xs font-medium text-slate-600" aria-live="polite">
+            Page {page} of {pageCount}
+          </span>
           <button onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page === pageCount}
             className="p-1.5 rounded border border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-100">
             <ChevronRight size={16} className="text-slate-600" />

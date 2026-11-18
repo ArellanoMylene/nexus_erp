@@ -14,7 +14,8 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
+  Eye,
+  X,
   Shuffle,
 } from "lucide-react";
 import {
@@ -1165,7 +1166,7 @@ const EnrollmentRecords = () => {
   const [bulkExporting, setBulkExporting] = useState(false);
   const [bulkExportProgress, setBulkExportProgress] = useState(null);
   const [singleExportingId, setSingleExportingId] = useState(null);
-  const [expandedStudentIds, setExpandedStudentIds] = useState(() => new Set());
+  const [coursesStudent, setCoursesStudent] = useState(null);
   const invoiceCacheRef = useRef(new Map());
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -1518,16 +1519,6 @@ const EnrollmentRecords = () => {
     (page - 1) * rowsPerPage,
     page * rowsPerPage,
   );
-
-  const toggleStudentExpanded = (studentId) => {
-    setExpandedStudentIds((current) => {
-      const next = new Set(current);
-      const key = String(studentId);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
 
   const handleSubmit = async (data) => {
     if (modalMode === "bulk-edit") {
@@ -1889,13 +1880,15 @@ const EnrollmentRecords = () => {
             {displayed.length > 0 ? displayed.map((group) => {
               const enrollment = group.matching_enrollment;
               const studentKey = String(group.student_id);
-              const expanded = expandedStudentIds.has(studentKey);
               const courseCodes = [...new Set(group.enrollments.map((row) => row.course_code).filter(Boolean))];
               const periods = [...new Set(group.enrollments
                 .map((row) => row.school_year && row.semester ? `${row.school_year} · ${row.semester}` : null)
                 .filter(Boolean))];
               const yearLevels = [...new Set(group.enrollments.map((row) => row.year_level).filter(Boolean))];
-              const sectionsForStudent = [...new Set(group.enrollments.map((row) => row.section_name || "Unsectioned"))];
+              // A section belongs to the student cohort. Older enrollments can
+              // have a null section even when another course row for this
+              // student already carries the cohort section.
+              const sectionsForStudent = [...new Set(group.enrollments.map((row) => row.section_name).filter(Boolean))];
               const statuses = [...new Set(group.enrollments.map((row) => row.status).filter(Boolean))];
               const isExporting = String(singleExportingId) === String(enrollment.enrollment_id);
 
@@ -1915,15 +1908,9 @@ const EnrollmentRecords = () => {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleStudentExpanded(group.student_id)}
-                        className="flex items-center gap-1 text-left font-medium text-indigo-700 hover:text-indigo-900"
-                        aria-expanded={expanded}
-                      >
-                        {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                      <div className="flex items-center gap-1 text-left font-medium text-slate-800">
                         {courseCodes.length} course(s)
-                      </button>
+                      </div>
                       <div className="mt-0.5 max-w-[200px] truncate text-xs text-slate-500">
                         {courseCodes.slice(0, 3).join(", ")}{courseCodes.length > 3 ? ", …" : ""}
                       </div>
@@ -1933,7 +1920,7 @@ const EnrollmentRecords = () => {
                     </td>
                     <td className="px-3 py-2 text-xs">{yearLevels.join(", ") || "N/A"}</td>
                     <td className="px-3 py-2 text-xs font-semibold">
-                      {sectionsForStudent.join(", ")}
+                      {sectionsForStudent.length ? sectionsForStudent.join(", ") : "Unsectioned"}
                     </td>
                     <td className="px-3 py-2 text-xs text-slate-600">
                       {toDateInputValue(enrollment.enrollment_date) || "N/A"}
@@ -1946,18 +1933,12 @@ const EnrollmentRecords = () => {
                     <td className="px-3 py-2 text-center text-xs">
                       {group.enrollments.length === 1
                         ? `${enrollment.midterm_grade || "-"} / ${enrollment.final_grade || "-"}`
-                        : <button type="button" onClick={() => toggleStudentExpanded(group.student_id)} className="text-indigo-700 hover:underline">Per course</button>}
+                        : <span className="text-slate-500">Per course</span>}
                     </td>
                     <td className="px-3 py-2 text-right">
                       <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleStudentExpanded(group.student_id)}
-                          className="rounded p-1 text-slate-600 hover:bg-slate-100"
-                          title={expanded ? "Hide courses" : "Manage courses"}
-                          aria-label={expanded ? "Hide courses" : "Manage courses"}
-                        >
-                          {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                        <button type="button" onClick={() => setCoursesStudent(group)} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50" title="View enrolled courses" aria-label={`View courses for ${group.student_name}`}>
+                          <Eye size={15} /> View courses
                         </button>
                         <button
                           type="button"
@@ -1972,54 +1953,6 @@ const EnrollmentRecords = () => {
                       </div>
                     </td>
                   </tr>
-                  {expanded && (
-                    <tr key={`${studentKey}-courses`} className="bg-slate-50">
-                      <td colSpan={11} className="px-6 py-3">
-                        <div className="overflow-x-auto rounded border border-slate-200 bg-white">
-                          <table className="min-w-full text-xs">
-                            <thead className="bg-slate-100 text-slate-700">
-                              <tr>
-                                <th className="px-3 py-2 text-left">Course</th>
-                                <th className="px-3 py-2 text-left">Period / Year</th>
-                                <th className="px-3 py-2 text-left">Section</th>
-                                <th className="px-3 py-2 text-left">Status</th>
-                                <th className="px-3 py-2 text-left">Grades</th>
-                                <th className="px-3 py-2 text-right">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {group.enrollments.map((courseEnrollment) => (
-                                <tr key={courseEnrollment.enrollment_id}>
-                                  <td className="px-3 py-2">
-                                    <span className="font-medium">{courseEnrollment.course_code}</span>
-                                    <span className="ml-2 text-slate-500">{courseEnrollment.course_title}</span>
-                                  </td>
-                                  <td className="px-3 py-2">
-                                    {courseEnrollment.school_year} · {courseEnrollment.semester} · {courseEnrollment.year_level || "N/A"}
-                                  </td>
-                                  <td className="px-3 py-2"><SectionBadge sectionName={courseEnrollment.section_name} /></td>
-                                  <td className="px-3 py-2"><StatusBadge status={courseEnrollment.status} /></td>
-                                  <td className="px-3 py-2">
-                                    {courseEnrollment.midterm_grade || "-"} / {courseEnrollment.final_grade || "-"}
-                                  </td>
-                                  <td className="px-3 py-2 text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <button type="button" onClick={() => openModal("edit", courseEnrollment)} className="rounded p-1 text-indigo-600 hover:bg-slate-100" title="Edit enrollment">
-                                        <Pencil size={14} />
-                                      </button>
-                                      <button type="button" onClick={() => handleDelete(courseEnrollment.enrollment_id)} className="rounded p-1 text-red-600 hover:bg-slate-100" title="Delete enrollment">
-                                        <Trash2 size={14} />
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                 </React.Fragment>
               );
             }) : (
@@ -2042,6 +1975,47 @@ const EnrollmentRecords = () => {
         setPage={setPage}
         totalItems={studentGroups.length}
       />
+
+      {coursesStudent && (() => {
+        const sectionNames = [...new Set(coursesStudent.enrollments.map((row) => row.section_name).filter(Boolean))];
+        const studentSectionName = sectionNames[0] || "Unsectioned";
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setCoursesStudent(null); }}>
+            <section role="dialog" aria-modal="true" aria-labelledby="enrolled-courses-title" className="max-h-[85vh] w-full max-w-5xl overflow-hidden rounded-xl bg-white shadow-2xl">
+              <header className="flex items-start justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                  <h2 id="enrolled-courses-title" className="text-lg font-semibold text-slate-900">Enrolled courses</h2>
+                  <p className="mt-1 text-sm text-slate-600">{coursesStudent.student_name} · {coursesStudent.student_number || `#${coursesStudent.student_id}`}</p>
+                </div>
+                <button type="button" onClick={() => setCoursesStudent(null)} className="rounded p-2 text-slate-500 hover:bg-slate-100" aria-label="Close courses dialog"><X size={18} /></button>
+              </header>
+              <div className="max-h-[calc(85vh-6rem)] overflow-auto p-5">
+                <div className="mb-4 flex flex-wrap gap-4 text-sm text-slate-600">
+                  <span><strong className="text-slate-800">Program:</strong> {coursesStudent.student_program_code || coursesStudent.student_course || "General"}</span>
+                  <span><strong className="text-slate-800">Section:</strong> {sectionNames.join(", ") || "Unsectioned"}</span>
+                </div>
+                <div className="overflow-x-auto rounded border border-slate-200">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-slate-100 text-left text-xs font-bold uppercase text-slate-700"><tr><th className="px-3 py-2">Course</th><th className="px-3 py-2">Period / Year</th><th className="px-3 py-2">Section</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Grades</th><th className="px-3 py-2 text-right">Actions</th></tr></thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {coursesStudent.enrollments.map((courseEnrollment) => (
+                        <tr key={courseEnrollment.enrollment_id}>
+                          <td className="px-3 py-2"><span className="font-medium">{courseEnrollment.course_code}</span><span className="ml-2 text-slate-500">{courseEnrollment.course_title}</span></td>
+                          <td className="px-3 py-2">{courseEnrollment.school_year} · {courseEnrollment.semester} · {courseEnrollment.year_level || "N/A"}</td>
+                          <td className="px-3 py-2"><SectionBadge sectionName={courseEnrollment.section_name || studentSectionName} /></td>
+                          <td className="px-3 py-2"><StatusBadge status={courseEnrollment.status} /></td>
+                          <td className="px-3 py-2">{courseEnrollment.midterm_grade || "-"} / {courseEnrollment.final_grade || "-"}</td>
+                          <td className="px-3 py-2 text-right"><div className="flex justify-end gap-2"><button type="button" onClick={() => { setCoursesStudent(null); openModal("edit", courseEnrollment); }} className="rounded p-1 text-indigo-600 hover:bg-slate-100" title="Edit enrollment"><Pencil size={14} /></button><button type="button" onClick={() => { setCoursesStudent(null); handleDelete(courseEnrollment.enrollment_id); }} className="rounded p-1 text-red-600 hover:bg-slate-100" title="Delete enrollment"><Trash2 size={14} /></button></div></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+        );
+      })()}
 
       <EnrollmentModal
         isOpen={modalOpen}

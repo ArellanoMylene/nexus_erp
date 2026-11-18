@@ -83,18 +83,11 @@ const ReportsModel = {
         u.status,
         p.name as program_name,
         COALESCE(p.code, sd.course) as program_code,
-        e.enrollment_id,
-        e.enrollment_date,
-        e.status AS enrollment_status,
-        ap.school_year as academic_year,
-        ap.semester,
         COUNT(DISTINCT g.grade_id) as total_grades,
         AVG(g.final_grade) as gpa
       FROM users u
       INNER JOIN student_details sd ON u.user_id = sd.user_id
       LEFT JOIN programs p ON sd.course = p.name OR sd.course = p.code
-      LEFT JOIN enrollments e ON u.user_id = e.student_id
-      LEFT JOIN academic_periods ap ON e.period_id = ap.period_id
       LEFT JOIN grades g ON u.user_id = g.student_user_id
       WHERE u.role = 'Student'
     `;
@@ -123,16 +116,16 @@ const ReportsModel = {
     }
 
     if (filters.date_from) {
-      query += ` AND e.enrollment_date >= ?`;
+      query += ` AND EXISTS (SELECT 1 FROM enrollments e WHERE e.student_id = u.user_id AND e.enrollment_date >= ?)`;
       params.push(filters.date_from);
     }
 
     if (filters.date_to) {
-      query += ` AND e.enrollment_date <= ?`;
+      query += ` AND EXISTS (SELECT 1 FROM enrollments e WHERE e.student_id = u.user_id AND e.enrollment_date <= ?)`;
       params.push(filters.date_to);
     }
 
-    query += ` GROUP BY u.user_id, sd.student_number, sd.year_level, u.email, u.phone, u.gender, u.date_of_birth, u.status, u.first_name, u.middle_name, u.last_name, p.name, p.code, sd.course, e.enrollment_id, e.enrollment_date, e.status, ap.school_year, ap.semester, ap.period_id ORDER BY sd.student_number ASC`;
+    query += ` GROUP BY u.user_id, sd.student_number, sd.year_level, u.email, u.phone, u.gender, u.date_of_birth, u.status, u.first_name, u.middle_name, u.last_name, p.name, p.code, sd.course ORDER BY sd.student_number ASC`;
 
     const [rows] = await pool.query(query, params);
     return rows;
@@ -142,10 +135,11 @@ const ReportsModel = {
   async getEnrollmentReports(filters = {}) {
     let query = `
       SELECT 
-        e.enrollment_id,
-        e.enrollment_date,
-        e.status AS enrollment_status,
-        e.year_level,
+        MIN(e.enrollment_id) AS enrollment_id,
+        MIN(e.enrollment_date) AS enrollment_date,
+        CASE WHEN COUNT(DISTINCT e.status) = 1 THEN MAX(e.status) ELSE 'mixed' END AS enrollment_status,
+        MAX(e.year_level) AS year_level,
+        e.student_id,
         CONCAT(u.first_name, ' ', u.last_name) AS student_name,
         sd.student_number,
         u.email,
@@ -155,9 +149,8 @@ const ReportsModel = {
         ap.semester,
         ap.start_date,
         ap.end_date,
-        c.code as course_code,
-        c.title as course_title,
-        c.units as total_units
+        COALESCE(SUM(c.units), 0) as total_units,
+        COUNT(DISTINCT e.course_id) as subject_count
       FROM enrollments e
       INNER JOIN users u ON e.student_id = u.user_id
       INNER JOIN student_details sd ON u.user_id = sd.user_id
@@ -194,7 +187,7 @@ const ReportsModel = {
       params.push(filters.date_to);
     }
 
-    query += ` ORDER BY e.enrollment_date DESC`;
+    query += ` GROUP BY e.student_id, sd.student_number, u.first_name, u.last_name, u.email, p.program_id, p.name, p.code, ap.period_id, ap.school_year, ap.semester, ap.start_date, ap.end_date ORDER BY MAX(e.enrollment_date) DESC`;
 
     const [rows] = await pool.query(query, params);
     return rows;
@@ -210,7 +203,7 @@ const ReportsModel = {
         p.program_id,
         p.code AS program_code,
         p.name AS program_name,
-        COUNT(DISTINCT e.enrollment_id) AS enrollment_count
+        COUNT(DISTINCT e.student_id) AS enrollment_count
       FROM enrollments e
       INNER JOIN academic_periods ap ON e.period_id = ap.period_id
       INNER JOIN users u ON e.student_id = u.user_id
@@ -517,10 +510,17 @@ const ReportsModel = {
     const [enrollmentStats] = await pool.query(`
       SELECT 
         COUNT(*) as total_enrollments,
-        SUM(CASE WHEN status = 'enrolled' THEN 1 ELSE 0 END) as enrolled,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'dropped' THEN 1 ELSE 0 END) as dropped
-      FROM enrollments
+        SUM(has_enrolled) as enrolled,
+        SUM(has_pending) as pending,
+        SUM(has_dropped) as dropped
+      FROM (
+        SELECT student_id, period_id,
+          MAX(status = 'enrolled') AS has_enrolled,
+          MAX(status = 'pending') AS has_pending,
+          MAX(status = 'dropped') AS has_dropped
+        FROM enrollments
+        GROUP BY student_id, period_id
+      ) program_enrollments
     `);
 
     // Count admissions marked as enrolled (admissions.status uses 'Enrolled')
@@ -652,7 +652,7 @@ const ReportsModel = {
         p.program_id,
         p.code AS program_code,
         p.name AS program_name,
-        COUNT(DISTINCT e.enrollment_id) AS enrollment_count,
+        COUNT(DISTINCT e.student_id) AS enrollment_count,
         COUNT(DISTINCT e.student_id) AS unique_students
       FROM enrollments e
       INNER JOIN users u ON e.student_id = u.user_id
@@ -706,8 +706,8 @@ const ReportsModel = {
       SELECT
         COALESCE(p.name, 'Unknown Program') AS program,
         COALESCE(p.code, 'Unknown') AS short_name,
-        COUNT(*) AS enrolled,
-        SUM(CASE WHEN LOWER(e.status) = 'dropped' THEN 1 ELSE 0 END) AS dropouts
+        COUNT(DISTINCT e.student_id) AS enrolled,
+        COUNT(DISTINCT CASE WHEN LOWER(e.status) = 'dropped' THEN e.student_id END) AS dropouts
       FROM enrollments e
       INNER JOIN users u ON e.student_id = u.user_id
       INNER JOIN student_details sd ON u.user_id = sd.user_id
@@ -720,8 +720,8 @@ const ReportsModel = {
       SELECT
         DATE_FORMAT(e.enrollment_date, '%Y-%m') AS period_key,
         DATE_FORMAT(e.enrollment_date, '%b %Y') AS period_label,
-        COUNT(*) AS enrollments,
-        SUM(CASE WHEN LOWER(e.status) = 'dropped' THEN 1 ELSE 0 END) AS dropouts
+        COUNT(DISTINCT e.student_id) AS enrollments,
+        COUNT(DISTINCT CASE WHEN LOWER(e.status) = 'dropped' THEN e.student_id END) AS dropouts
       FROM enrollments e
       WHERE e.enrollment_date IS NOT NULL
       GROUP BY period_key, period_label

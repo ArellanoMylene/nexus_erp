@@ -11,8 +11,16 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+const normalizeExamType = (value) => {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "midterm") return "midterm";
+  if (normalized === "final" || normalized === "finals") return "final";
+  return "prelims";
+};
 
 const runtimeHostApiBase =
   typeof window !== "undefined"
@@ -111,7 +119,7 @@ const ExamSetup = () => {
     section_id: "",
     room_id: "",
     proctor_id: "",
-    exam_type: "quiz",
+    exam_type: "prelims",
     exam_date: "",
     exam_time: "",
     exam_duration: "",
@@ -120,6 +128,14 @@ const ExamSetup = () => {
     instructions: "",
     status: "draft",
   });
+  const examStats = exams.reduce((counts, exam) => {
+    const status = String(exam.status || "").toLowerCase();
+    counts.total += 1;
+    if (status === "scheduled") counts.scheduled += 1;
+    if (status === "ongoing") counts.ongoing += 1;
+    if (status === "completed") counts.completed += 1;
+    return counts;
+  }, { total: 0, scheduled: 0, ongoing: 0, completed: 0 });
 
   useEffect(() => {
     fetchExams();
@@ -225,59 +241,19 @@ const ExamSetup = () => {
     }
   };
 
-  const fetchFacultyByDepartment = async (departmentId) => {
-    if (!departmentId) {
-      // Fallback: no department_id on the course, so load all faculty instead
-      // (same pattern as GradeManagement.jsx: fetch all users, filter by role)
-      fetchAllFaculty();
-      return;
-    }
-    try {
-      const response = await apiFetch(
-        `/api/faculty/department/${departmentId}`,
-      );
-      const data = await response.json();
-      console.log(`Faculty for department ${departmentId}:`, data); // Debug
-      if (Array.isArray(data) && data.length > 0) {
-        setFaculty(data);
-      } else {
-        // Department endpoint returned nothing usable (or an empty list,
-        // meaning no faculty is assigned to that specific department) —
-        // fall back to showing all faculty instead of leaving it empty.
-        console.log(
-          "No faculty found for this department, falling back to all faculty",
-        ); // Debug
-        fetchAllFaculty();
-      }
-    } catch (error) {
-      console.error("Error fetching faculty:", error);
-      setFaculty([]);
-      toast.error(await getErrorMessage(error, "Failed to load faculty."));
-    }
-  };
-
-  // Fallback: fetch ALL faculty (any department) when the course has no
-  // department_id or the department-specific endpoint has nothing to offer.
+  // Proctors may be selected from any department, so load all faculty.
   const fetchAllFaculty = async () => {
     try {
-      const response = await apiFetch("/api/users");
+      const response = await apiFetch("/api/users?role=Faculty");
       const data = await response.json();
-      console.log("Raw /api/users response:", data); // Debug
 
       const usersList = Array.isArray(data)
         ? data
         : data?.data || data?.users || [];
-      console.log("Users list after unwrap:", usersList); // Debug
-      console.log(
-        "Distinct roles found:",
-        [...new Set(usersList.map((u) => u.role))],
-      ); // Debug
 
-      // Case-insensitive match so "Faculty", "faculty", "FACULTY" all work
       const facultyList = usersList.filter(
         (user) => (user.role || "").toLowerCase() === "faculty",
       );
-      console.log("Filtered faculty list:", facultyList); // Debug
 
       setFaculty(facultyList);
       if (facultyList.length === 0) {
@@ -295,13 +271,11 @@ const ExamSetup = () => {
   const handleOpenModal = (exam = null) => {
     if (exam) {
       setEditingExam(exam);
-      // Fetch all rooms and faculty based on course department
+      // Fetch all rooms and all eligible proctors.
       const selectedCourse = courses.find((c) => c.id === exam.course_id);
       if (selectedCourse) {
         fetchAllRooms();
-        // fetchFacultyByDepartment falls back to fetchAllFaculty when there's
-        // no department_id, so always call it once we have the course.
-        fetchFacultyByDepartment(selectedCourse.department_id);
+        fetchAllFaculty();
       }
       setFormData({
         exam_name: exam.exam_name || "",
@@ -309,7 +283,7 @@ const ExamSetup = () => {
         section_id: exam.section_id || "",
         room_id: exam.room_id || "",
         proctor_id: exam.proctor_id || "",
-        exam_type: exam.exam_type || "quiz",
+        exam_type: normalizeExamType(exam.exam_type),
         exam_date: exam.exam_date || "",
         exam_time: exam.exam_time || "",
         exam_duration: exam.exam_duration || "",
@@ -328,7 +302,7 @@ const ExamSetup = () => {
         section_id: "",
         room_id: "",
         proctor_id: "",
-        exam_type: "quiz",
+        exam_type: "prelims",
         exam_date: "",
         exam_time: "",
         exam_duration: "",
@@ -352,7 +326,7 @@ const ExamSetup = () => {
       section_id: "",
       room_id: "",
       proctor_id: "",
-      exam_type: "quiz",
+      exam_type: "prelims",
       exam_date: "",
       exam_time: "",
       exam_duration: "",
@@ -493,28 +467,25 @@ const ExamSetup = () => {
             <FileText size={24} className="text-indigo-600" />
             Exam Setup
           </h2>
-          <span className="text-sm text-slate-500 font-medium">
-            Data Integrity: Online
-          </span>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
             <p className="text-sm text-slate-600">Total Exams</p>
-            <p className="text-2xl font-bold text-indigo-600">245</p>
+            <p className="text-2xl font-bold text-indigo-600">{examStats.total}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
             <p className="text-sm text-slate-600">Scheduled</p>
-            <p className="text-2xl font-bold text-blue-600">32</p>
+            <p className="text-2xl font-bold text-blue-600">{examStats.scheduled}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
             <p className="text-sm text-slate-600">Ongoing</p>
-            <p className="text-2xl font-bold text-green-600">8</p>
+            <p className="text-2xl font-bold text-green-600">{examStats.ongoing}</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
             <p className="text-sm text-slate-600">Completed</p>
-            <p className="text-2xl font-bold text-purple-600">205</p>
+            <p className="text-2xl font-bold text-purple-600">{examStats.completed}</p>
           </div>
         </div>
 
@@ -547,11 +518,9 @@ const ExamSetup = () => {
               className="px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm w-40"
             >
               <option value="">All Exam Types</option>
-              <option value="quiz">Quiz</option>
+              <option value="prelims">Prelims</option>
               <option value="midterm">Midterm</option>
-              <option value="final">Final</option>
-              <option value="practical">Practical</option>
-              <option value="project">Project</option>
+              <option value="final">Finals</option>
             </select>
             <select
               value={filters.status}
@@ -869,7 +838,7 @@ const ExamSetup = () => {
                             ...formData,
                             course_id: option?.value || "",
                           });
-                          // Fetch rooms from sections for this course and faculty based on course department
+                          // Fetch rooms from sections for this course.
                           const selectedCourse = courses.find(
                             (c) => c.id === option?.value,
                           );
@@ -882,11 +851,7 @@ const ExamSetup = () => {
                             fetchAllRooms();
                           }
                           if (selectedCourse) {
-                            // fetchFacultyByDepartment falls back to all
-                            // faculty when department_id is missing.
-                            fetchFacultyByDepartment(
-                              selectedCourse.department_id,
-                            );
+                            fetchAllFaculty();
                           } else {
                             setFaculty([]);
                           }
@@ -920,11 +885,9 @@ const ExamSetup = () => {
                         required
                         className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       >
-                        <option value="quiz">Quiz</option>
+                        <option value="prelims">Prelims</option>
                         <option value="midterm">Midterm</option>
-                        <option value="final">Final</option>
-                        <option value="practical">Practical</option>
-                        <option value="project">Project</option>
+                        <option value="final">Finals</option>
                       </select>
                     </div>
 

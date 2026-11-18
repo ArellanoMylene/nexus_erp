@@ -10,7 +10,6 @@ import {
   ClipboardCheck,
   Star,
   Download,
-  ClipboardList,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -23,13 +22,12 @@ const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const TABS = [
   { id: "students",    label: "Students",    icon: Users },
   { id: "enrollments", label: "Enrollments", icon: GraduationCap },
-  { id: "registration_forms", label: "Registration Forms", icon: ClipboardList },
   { id: "grades",      label: "Grades",      icon: Star },
 ];
 
 const COLUMNS = {
   students:    ["Student No.", "Name", "Program", "Year Level", "GPA", "Status"],
-  enrollments: ["Enrollment ID", "Student", "Program", "Academic Year", "Units", "Status"],
+  enrollments: ["Student No.", "Student", "Program", "Academic Year", "Total Units", "Status"],
   registration_forms: ["Enrollment ID", "Student", "Program", "Subject", "Period", "Year Level", "Status"],
   grades:      ["Student", "Course", "Period", "Raw Grade", "Final Grade", "Status"],
 };
@@ -209,7 +207,7 @@ const getExportShape = () => {
   if (activeTab === "enrollments") {
     return {
       rows: filtered.map((row) => ({
-        enrollment_id: row.enrollment_id || "",
+        student_number: row.student_number || row.student_id || "",
         student_name:  row.student_name  || "",
         program_code:  row.program_code  || "",
         academic_year: row.academic_year && row.semester
@@ -218,7 +216,7 @@ const getExportShape = () => {
         total_units:   row.total_units ?? 0,
         status:        row.enrollment_status || "",
       })),
-      headers: ["enrollment_id", "student_name", "program_code", "academic_year", "total_units", "status"],
+      headers: ["student_number", "student_name", "program_code", "academic_year", "total_units", "status"],
     };
   }
 
@@ -359,7 +357,7 @@ const getExportShape = () => {
       case "enrollments":
         cells = (
           <>
-            <td className="px-4 py-2">{item.enrollment_id}</td>
+            <td className="px-4 py-2">{item.student_number || item.student_id}</td>
             <td className="px-4 py-2 font-semibold text-slate-900">{item.student_name}</td>
             <td className="px-4 py-2">{item.program_code}</td>
             <td className="px-4 py-2">{item.academic_year} – {item.semester}</td>
