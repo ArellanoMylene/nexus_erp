@@ -6,7 +6,7 @@ const DigitalLibraryModel = {
     try {
       let query = `
         SELECT 
-          dl.*,
+          dl.*, dl.digital_id AS resource_id, dl.download_allowed AS allow_download,
           lb.title as linked_book_title,
           CONCAT(u.first_name, ' ', u.last_name) as uploaded_by_name
         FROM digital_library dl
@@ -46,7 +46,7 @@ const DigitalLibraryModel = {
     try {
       const query = `
         SELECT 
-          dl.*,
+          dl.*, dl.digital_id AS resource_id, dl.download_allowed AS allow_download,
           lb.title as linked_book_title,
           CONCAT(u.first_name, ' ', u.last_name) as uploaded_by_name
         FROM digital_library dl
@@ -102,7 +102,8 @@ const DigitalLibraryModel = {
       const values = [];
 
       const allowedFields = [
-        'title', 'author', 'category', 'description', 'cover_image_url',
+        'title', 'author', 'file_name', 'file_path', 'file_type', 'file_size',
+        'category', 'description', 'cover_image_url',
         'access_level', 'download_allowed', 'view_count', 'download_count'
       ];
 
@@ -121,7 +122,9 @@ const DigitalLibraryModel = {
       const query = `UPDATE digital_library SET ${fields.join(', ')} WHERE digital_id = ?`;
       
       const [result] = await pool.query(query, values);
-      return result.affectedRows > 0;
+      if (result.affectedRows > 0) return true;
+      const [existing] = await pool.query("SELECT digital_id FROM digital_library WHERE digital_id = ? LIMIT 1", [id]);
+      return existing.length > 0;
     } catch (error) {
       throw error;
     }

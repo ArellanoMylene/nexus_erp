@@ -148,7 +148,9 @@ const LibraryBooksModel = {
       const query = `UPDATE library_books SET ${fields.join(', ')} WHERE book_id = ?`;
       
       const [result] = await pool.query(query, values);
-      return result.affectedRows > 0;
+      if (result.affectedRows > 0) return true;
+      const [existing] = await pool.query("SELECT book_id FROM library_books WHERE book_id = ? LIMIT 1", [id]);
+      return existing.length > 0;
     } catch (error) {
       throw error;
     }

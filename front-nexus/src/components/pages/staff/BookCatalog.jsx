@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import {
   Plus,
@@ -125,10 +126,10 @@ const BookCatalog = () => {
       fetchBooks();
       fetchStatistics();
       closeModal();
-      window.alert(editMode ? "Book updated successfully." : "Book saved successfully.");
+      toast.success(editMode ? "Book updated successfully." : "Book saved successfully.");
     } catch (error) {
       console.error("Error saving book:", error);
-      window.alert(error.response?.data?.error || "Error saving book.");
+      toast.error(error.response?.data?.error || "Error saving book.");
     }
   };
 
@@ -169,10 +170,10 @@ const BookCatalog = () => {
         await axios.delete(`${API_BASE}/api/library/books/${id}`);
         fetchBooks();
         fetchStatistics();
-        window.alert("Book deleted successfully.");
+        toast.success("Book deleted successfully.");
       } catch (error) {
         console.error("Error deleting book:", error);
-        window.alert(error.response?.data?.error || "Error deleting book.");
+        toast.error(error.response?.data?.error || "Error deleting book.");
       }
     }
   };

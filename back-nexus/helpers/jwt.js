@@ -111,6 +111,11 @@ export const enforceApiAccess = (req, res, next) => {
   }
 
   if (resourcePath === "/users" || resourcePath.startsWith("/users/")) {
+    if (resourcePath === "/users" && method === "GET") {
+      const requestedRole = String(req.query?.role || "").trim().toLowerCase();
+      if (requestedRole === "student" && roleIs(req.user, "Admin", "HR", "Accounting", "Staff")) return next();
+      if (requestedRole === "faculty" && roleIs(req.user, "Admin", "HR", "Staff")) return next();
+    }
     if (/^\/users\/[^/]+$/.test(resourcePath) && method === "GET"
       && resourcePath.split("/").at(-1) === userId) return next();
     // Profile edits are limited to the account owner (or authorized administrators).
@@ -143,6 +148,11 @@ export const enforceApiAccess = (req, res, next) => {
   }
 
   if (resourcePath === "/payroll/my-payslips" && method === "GET") return next();
+
+  const employeeByUser = resourcePath.match(/^\/employees\/by-user\/([^/]+)$/);
+  if (employeeByUser && method === "GET") {
+    return roleIs(req.user, "Admin", "HR", "Accounting") || employeeByUser[1] === userId ? next() : deny(res);
+  }
 
   if (["/payroll", "/employees", "/deductions"].some(
     (prefix) => resourcePath === prefix || resourcePath.startsWith(`${prefix}/`),

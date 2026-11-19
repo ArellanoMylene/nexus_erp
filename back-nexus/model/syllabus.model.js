@@ -31,6 +31,27 @@ const SyllabusModel = {
         params.push(filters.period_id);
       }
 
+      if (filters.faculty_user_id) {
+        query += ` AND (
+          s.uploaded_by = ? OR EXISTS (
+            SELECT 1 FROM faculty_course_assignments fca
+            WHERE fca.faculty_user_id = ? AND fca.course_id = s.course_id
+              AND fca.academic_period_id = s.period_id
+          )
+        )`;
+        params.push(filters.faculty_user_id, filters.faculty_user_id);
+      }
+
+      if (filters.student_id) {
+        query += ` AND EXISTS (
+          SELECT 1 FROM enrollments e
+          WHERE e.student_id = ? AND e.course_id = s.course_id
+            AND (s.period_id IS NULL OR e.period_id = s.period_id)
+            AND LOWER(COALESCE(e.status, 'enrolled')) NOT IN ('dropped', 'withdrawn')
+        )`;
+        params.push(filters.student_id);
+      }
+
       if (filters.search) {
         query +=
           " AND (c.course_code LIKE ? OR c.course_title LIKE ? OR s.description LIKE ?)";

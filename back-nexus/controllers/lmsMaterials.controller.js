@@ -26,7 +26,8 @@ const lmsMaterialsController = {
 
       fs.writeFileSync(filePath, buffer);
 
-      const fileUrl = `/uploads/materials/${uniqueFilename}`;
+      const configuredBase = String(process.env.PUBLIC_API_URL || process.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+      const fileUrl = `${configuredBase}/uploads/materials/${encodeURIComponent(uniqueFilename)}`;
 
       res.status(200).json({
         success: true,

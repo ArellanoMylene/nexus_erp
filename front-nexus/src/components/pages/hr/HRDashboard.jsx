@@ -226,14 +226,14 @@ const HRDashboard = () => {
               description="Run payroll for current period"
               icon={FileText}
               color="bg-green-500"
-              onClick={() => (window.location.href = "/hr_payslip_generator")}
+              onClick={() => (window.location.href = "/hr/hr_payslip_generator")}
             />
             <QuickAction
               title="Approve Leave"
               description="Review and approve leave requests"
               icon={CalendarCheck}
               color="bg-blue-500"
-              onClick={() => (window.location.href = "/hr_staff_leave")}
+              onClick={() => (window.location.href = "/hr/hr_staff_leave")}
             />
             <QuickAction
               title="Manage Deductions"
@@ -241,7 +241,7 @@ const HRDashboard = () => {
               icon={CheckSquare}
               color="bg-purple-500"
               onClick={() =>
-                (window.location.href = "/hr_deduction_management")
+                (window.location.href = "/hr/hr_deduction_management")
               }
             />
             <QuickAction
@@ -249,7 +249,7 @@ const HRDashboard = () => {
               description="Access employee records"
               icon={Users}
               color="bg-blue-500"
-              onClick={() => (window.location.href = "/hr_employee_records")}
+              onClick={() => (window.location.href = "/hr/hr_employee_records")}
             />
           </div>
         </div>

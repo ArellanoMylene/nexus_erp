@@ -143,9 +143,9 @@ const StaffLeave = {
     let query = `
       SELECT 
         COUNT(*) as total_requests,
-        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) as approved,
-        SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
+        SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending_requests,
+        SUM(CASE WHEN status = 'Approved' THEN 1 ELSE 0 END) as approved_requests,
+        SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected_requests,
         SUM(CASE WHEN status = 'Approved' THEN total_days ELSE 0 END) as total_days_approved
       FROM staff_leave
       WHERE 1=1

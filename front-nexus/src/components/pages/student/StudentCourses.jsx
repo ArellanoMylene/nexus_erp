@@ -89,6 +89,7 @@ const StudentCourses = () => {
   const [enrollmentStatus, setEnrollmentStatus] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState(null);
+  const [dropTarget, setDropTarget] = useState(null);
 
   // Period/registration-form metadata (captured from the student's own
   // active enrollments so the Download button can build the PDF)
@@ -324,14 +325,20 @@ const StudentCourses = () => {
   };
 
   const handleDrop = async (enrollmentId) => {
-    if (!confirm("Are you sure you want to drop this subject?")) return;
+    setDropTarget(enrollmentId);
+  };
+
+  const confirmDrop = async () => {
+    if (!dropTarget) return;
 
     try {
-      await axios.delete(`${API_BASE}/api/enrollments/${enrollmentId}`);
+      await axios.delete(`${API_BASE}/api/enrollments/${dropTarget}`);
       fetchEnlistmentData();
       fetchEnrollmentStatus();
+      setDropTarget(null);
     } catch (error) {
       console.error("Error dropping:", error);
+      toast.error(error.response?.data?.message || "Unable to drop this subject.");
     }
   };
 
@@ -869,6 +876,18 @@ const StudentCourses = () => {
         )}
 
         {/* Confirmation Modal */}
+        {dropTarget && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Drop subject?</h3>
+              <p className="text-sm text-slate-600 mb-5">Are you sure you want to drop this subject?</p>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setDropTarget(null)} className="px-4 py-2 rounded-md bg-slate-200 text-slate-800">Cancel</button>
+                <button onClick={confirmDrop} className="px-4 py-2 rounded-md bg-red-600 text-white">Confirm Drop</button>
+              </div>
+            </div>
+          </div>
+        )}
         {showConfirmModal && selectedSubject && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white  rounded-lg max-w-md w-full p-6 shadow-xl">

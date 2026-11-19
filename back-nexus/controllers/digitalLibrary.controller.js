@@ -30,8 +30,12 @@ const DigitalLibraryController = {
 
   createDigitalResource: async (req, res) => {
     try {
+      const payload = {
+        ...req.body,
+        download_allowed: req.body.download_allowed ?? req.body.allow_download,
+      };
       const resource = await DigitalLibraryService.createDigitalResource(
-        req.body,
+        payload,
       );
       res.status(201).json(resource);
     } catch (error) {
@@ -41,9 +45,13 @@ const DigitalLibraryController = {
 
   updateDigitalResource: async (req, res) => {
     try {
+      const payload = {
+        ...req.body,
+        download_allowed: req.body.download_allowed ?? req.body.allow_download,
+      };
       const resource = await DigitalLibraryService.updateDigitalResource(
         req.params.id,
-        req.body,
+        payload,
       );
       res.status(200).json(resource);
     } catch (error) {
