@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import Select from "react-select";
 import {
@@ -90,12 +91,11 @@ const BorrowReturn = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/api/users`);
-      setUsers(
-        response.data.filter(
-          (user) => user.role === "Student" || user.role === "Faculty",
-        ),
-      );
+      const [students, faculty] = await Promise.all([
+        axios.get(`${API_BASE}/api/users?role=Student`),
+        axios.get(`${API_BASE}/api/users?role=Faculty`),
+      ]);
+      setUsers([...students.data, ...faculty.data]);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -137,10 +137,10 @@ const BorrowReturn = () => {
       fetchStatistics();
       fetchBooks();
       closeModal();
-      window.alert("Borrow transaction saved successfully.");
+      toast.success("Borrow transaction saved successfully.");
     } catch (error) {
       console.error("Error creating transaction:", error);
-      window.alert(error.response?.data?.error || "Error creating transaction.");
+      toast.error(error.response?.data?.error || "Error creating transaction.");
     }
   };
 
@@ -155,10 +155,10 @@ const BorrowReturn = () => {
       fetchStatistics();
       fetchBooks();
       closeReturnModal();
-      window.alert("Book returned successfully.");
+      toast.success("Book returned successfully.");
     } catch (error) {
       console.error("Error returning book:", error);
-      window.alert(error.response?.data?.error || "Error returning book.");
+      toast.error(error.response?.data?.error || "Error returning book.");
     }
   };
 

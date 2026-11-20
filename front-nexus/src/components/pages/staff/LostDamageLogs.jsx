@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import Select from "react-select";
 import {
@@ -80,8 +81,11 @@ const LostDamageLogs = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/api/users`);
-      setUsers(response.data);
+      const [students, faculty] = await Promise.all([
+        axios.get(`${API_BASE}/api/users?role=Student`),
+        axios.get(`${API_BASE}/api/users?role=Faculty`),
+      ]);
+      setUsers([...students.data, ...faculty.data]);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -116,10 +120,10 @@ const LostDamageLogs = () => {
       fetchIncidents();
       fetchStatistics();
       closeModal();
-      window.alert(currentIncident ? "Incident updated successfully." : "Incident saved successfully.");
+      toast.success(currentIncident ? "Incident updated successfully." : "Incident saved successfully.");
     } catch (error) {
       console.error("Error saving incident:", error);
-      window.alert(error.response?.data?.error || "Error saving incident.");
+      toast.error(error.response?.data?.error || "Error saving incident.");
     }
   };
 
@@ -146,10 +150,10 @@ const LostDamageLogs = () => {
         await axios.delete(`${API_BASE}/api/library/incidents/${id}`);
         fetchIncidents();
         fetchStatistics();
-        window.alert("Incident deleted successfully.");
+        toast.success("Incident deleted successfully.");
       } catch (error) {
         console.error("Error deleting incident:", error);
-        window.alert(error.response?.data?.error || "Error deleting incident.");
+        toast.error(error.response?.data?.error || "Error deleting incident.");
       }
     }
   };

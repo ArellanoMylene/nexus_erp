@@ -695,7 +695,7 @@ const confirmDelete = (id) => {
 
               {selectedMaterial.file_url && (
                 <a
-                  href={selectedMaterial.file_url}
+                  href={selectedMaterial.file_url?.startsWith("http") ? selectedMaterial.file_url : `${API_BASE}${selectedMaterial.file_url?.startsWith("/") ? "" : "/"}${selectedMaterial.file_url || ""}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"

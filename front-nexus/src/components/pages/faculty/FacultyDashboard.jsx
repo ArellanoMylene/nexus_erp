@@ -227,9 +227,9 @@ const FacultyDashboard = () => {
             Upcoming Classes
           </h2>
           <div className="space-y-2">
-            {dashboardData.upcomingClasses.map((course) => (
+            {dashboardData.upcomingClasses.length ? dashboardData.upcomingClasses.map((course) => (
               <UpcomingClass key={course.id} course={course} />
-            ))}
+            )) : <p className="py-6 text-center text-sm text-gray-500">No upcoming classes scheduled.</p>}
           </div>
         </div>
 

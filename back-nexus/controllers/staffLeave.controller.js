@@ -2,7 +2,7 @@ import StaffLeave from "../model/staffLeave.model.js";
 import EmployeeRecords from "../model/employeeRecords.model.js";
 
 const isHr = (req) => ["admin", "hr"].includes(String(req.user?.role || "").toLowerCase());
-const canRequestLeave = (req) => ["staff", "faculty"].includes(String(req.user?.role || "").toLowerCase());
+const canRequestLeave = (req) => ["staff", "faculty", "employee", "accounting"].includes(String(req.user?.role || "").toLowerCase());
 const denyLeave = (res) => res.status(403).json({ message: "You do not have permission to access this leave request" });
 const getCurrentEmployeeId = async (req) => {
   const rows = await EmployeeRecords.getByUserId(req.user.userId || req.user.user_id);

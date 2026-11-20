@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import axios from "axios";
 import {
   Plus,
@@ -105,10 +106,10 @@ const DigitalLibrary = () => {
       fetchResources();
       fetchStatistics();
       closeModal();
-      window.alert(currentResource ? "Resource updated successfully." : "Resource saved successfully.");
+      toast.success(currentResource ? "Resource updated successfully." : "Resource saved successfully.");
     } catch (error) {
       console.error("Error saving resource:", error);
-      window.alert(error.response?.data?.error || "Error saving resource.");
+      toast.error(error.response?.data?.error || "Error saving resource.");
     }
   };
 
@@ -136,10 +137,10 @@ const DigitalLibrary = () => {
         await axios.delete(`${API_BASE}/api/library/digital/${id}`);
         fetchResources();
         fetchStatistics();
-        window.alert("Resource deleted successfully.");
+        toast.success("Resource deleted successfully.");
       } catch (error) {
         console.error("Error deleting resource:", error);
-        window.alert(error.response?.data?.error || "Error deleting resource.");
+        toast.error(error.response?.data?.error || "Error deleting resource.");
       }
     }
   };
