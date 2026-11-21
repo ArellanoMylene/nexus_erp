@@ -21,6 +21,7 @@ const PayslipGenerator = () => {
   const [showPayslipModal, setShowPayslipModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showAutoCreateConfirm, setShowAutoCreateConfirm] = useState(false);
   const [selectedSetup, setSelectedSetup] = useState(null);
   const [eligibleEmployees, setEligibleEmployees] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -349,16 +350,18 @@ const resolveDepartment = (user) => {
     }
   };
 
-  const handleAutoCreatePayslips = async () => {
+  const handleAutoCreatePayslips = async (confirmed = false) => {
     if (!selectedSetup) {
       toast.warning("Please select a payroll period first");
       return;
     }
 
-    if (!window.confirm("Auto-generate payslips for all eligible employees in this period?")) {
+    if (!confirmed) {
+      setShowAutoCreateConfirm(true);
       return;
     }
 
+    setShowAutoCreateConfirm(false);
     setIsAutoCreating(true);
     try {
       const response = await api.post(
@@ -991,6 +994,42 @@ const resolveDepartment = (user) => {
                   disabled={isDeleting}
                   className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
                 >{isDeleting ? "Deleting..." : "Yes, delete"}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAutoCreateConfirm && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !isAutoCreating && setShowAutoCreateConfirm(false)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="auto-create-payslips-title"
+              className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2 id="auto-create-payslips-title" className="text-lg font-bold text-slate-900">
+                Generate payslips?
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Create payslips for all eligible employees in this payroll period? Existing payslips will be skipped.
+              </p>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAutoCreateConfirm(false)}
+                  disabled={isAutoCreating}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >Cancel</button>
+                <button
+                  type="button"
+                  onClick={() => handleAutoCreatePayslips(true)}
+                  disabled={isAutoCreating}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+                >{isAutoCreating ? "Generating..." : "Yes, generate payslips"}</button>
               </div>
             </div>
           </div>
