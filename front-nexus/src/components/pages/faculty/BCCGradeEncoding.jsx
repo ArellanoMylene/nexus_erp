@@ -62,6 +62,7 @@ const entryType = (key) => key === "quizzes" ? "assignment" : COMPONENTS.find((c
 const normalizeDepartmentName = (name) => String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
 const normalizeCourseCode = (code) => String(code || "").trim().toUpperCase().replace(/\s+/g, " ");
 const normalizeSectionName = (section) => String(section || "").trim().toUpperCase().replace(/\s+/g, " ");
+const formatStudentName = (student) => `${student.lastName}, ${[student.firstName, student.middleName, student.suffix].filter(Boolean).join(" ")}`.trim();
 const coordinatorLabelFor = (departmentName) => {
   const name = normalizeDepartmentName(departmentName);
   if (name.includes("PUBLIC ADMINISTRATION") || name === "BPA") return "BPA Coordinator";
@@ -249,7 +250,7 @@ function setWorksheetFormula(xml, address, formula, cachedValue = 0) {
 function setStudentColumnWidths(xml, students) {
   const longestText = (values) => values.reduce((longest, value) => Math.max(longest, String(value ?? "").trim().length), 0);
   const studentIdWidth = Math.max(10, longestText(students.map((student) => student.studentId)) + 2);
-  const studentNameWidth = Math.max(48 - studentIdWidth, longestText(students.map((student) => `${student.lastName}, ${student.firstName}`)) + 2);
+  const studentNameWidth = Math.max(48 - studentIdWidth, longestText(students.map(formatStudentName)) + 2);
   const setWidth = (worksheetXml, column, width) => {
     const pattern = new RegExp(`<col\\b(?=[^>]*\\bmin="${column}")(?=[^>]*\\bmax="${column}")[^>]*/>`);
     return worksheetXml.replace(pattern, (col) => col
@@ -370,7 +371,9 @@ export default function BCCGradeEncoding() {
           id: item.enrollment_id || item.student_id || item.user_id || index,
           studentId: item.student_number || item.student_id || item.user_id || "",
           firstName: item.first_name || item.student_name?.split(" ")?.[0] || item.name?.split(" ")?.[0] || "",
+          middleName: item.middle_name || "",
           lastName: item.last_name || item.student_name?.split(" ")?.slice(1).join(" ") || item.name?.split(" ")?.slice(1).join(" ") || "",
+          suffix: item.suffix || "",
           courseId: item.course_id,
           courseCode: item.course_code || "",
           periodId: item.period_id || item.academic_period_id,
@@ -404,7 +407,7 @@ export default function BCCGradeEncoding() {
     [courseId, courseStudents],
   );
   const visibleStudents = useMemo(() => courseStudents.filter((student) =>
-    `${student.firstName} ${student.lastName} ${student.studentId}`.toLowerCase().includes(search.toLowerCase()),
+    `${formatStudentName(student)} ${student.studentId}`.toLowerCase().includes(search.toLowerCase()),
   ), [courseStudents, search]);
 
   useEffect(() => {
@@ -701,7 +704,7 @@ export default function BCCGradeEncoding() {
         const row = student ? (rows[student.id] || EMPTY_ROW(quizCount)) : EMPTY_ROW(quizCount);
         const excelRow = 14 + index;
         gradingXml = setWorksheetCell(gradingXml, `A${excelRow}`, student ? String(student.studentId) : "");
-        gradingXml = setWorksheetCell(gradingXml, `B${excelRow}`, student ? `${student.lastName}, ${student.firstName}` : "");
+        gradingXml = setWorksheetCell(gradingXml, `B${excelRow}`, student ? formatStudentName(student) : "");
         quizCols.forEach((column, quizIndex) => { gradingXml = setWorksheetCell(gradingXml, `${column}${excelRow}`, row.quizzes[quizIndex] === "" ? "" : Number(row.quizzes[quizIndex])); });
         [[col("J"), "performance"], [col("L"), "attendance"], [col("O"), "project"], [col("Q"), "prelim"], [col("T"), "midterm"], [col("W"), "finals"]]
           .forEach(([column, key]) => { gradingXml = setWorksheetCell(gradingXml, `${column}${excelRow}`, row[key] === "" ? "" : Number(row[key])); });
@@ -813,8 +816,8 @@ export default function BCCGradeEncoding() {
       data.slice(headerIndex + 2).forEach((line, rowIndex) => {
         const name = String(line[0] || "").trim().toLowerCase(); if (!name) return;
         const student = isAppExport
-          ? visibleStudents.find((item) => `${item.lastName}, ${item.firstName}`.trim().toLowerCase() === name || String(item.studentId) === String(line[1]))
-          : visibleStudents.find((item) => String(item.studentId) === String(line[1]) || `${item.lastName}, ${item.firstName}`.trim().toLowerCase() === name)
+          ? visibleStudents.find((item) => formatStudentName(item).toLowerCase() === name || String(item.studentId) === String(line[1]))
+          : visibleStudents.find((item) => String(item.studentId) === String(line[1]) || formatStudentName(item).toLowerCase() === name)
             || (Number(line[0]) > 0 ? visibleStudents[Number(line[0]) - 1] : visibleStudents[rowIndex]);
         if (!student) return;
         imported[student.id] = isAppExport
@@ -912,7 +915,7 @@ export default function BCCGradeEncoding() {
           const weighted = (rating, weight) => rating === null ? "-" : (rating * weight / 100).toFixed(2);
           const shown = (rating) => rating === null ? "-" : rating.toFixed(2);
           return <tr key={student.id} className="hover:bg-slate-50">
-            <td className="border px-2 py-2 whitespace-nowrap">{student.studentId}</td><td className="border px-2 py-2 whitespace-nowrap">{student.lastName}, {student.firstName}</td>
+            <td className="border px-2 py-2 whitespace-nowrap">{student.studentId}</td><td className="border px-2 py-2 whitespace-nowrap">{formatStudentName(student)}</td>
             {Array.from({ length: quizCount }, (_, index) => <td key={index} className="border bg-blue-50 p-1 text-center">{input(student, "quizzes", index, maxScores.quizzes[index])}</td>)}
             <td className="border bg-blue-100 px-2 text-center">{quizTotal || "-"}</td><td className="border bg-blue-100 px-2 text-center">{shown(quizRating)}</td><td className="border bg-blue-100 px-2 text-center">{weighted(quizRating, 10)}</td>
             <td className="border bg-emerald-50 p-1 text-center">{input(student, "performance", null, maxScores.performance)}</td><td className="border bg-emerald-100 px-2 text-center">{weighted(performanceRating, 10)}</td>
