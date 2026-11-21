@@ -8,6 +8,8 @@ import {
   bulkUpdateEnrollments,
   updateEnrollment,
   deleteEnrollment,
+  transferStudentSection,
+  deleteStudentPeriodEnrollments,
   getStudentsByAssignment,
   getStudentsByFaculty,
 runSectioning
@@ -25,6 +27,8 @@ router.post("/enrollments/run-sectioning",runSectioning);
 // router.put("/enrollments/:id", enrollmentsController.updateEnrollment);
 // router.delete("/enrollments/:id", enrollmentsController.deleteEnrollment);
 router.get("/enrollments/student/:studentId", getEnrollmentsByStudent);
+router.put("/enrollments/student/:studentId/section", transferStudentSection);
+router.delete("/enrollments/student/:studentId/period/:periodId", deleteStudentPeriodEnrollments);
 router.get("/enrollments/:id", getEnrollmentById);
 router.post("/enrollments", createEnrollment);
 router.put("/enrollments/bulk", bulkUpdateEnrollments);

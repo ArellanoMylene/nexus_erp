@@ -91,7 +91,10 @@ const SectionsService = {
         section_name: s.section_name,
         occupied: Number(s.current_enrolled) || 0,
         assigned: 0,
-        max_capacity: Number(s.max_capacity) || 0,
+        // Match the admin UI and section creation default for legacy rows
+        // where max_capacity is NULL or zero; treating these as zero leaves
+        // every student unassigned even though the UI shows a 40-seat room.
+        max_capacity: Number(s.max_capacity) || 40,
       }));
 
     const assignments = [];

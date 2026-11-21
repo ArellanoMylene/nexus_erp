@@ -18,6 +18,8 @@ const IncomeExpensesReports = () => {
   const [transactions, setTransactions] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [summary, setSummary] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -149,14 +151,18 @@ const IncomeExpensesReports = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this transaction?")) {
-      try {
-        await api.delete(`/api/income-expenses/${id}`);
-        fetchTransactions();
-        fetchSummary();
-      } catch (error) {
-        console.error("Error deleting transaction:", error);
-      }
+    setDeleting(true);
+    try {
+      await api.delete(`/api/income-expenses/${id}`);
+      setDeleteTargetId(null);
+      fetchTransactions();
+      fetchSummary();
+      toast.success("Transaction deleted successfully");
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      toast.error(error.response?.data?.message || "Failed to delete transaction");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -468,7 +474,7 @@ const IncomeExpensesReports = () => {
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(transaction.transaction_id)}
+                          onClick={() => setDeleteTargetId(transaction.transaction_id)}
                           className="text-red-600  hover:text-red-800  transition-colors"
                           title="Delete"
                         >
@@ -778,6 +784,46 @@ const IncomeExpensesReports = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !deleting && setDeleteTargetId(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-transaction-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-transaction-title" className="text-lg font-bold text-slate-900">
+              Delete transaction?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete this transaction? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetId(null)}
+                disabled={deleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteTargetId)}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Yes, delete transaction"}
+              </button>
+            </div>
           </div>
         </div>
       )}

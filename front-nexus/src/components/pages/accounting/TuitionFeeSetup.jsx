@@ -12,11 +12,25 @@ import {
   SendHorizonal,
 } from "lucide-react";
 
+const ADDITIONAL_INVOICE_FEES = [
+  { name: "admission_fee", label: "Admission Fee" },
+  { name: "entrance_fee", label: "Entrance Fee" },
+  { name: "guidance_fee", label: "Guidance Fee" },
+  { name: "handbook_fee", label: "Handbook Fee" },
+  { name: "medical_dental_fee", label: "Medical & Dental Fee" },
+  { name: "computer_fee", label: "Computer Fee" },
+  { name: "cultural_fee", label: "Cultural Fee" },
+  { name: "development_fee", label: "Development Fee" },
+  { name: "nstp_fee", label: "NSTP Fee" },
+];
+
 const TuitionFeeSetup = () => {
   const [fees, setFees] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [filters, setFilters] = useState({
@@ -26,6 +40,7 @@ const TuitionFeeSetup = () => {
     search: "",
   });
   const [generatingId, setGeneratingId] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [genFeedback, setGenFeedback] = useState(null); // { type: 'success'|'error', message }
 
   const [formData, setFormData] = useState({
@@ -40,11 +55,23 @@ const TuitionFeeSetup = () => {
     registration_fee: 0,
     id_fee: 0,
     miscellaneous_fee: 0,
+    admission_fee: 0,
+    entrance_fee: 0,
+    guidance_fee: 0,
+    handbook_fee: 0,
+    medical_dental_fee: 0,
+    computer_fee: 0,
+    cultural_fee: 0,
+    development_fee: 0,
+    nstp_fee: 0,
     other_fees: 0,
+    discount_amount: 0,
+    scholarship_amount: 0,
     is_active: true,
   });
 
   const yearLevels = [
+    "All Levels",
     "1st Year",
     "2nd Year",
     "3rd Year",
@@ -98,18 +125,39 @@ const TuitionFeeSetup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.program_id || !formData.academic_period_id || !formData.year_level) {
+      toast.error("Select a program, year level, and academic period before saving.");
+      return;
+    }
+
+    setSaving(true);
     try {
+      const requestConfig = { timeout: 20000 };
       if (formData.fee_setup_id) {
-        await api.put(`/api/tuition-fees/${formData.fee_setup_id}`, formData);
+        await api.put(
+          `/api/tuition-fees/${formData.fee_setup_id}`,
+          formData,
+          requestConfig,
+        );
       } else {
-        await api.post(`/api/tuition-fees`, formData);
+        await api.post(`/api/tuition-fees`, formData, requestConfig);
       }
       setShowModal(false);
       resetForm();
       fetchFees();
+      toast.success("Tuition fee setup saved successfully");
     } catch (error) {
       console.error("Error saving fee:", error);
-      toast.error("Failed to save tuition fee setup");
+      toast.error(
+        (error.code === "ECONNABORTED"
+          ? "Saving timed out. Check the API/database connection and try again."
+          : null) ||
+          error.response?.data?.error ||
+          error.response?.data?.message ||
+          "Failed to save tuition fee setup",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -119,13 +167,19 @@ const TuitionFeeSetup = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this fee setup?")) {
-      try {
-        await api.delete(`/api/tuition-fees/${id}`);
-        fetchFees();
-      } catch (error) {
-        console.error("Error deleting fee:", error);
-      }
+    setDeleting(true);
+    try {
+      await api.delete(`/api/tuition-fees/${id}`);
+      setDeleteTargetId(null);
+      await fetchFees();
+      toast.success("Tuition fee setup deleted");
+    } catch (error) {
+      console.error("Error deleting fee:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to delete tuition fee setup",
+      );
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -172,21 +226,32 @@ const TuitionFeeSetup = () => {
       registration_fee: 0,
       id_fee: 0,
       miscellaneous_fee: 0,
+      admission_fee: 0,
+      entrance_fee: 0,
+      guidance_fee: 0,
+      handbook_fee: 0,
+      medical_dental_fee: 0,
+      computer_fee: 0,
+      cultural_fee: 0,
+      development_fee: 0,
+      nstp_fee: 0,
       other_fees: 0,
+      discount_amount: 0,
+      scholarship_amount: 0,
       is_active: true,
     });
   };
 
   const calculateTotal = () => {
-    return (
-      parseFloat(formData.tuition_fee || 0) +
-      parseFloat(formData.laboratory_fee || 0) +
-      parseFloat(formData.library_fee || 0) +
-      parseFloat(formData.athletic_fee || 0) +
-      parseFloat(formData.registration_fee || 0) +
-      parseFloat(formData.id_fee || 0) +
-      parseFloat(formData.miscellaneous_fee || 0) +
-      parseFloat(formData.other_fees || 0)
+    const feeTotal = [
+      "tuition_fee", "laboratory_fee", "library_fee", "athletic_fee",
+      "registration_fee", "id_fee", "miscellaneous_fee", "admission_fee",
+      "entrance_fee", "guidance_fee", "handbook_fee", "medical_dental_fee",
+      "computer_fee", "cultural_fee", "development_fee", "nstp_fee", "other_fees",
+    ].reduce((total, field) => total + parseFloat(formData[field] || 0), 0);
+    return Math.max(
+      feeTotal - parseFloat(formData.discount_amount || 0) - parseFloat(formData.scholarship_amount || 0),
+      0,
     );
   };
 
@@ -388,7 +453,7 @@ const TuitionFeeSetup = () => {
                           <Edit size={14} />
                         </button>
                         <button
-                          onClick={() => handleDelete(fee.fee_setup_id)}
+                          onClick={() => setDeleteTargetId(fee.fee_setup_id)}
                           title="Delete"
                           className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
@@ -539,7 +604,10 @@ const TuitionFeeSetup = () => {
                   >
                     <option value="">Select Program</option>
                     {programs.map((prog) => (
-                      <option key={prog.id} value={prog.id}>
+                      <option
+                        key={prog.program_id || prog.id}
+                        value={prog.program_id || prog.id}
+                      >
                         {prog.name}
                       </option>
                     ))}
@@ -576,7 +644,10 @@ const TuitionFeeSetup = () => {
                   >
                     <option value="">Select Period</option>
                     {periods.map((period) => (
-                      <option key={period.id} value={period.id}>
+                      <option
+                        key={period.period_id || period.id}
+                        value={period.period_id || period.id}
+                      >
                         {period.school_year} - {period.semester}
                       </option>
                     ))}
@@ -688,6 +759,22 @@ const TuitionFeeSetup = () => {
                     className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
                 </div>
+                {ADDITIONAL_INVOICE_FEES.map((fee) => (
+                  <div key={fee.name}>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">
+                      {fee.label}
+                    </label>
+                    <input
+                      type="number"
+                      name={fee.name}
+                      value={formData[fee.name]}
+                      onChange={handleInputChange}
+                      step="0.01"
+                      min="0"
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    />
+                  </div>
+                ))}
                 <div>
                   <label className="block text-xs font-medium text-slate-700  mb-1">
                     Other Fees
@@ -700,6 +787,33 @@ const TuitionFeeSetup = () => {
                     step="0.01"
                     className="w-full px-3 py-2 text-sm border border-slate-300  rounded-md   focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 pt-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-3">
+                  Discounts
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { name: "discount_amount", label: "Discount Amount" },
+                    { name: "scholarship_amount", label: "Scholarship Amount" },
+                  ].map((item) => (
+                    <div key={item.name}>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">
+                        {item.label}
+                      </label>
+                      <input
+                        type="number"
+                        name={item.name}
+                        value={formData[item.name]}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="0.01"
+                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -728,12 +842,53 @@ const TuitionFeeSetup = () => {
                 </button>
                 <button
                   type="submit"
+                  disabled={saving}
                   className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/30"
                 >
-                  Save Fee Setup
+                  {saving ? "Saving..." : "Save Fee Setup"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+          onClick={() => !deleting && setDeleteTargetId(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-fee-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 id="delete-fee-title" className="text-lg font-bold text-slate-900">
+              Delete tuition fee setup?
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete this fee setup? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetId(null)}
+                disabled={deleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteTargetId)}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Yes, delete setup"}
+              </button>
+            </div>
           </div>
         </div>
       )}

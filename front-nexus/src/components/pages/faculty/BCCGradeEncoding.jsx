@@ -60,6 +60,8 @@ function getGrade(row, maxScores) {
 const entryName = (key, index) => key === "quizzes" ? `BCC Quiz / Activity ${index + 1}` : `BCC ${COMPONENTS.find((component) => component.key === key)?.title || key}`;
 const entryType = (key) => key === "quizzes" ? "assignment" : COMPONENTS.find((component) => component.key === key)?.type;
 const normalizeDepartmentName = (name) => String(name || "").trim().toUpperCase().replace(/\s+/g, " ");
+const normalizeCourseCode = (code) => String(code || "").trim().toUpperCase().replace(/\s+/g, " ");
+const normalizeSectionName = (section) => String(section || "").trim().toUpperCase().replace(/\s+/g, " ");
 const coordinatorLabelFor = (departmentName) => {
   const name = normalizeDepartmentName(departmentName);
   if (name.includes("PUBLIC ADMINISTRATION") || name === "BPA") return "BPA Coordinator";
@@ -327,9 +329,9 @@ export default function BCCGradeEncoding() {
         setPeriodLabel([semester, schoolYear ? `F.Y. ${schoolYear}` : ""].filter(Boolean).join(" "));
         const assignmentSections = new Map();
         currentAssignments.forEach((item) => {
-          const id = String(item.course_id);
-          if (!assignmentSections.has(id)) assignmentSections.set(id, new Set());
-          assignmentSections.get(id).add(String(item.section || ""));
+          const code = normalizeCourseCode(item.course_code);
+          if (!assignmentSections.has(code)) assignmentSections.set(code, new Set());
+          assignmentSections.get(code).add(normalizeSectionName(item.section));
         });
         const coursesById = new Map();
         currentAssignments.forEach((item) => {
@@ -370,13 +372,14 @@ export default function BCCGradeEncoding() {
           firstName: item.first_name || item.student_name?.split(" ")?.[0] || item.name?.split(" ")?.[0] || "",
           lastName: item.last_name || item.student_name?.split(" ")?.slice(1).join(" ") || item.name?.split(" ")?.slice(1).join(" ") || "",
           courseId: item.course_id,
+          courseCode: item.course_code || "",
           periodId: item.period_id || item.academic_period_id,
           section: item.section_name || item.section || "",
           sectionId: item.section_id || null,
         }));
         setStudents(enrolled.filter((student) => {
-          const sections = assignmentSections.get(String(student.courseId));
-          return sections && (!activePeriodId || String(student.periodId) === activePeriodId) && sections.has(String(student.section));
+          const sections = assignmentSections.get(normalizeCourseCode(student.courseCode));
+          return sections && (!activePeriodId || String(student.periodId) === activePeriodId) && sections.has(normalizeSectionName(student.section));
         }));
         setPeriodId(String(active?.period_id ?? active?.id ?? active?.periodId ?? ""));
       } catch (error) {
@@ -387,21 +390,43 @@ export default function BCCGradeEncoding() {
     load();
   }, []);
 
+  const selectedCourse = courses.find((course) => String(course.id) === String(courseId));
+  const courseStudents = useMemo(() => {
+    if (!selectedCourse) return [];
+    const selectedCode = normalizeCourseCode(selectedCourse.code);
+    return students.filter((student) =>
+      String(student.courseId) === String(courseId)
+      || (selectedCode && normalizeCourseCode(student.courseCode) === selectedCode),
+    );
+  }, [students, selectedCourse, courseId]);
+  const selectedCourseIds = useMemo(
+    () => [...new Set([courseId, ...courseStudents.map((student) => student.courseId)].filter(Boolean).map(String))],
+    [courseId, courseStudents],
+  );
+  const visibleStudents = useMemo(() => courseStudents.filter((student) =>
+    `${student.firstName} ${student.lastName} ${student.studentId}`.toLowerCase().includes(search.toLowerCase()),
+  ), [courseStudents, search]);
+
   useEffect(() => {
-    if (!courseId || !periodId || !students.length) { setRows({}); setEntryIds({}); setLocked({}); return; }
+    if (!courseId || !periodId || !courseStudents.length) { setRows({}); setEntryIds({}); setLocked({}); return; }
     let cancelled = false;
     const loadEntries = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: courseId, period_id: periodId } });
-        const entries = response.data?.data || [];
+        const responses = await Promise.all(selectedCourseIds.map((selectedId) =>
+          axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: selectedId, period_id: periodId } }),
+        ));
+        const entries = responses.flatMap((response) => response.data?.data || []);
         const current = entries.filter(isBccGradeEntry);
         const nextRows = {};
         const nextIds = {};
         const nextLocks = {};
-        const studentByUserId = new Map(students.map((student) => [String(student.userId), student]));
+        const studentByUserAndCourse = new Map(courseStudents.map((student) => [
+          `${student.userId}:${student.courseId}`,
+          student,
+        ]));
         current.forEach((entry) => {
-          const student = studentByUserId.get(String(entry.student_id));
+          const student = studentByUserAndCourse.get(`${entry.student_id}:${entry.course_id}`);
           if (!student) return;
           const row = nextRows[student.id] || EMPTY_ROW(quizCount);
           const quizMatch = String(entry.component_name).match(/^BCC Quiz \/ Activity (\d+)$/i);
@@ -434,9 +459,7 @@ export default function BCCGradeEncoding() {
     };
     loadEntries();
     return () => { cancelled = true; };
-  }, [courseId, periodId, students]);
-
-  const visibleStudents = useMemo(() => courseId ? students.filter((student) => String(student.courseId) === String(courseId) && `${student.firstName} ${student.lastName} ${student.studentId}`.toLowerCase().includes(search.toLowerCase())) : [], [students, courseId, search]);
+  }, [courseId, periodId, courseStudents, selectedCourseIds]);
   const updateRow = (studentId, key, index, value) => setRows((prev) => {
     const row = { ...(prev[studentId] || EMPTY_ROW(quizCount)) };
     if (key === "quizzes") { row.quizzes = [...row.quizzes]; row.quizzes[index] = value; }
@@ -484,7 +507,7 @@ export default function BCCGradeEncoding() {
           return;
         }
         const payload = {
-          student_id: student.userId, course_id: Number(courseId), section_id: student.sectionId,
+          student_id: student.userId, course_id: Number(student.courseId), section_id: student.sectionId,
           period_id: Number(periodId), component_name: name, component_type: entryType(key),
           raw_score: rawScore, max_score: Number(max) || 100, weight, submitted_by: facultyId,
         };
@@ -497,9 +520,12 @@ export default function BCCGradeEncoding() {
       });
       if (!operations.length) return true;
       const results = await Promise.allSettled(operations.map(({ promise }) => promise));
-      const refresh = await axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: courseId, period_id: periodId } });
+      const refresh = await axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: student.courseId, period_id: periodId } });
       const saved = (refresh.data?.data || []).filter(isBccGradeEntry);
-      const studentEntries = saved.filter((entry) => String(entry.student_id) === String(student.userId));
+      const studentEntries = saved.filter((entry) =>
+        String(entry.student_id) === String(student.userId)
+        && String(entry.course_id) === String(student.courseId),
+      );
       const savedByComponent = new Map(studentEntries.map((entry) => [entry.component_name, entry]));
       const failed = results.some((result) => result.status === "rejected" || result.value?.data?.success === false);
       const mismatches = operations.filter((operation) => {
@@ -558,11 +584,11 @@ export default function BCCGradeEncoding() {
           if (locked[idKey]) return;
           const rawScore = parseScore(score);
           if (rawScore === null) {
-            if (entryIds[idKey]) operations.push({ promise: axios.delete(`${API_BASE}/api/grade-entries/${entryIds[idKey]}`), studentId: student.userId, componentName: name, delete: true });
+            if (entryIds[idKey]) operations.push({ promise: axios.delete(`${API_BASE}/api/grade-entries/${entryIds[idKey]}`), studentId: student.userId, courseId: student.courseId, componentName: name, delete: true });
             return;
           }
           const payload = {
-            student_id: student.userId, course_id: Number(courseId), section_id: student.sectionId,
+            student_id: student.userId, course_id: Number(student.courseId), section_id: student.sectionId,
             period_id: Number(periodId),
             component_name: name, component_type: entryType(key), raw_score: rawScore,
             max_score: Number(max) || 100, weight, submitted_by: facultyId,
@@ -571,7 +597,7 @@ export default function BCCGradeEncoding() {
             promise: entryIds[idKey]
               ? axios.put(`${API_BASE}/api/grade-entries/${entryIds[idKey]}`, payload)
               : axios.post(`${API_BASE}/api/grade-entries`, payload),
-            studentId: student.userId, componentName: name, rawScore,
+            studentId: student.userId, courseId: student.courseId, componentName: name, rawScore,
           });
         });
       });
@@ -582,17 +608,22 @@ export default function BCCGradeEncoding() {
       const results = await Promise.allSettled(operations.map((operation) => operation.promise));
       const failed = results.filter((result) => result.status === "rejected" || result.value?.data?.success === false);
       const successfulCount = results.length - failed.length;
-      const refresh = await axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: courseId, period_id: periodId } });
-      const saved = (refresh.data?.data || []).filter(isBccGradeEntry);
-      const savedByStudentAndComponent = new Map(saved.map((entry) => [`${entry.student_id}:${entry.component_name}`, entry]));
+      const refreshed = await Promise.all(selectedCourseIds.map((selectedId) =>
+        axios.get(`${API_BASE}/api/grade-entries`, { params: { course_id: selectedId, period_id: periodId } }),
+      ));
+      const saved = refreshed.flatMap((response) => response.data?.data || []).filter(isBccGradeEntry);
+      const savedByStudentAndComponent = new Map(saved.map((entry) => [`${entry.student_id}:${entry.course_id}:${entry.component_name}`, entry]));
       const mismatches = operations.filter((operation) => {
-        const stored = savedByStudentAndComponent.get(`${operation.studentId}:${operation.componentName}`);
+        const stored = savedByStudentAndComponent.get(`${operation.studentId}:${operation.courseId}:${operation.componentName}`);
         return operation.delete ? Boolean(stored) : !stored || Number(stored.raw_score) !== operation.rawScore;
       });
       const ids = {};
       const locks = {};
       saved.forEach((entry) => {
-        const student = students.find((item) => String(item.userId) === String(entry.student_id));
+        const student = courseStudents.find((item) =>
+          String(item.userId) === String(entry.student_id)
+          && String(item.courseId) === String(entry.course_id),
+        );
         if (!student) return;
         const key = `${student.id}:${entry.component_name}`;
         ids[key] = entry.entry_id;
@@ -808,8 +839,6 @@ export default function BCCGradeEncoding() {
     }} className="w-16 rounded border border-slate-300 px-1 py-1 text-center disabled:bg-slate-100" />;
   };
   const maxInput = (key, index, title) => <input aria-label={`${title} maximum score`} type="number" min="1" value={key === "quizzes" ? maxScores.quizzes[index] : maxScores[key]} onChange={(event) => updateMax(key, index, event.target.value)} className="w-14 rounded border border-slate-300 px-1 py-1 text-center" />;
-  const selectedCourse = courses.find((course) => String(course.id) === String(courseId));
-
   return <div className="p-4 space-y-4">
     <ToastContainer position="top-right" />
     <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">

@@ -47,7 +47,31 @@ const LibraryBooksService = {
 
   updateBook: async (id, bookData) => {
     try {
-      const updated = await LibraryBooksModel.updateBook(id, bookData);
+      if (!bookData.title?.trim() || !bookData.author?.trim() || !bookData.category?.trim()) {
+        throw new Error("Title, author, and category are required");
+      }
+
+      const normalizedData = {
+        ...bookData,
+        title: bookData.title.trim(),
+        author: bookData.author.trim(),
+        category: bookData.category.trim(),
+      };
+      for (const field of ["publication_year", "pages", "price"]) {
+        const value = normalizedData[field];
+        normalizedData[field] = value === "" || value === null || value === undefined
+          ? null
+          : Number(value);
+        if (normalizedData[field] !== null && !Number.isFinite(normalizedData[field])) {
+          throw new Error(`${field.replaceAll("_", " ")} must be a valid number`);
+        }
+      }
+      if (normalizedData.date_acquired === "") normalizedData.date_acquired = null;
+      for (const field of ["isbn", "publisher", "edition", "subcategory", "shelf_location", "dewey_decimal", "call_number", "description", "cover_image_url"]) {
+        if (normalizedData[field] === "") normalizedData[field] = null;
+      }
+
+      const updated = await LibraryBooksModel.updateBook(id, normalizedData);
       if (!updated) {
         throw new Error("Book not found or not updated");
       }

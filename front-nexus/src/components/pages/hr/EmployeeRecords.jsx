@@ -476,6 +476,8 @@ function EmployeeRecords() {
   // view modal
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingUser, setViewingUser] = useState(null);
+  const [deleteTargetUser, setDeleteTargetUser] = useState(null);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
 
   // search / filter / pagination / sort
   const [query, setQuery] = useState("");
@@ -801,20 +803,22 @@ function EmployeeRecords() {
     setIsViewModalOpen(true);
   };
 
-  const handleDelete = async (userId) => {
-    if (!confirm("Delete this user? This action cannot be undone.")) return;
-
+  const handleDelete = async (user) => {
+    setIsDeletingUser(true);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/${user.user_id}`,
       );
 
-      setUsers((prev) => prev.filter((u) => u.user_id !== userId));
+      setUsers((prev) => prev.filter((u) => u.user_id !== user.user_id));
+      setDeleteTargetUser(null);
 
       toast.success("User deleted successfully");
     } catch (err) {
       console.error(err);
       toast.error(`Error deleting user: ${err.response?.data?.message || err.message}`,);
+    } finally {
+      setIsDeletingUser(false);
     }
   };
 
@@ -1582,7 +1586,7 @@ function EmployeeRecords() {
                       </button>
 
                       <button
-                        onClick={() => handleDelete(user.user_id)}
+                        onClick={() => setDeleteTargetUser(user)}
                         className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition"
                         title="Delete Record"
                       >
@@ -1730,6 +1734,37 @@ function EmployeeRecords() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <Modal
+        isOpen={deleteTargetUser !== null}
+        onClose={() => !isDeletingUser && setDeleteTargetUser(null)}
+        title="Delete user?"
+        size="sm"
+      >
+        <p className="text-sm text-slate-600">
+          Delete {deleteTargetUser?.first_name || deleteTargetUser?.name || "this user"}?
+          This action cannot be undone.
+        </p>
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setDeleteTargetUser(null)}
+            disabled={isDeletingUser}
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDelete(deleteTargetUser)}
+            disabled={isDeletingUser}
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {isDeletingUser ? "Deleting..." : "Yes, delete user"}
+          </button>
+        </div>
       </Modal>
 
       {/* VIEW DETAILS MODAL */}

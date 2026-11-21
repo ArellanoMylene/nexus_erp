@@ -1,9 +1,16 @@
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
+import Select from "react-select";
 import api from "../../../api/axios";
 import { Plus, Edit, Trash2, Search, FileText, ChevronLeft, ChevronRight, Users } from "lucide-react";
 
 const STAFF_ROLES = ["Faculty", "Admin", "HR", "Accounting", "Staff"];
+const STAFF_ROLE_KEYS = new Set(STAFF_ROLES.map((role) => role.toLowerCase()));
+const formatDateInput = (value) => {
+  if (!value) return "";
+  if (!(value instanceof Date)) return String(value).slice(0, 10);
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+};
 
 const ALL_FEE_FIELDS = [
   { name: "tuition_fee",       label: "Tuition Fee" },
@@ -12,6 +19,7 @@ const ALL_FEE_FIELDS = [
   { name: "athletic_fee",      label: "Athletic Fee" },
   { name: "registration_fee",  label: "Registration Fee" },
   { name: "id_fee",            label: "School ID Fee" },
+  { name: "miscellaneous_fee", label: "Miscellaneous Fee" },
   { name: "admission_fee",     label: "Admission Fee" },
   { name: "entrance_fee",      label: "Entrance Fee" },
   { name: "guidance_fee",      label: "Guidance Fee" },
@@ -21,6 +29,7 @@ const ALL_FEE_FIELDS = [
   { name: "cultural_fee",      label: "Cultural Fee" },
   { name: "development_fee",   label: "Development Fee" },
   { name: "nstp_fee",          label: "NSTP Fee" },
+  { name: "other_fees",        label: "Other Fees" },
 ];
 
 const EMPTY_FORM = {
@@ -33,6 +42,7 @@ const EMPTY_FORM = {
   athletic_fee:        0,
   registration_fee:    0,
   id_fee:              0,
+  miscellaneous_fee:   0,
   admission_fee:       0,
   entrance_fee:        0,
   guidance_fee:        0,
@@ -42,6 +52,7 @@ const EMPTY_FORM = {
   cultural_fee:        0,
   development_fee:     0,
   nstp_fee:            0,
+  other_fees:          0,
   discount_amount:     0,
   scholarship_amount:  0,
   invoice_date:        new Date().toISOString().split("T")[0],
@@ -56,12 +67,15 @@ const InvoiceManagement = () => {
   const [periods,        setPeriods]        = useState([]);
   const [showModal,      setShowModal]      = useState(false);
   const [showStaffModal, setShowStaffModal] = useState(false);
+  const [deleteInvoiceTarget, setDeleteInvoiceTarget] = useState(null);
+  const [isDeletingInvoice, setIsDeletingInvoice] = useState(false);
   const [summary,        setSummary]        = useState({});
   const [filters,        setFilters]        = useState({ status: "", academic_period_id: "", search: "" });
   const [currentPage,    setCurrentPage]    = useState(1);
   const [itemsPerPage]                      = useState(10);
   const [formData,       setFormData]       = useState(EMPTY_FORM);
   const [staffFormData,  setStaffFormData]  = useState({
+    invoice_id:         null,
     user_id:            "",
     academic_period_id: "",
     fee_label:          "",
@@ -82,18 +96,27 @@ const InvoiceManagement = () => {
 
   const fetchStudents = async () => {
     try {
-      const res = await api.get(`/api/users`);
+      const res = await api.get(`/api/users`, { params: { role: "Student" } });
       const all = res.data.users || res.data.data || res.data || [];
-      setStudents(all.filter((u) => u.role === "Student"));
-    } catch (e) { console.error("Error fetching students:", e); }
+      setStudents(all.filter((u) => String(u.role || "").trim().toLowerCase() === "student"));
+    } catch (e) {
+      console.error("Error fetching students:", e);
+      toast.error(e.response?.data?.message || "Could not load students for invoices.");
+    }
   };
 
   const fetchStaffUsers = async () => {
     try {
-      const res = await api.get(`/api/users`);
-      const all = res.data.users || res.data.data || res.data || [];
-      setStaffUsers(all.filter((u) => STAFF_ROLES.includes(u.role)));
-    } catch (e) { console.error("Error fetching staff:", e); }
+      const responses = await Promise.all(STAFF_ROLES.map((role) =>
+        api.get(`/api/users`, { params: { role } }),
+      ));
+      const users = responses.flatMap((res) => res.data.users || res.data.data || res.data || []);
+      const uniqueUsers = [...new Map(users.map((user) => [String(user.user_id), user])).values()];
+      setStaffUsers(uniqueUsers.filter((user) => STAFF_ROLE_KEYS.has(String(user.role || "").trim().toLowerCase())));
+    } catch (e) {
+      console.error("Error fetching staff:", e);
+      toast.error(e.response?.data?.message || "Could not load faculty and staff for invoices.");
+    }
   };
 
   const fetchInvoices = async () => {
@@ -133,6 +156,10 @@ const InvoiceManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.student_id || !formData.academic_period_id) {
+      toast.error("Select a student and academic period for the student invoice.");
+      return;
+    }
     try {
       const invoiceData = {
         ...formData,
@@ -149,9 +176,10 @@ const InvoiceManagement = () => {
       resetForm();
       fetchInvoices();
       fetchSummary();
+      toast.success(formData.invoice_id ? "Invoice updated successfully." : "Invoice created successfully.");
     } catch (e) {
       console.error("Error saving invoice:", e);
-      toast.error("Failed to save invoice");
+      toast.error(e.response?.data?.error || e.response?.data?.message || "Failed to save invoice.");
     }
   };
 
@@ -178,25 +206,28 @@ const InvoiceManagement = () => {
         status:             "Pending",
         notes:              `[STAFF INVOICE] ${staffFormData.fee_label}${staffFormData.notes ? " — " + staffFormData.notes : ""}`,
       };
-      await api.post(`/api/invoices`, invoiceData);
-
-      await api.post(`/api/income-expenses`, {
-        transaction_type: "Income",
-        category:         "Other Fees",
-        amount,
-        transaction_date: staffFormData.invoice_date,
-        department:       selectedUser?.department || "General",
-        description:      `Staff invoice — ${staffFormData.fee_label} for ${selectedUser?.first_name ?? ""} ${selectedUser?.last_name ?? ""} (${selectedUser?.role ?? ""})`,
-        reference_number: "",
-        payment_method:   "Cash",
-        recorded_by:      "Accounting",
-      });
+      if (staffFormData.invoice_id) {
+        await api.put(`/api/invoices/${staffFormData.invoice_id}`, invoiceData);
+      } else {
+        await api.post(`/api/invoices`, invoiceData);
+        await api.post(`/api/income-expenses`, {
+          transaction_type: "Income",
+          category:         "Other Fees",
+          amount,
+          transaction_date: staffFormData.invoice_date,
+          department:       selectedUser?.department || "General",
+          description:      `Staff invoice — ${staffFormData.fee_label} for ${selectedUser?.first_name ?? ""} ${selectedUser?.last_name ?? ""} (${selectedUser?.role ?? ""})`,
+          reference_number: "",
+          payment_method:   "Cash",
+          recorded_by:      "Accounting",
+        });
+      }
 
       setShowStaffModal(false);
       resetStaffForm();
       fetchInvoices();
       fetchSummary();
-      toast.success("Staff invoice created and recorded as income successfully.");
+      toast.success(staffFormData.invoice_id ? "Staff invoice updated successfully." : "Staff invoice created and recorded as income successfully.");
     } catch (e) {
       console.error("Error saving staff invoice:", e);
       toast.error("Failed to save staff invoice: " + JSON.stringify(e.response?.data || e.message));
@@ -204,23 +235,60 @@ const InvoiceManagement = () => {
   };
 
   const handleEdit = (invoice) => {
-    // Merge invoice data into EMPTY_FORM so new fee fields are always present
-    setFormData({ ...EMPTY_FORM, ...invoice });
+    if (invoice.notes?.startsWith("[STAFF INVOICE]")) {
+      const staffNote = invoice.notes.replace(/^\[STAFF INVOICE\]\s*/, "");
+      const [feeLabel, ...noteParts] = staffNote.split(" — ");
+      setStaffFormData({
+        invoice_id: invoice.invoice_id,
+        user_id: invoice.student_id == null ? "" : String(invoice.student_id),
+        academic_period_id: invoice.academic_period_id == null ? "" : String(invoice.academic_period_id),
+        fee_label: feeLabel || "",
+        amount: invoice.other_fees ?? invoice.total_amount ?? 0,
+        invoice_date: formatDateInput(invoice.invoice_date),
+        due_date: formatDateInput(invoice.due_date),
+        notes: noteParts.join(" — "),
+      });
+      setShowStaffModal(true);
+      return;
+    }
+    // Keep the exact linked user and nullable period selected in the form.
+    setFormData({
+      ...EMPTY_FORM,
+      ...invoice,
+      student_id: invoice.student_id == null ? "" : String(invoice.student_id),
+      academic_period_id: invoice.academic_period_id == null ? "" : String(invoice.academic_period_id),
+      invoice_date: formatDateInput(invoice.invoice_date) || EMPTY_FORM.invoice_date,
+      due_date: formatDateInput(invoice.due_date),
+    });
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this invoice?")) return;
+  const handleDelete = (invoice) => setDeleteInvoiceTarget(invoice);
+
+  const confirmDeleteInvoice = async () => {
+    if (!deleteInvoiceTarget || isDeletingInvoice) return;
+    setIsDeletingInvoice(true);
     try {
-      await api.delete(`/api/invoices/${id}`);
-      fetchInvoices();
-      fetchSummary();
-    } catch (e) { console.error("Error deleting invoice:", e); }
+      await api.delete(`/api/invoices/${deleteInvoiceTarget.invoice_id}`);
+      await Promise.all([fetchInvoices(), fetchSummary()]);
+      setDeleteInvoiceTarget(null);
+      toast.success("Invoice deleted successfully.");
+    } catch (e) {
+      console.error("Error deleting invoice:", e);
+      toast.error(e.response?.data?.error || e.response?.data?.message || "Failed to delete invoice.");
+    } finally {
+      setIsDeletingInvoice(false);
+    }
   };
+
+  const studentOptions = students.map((student) => ({
+    value: String(student.user_id),
+    label: `${student.student_number ? `${student.student_number} - ` : ""}${student.first_name} ${student.last_name}`.trim(),
+  }));
 
   const resetForm      = () => setFormData(EMPTY_FORM);
   const resetStaffForm = () => setStaffFormData({
-    user_id: "", academic_period_id: "", fee_label: "", amount: 0,
+    invoice_id: null, user_id: "", academic_period_id: "", fee_label: "", amount: 0,
     invoice_date: new Date().toISOString().split("T")[0], due_date: "", notes: "",
   });
 
@@ -347,7 +415,7 @@ const InvoiceManagement = () => {
                   <td className="px-4 py-2 whitespace-nowrap">
                     <div className="flex gap-2">
                       <button onClick={() => handleEdit(inv)} className="text-indigo-600 hover:text-indigo-800  " title="Edit"><Edit size={18} /></button>
-                      <button onClick={() => handleDelete(inv.invoice_id)} className="text-red-600 hover:text-red-800  " title="Delete"><Trash2 size={18} /></button>
+                      <button onClick={() => handleDelete(inv)} className="text-red-600 hover:text-red-800  " title="Delete"><Trash2 size={18} /></button>
                     </div>
                   </td>
                 </tr>
@@ -397,18 +465,28 @@ const InvoiceManagement = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-slate-700  mb-1">Student *</label>
-                  <select name="student_id" value={formData.student_id} onChange={handleInputChange} required className={inputCls}>
-                    <option value="">Select Student</option>
-                    {students.map((s) => (
-                      <option key={s.user_id} value={s.user_id}>
-                        {s.student_number ? `${s.student_number} - ` : ""}{s.first_name} {s.last_name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    inputId="student-invoice-recipient"
+                    options={studentOptions}
+                    value={studentOptions.find((option) => option.value === String(formData.student_id)) || null}
+                    onChange={(option) => setFormData((current) => ({ ...current, student_id: option?.value || "" }))}
+                    placeholder="Search or select a student..."
+                    isSearchable
+                    isClearable
+                    noOptionsMessage={() => "No students found"}
+                    className="text-sm"
+                    classNamePrefix="react-select"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-700  mb-1">Academic Period *</label>
-                  <select name="academic_period_id" value={formData.academic_period_id} onChange={handleInputChange} required className={inputCls}>
+                  <select
+                    name="academic_period_id"
+                    value={formData.academic_period_id}
+                    onChange={handleInputChange}
+                    required
+                    className={inputCls}
+                  >
                     <option value="">Select Period</option>
                     {periods.map((p) => <option key={p.period_id} value={p.period_id}>{p.school_year} - {p.semester}</option>)}
                   </select>
@@ -490,7 +568,7 @@ const InvoiceManagement = () => {
             <div className="sticky top-0 flex justify-between items-center px-4 py-3 border-b border-slate-200  bg-amber-50  rounded-t-lg z-10">
               <div className="flex items-center gap-2">
                 <Users size={18} className="text-amber-600 " />
-                <h3 className="text-lg font-bold text-slate-900 ">Staff / Faculty Invoice</h3>
+                <h3 className="text-lg font-bold text-slate-900 ">{staffFormData.invoice_id ? "Edit Staff / Faculty Invoice" : "Staff / Faculty Invoice"}</h3>
               </div>
               <button onClick={() => { setShowStaffModal(false); resetStaffForm(); }} className="p-1 text-slate-400 hover:text-slate-600 ">
                 <Plus size={18} className="rotate-45" />
@@ -506,7 +584,7 @@ const InvoiceManagement = () => {
                   className={inputCls.replace("focus:ring-indigo-500 focus:border-indigo-500", "focus:ring-amber-500 focus:border-amber-500")}>
                   <option value="">Select Member</option>
                   {STAFF_ROLES.map((role) => {
-                    const group = staffUsers.filter((u) => u.role === role);
+                    const group = staffUsers.filter((u) => String(u.role || "").trim().toLowerCase() === role.toLowerCase());
                     if (!group.length) return null;
                     return (
                       <optgroup key={role} label={role}>
@@ -564,10 +642,44 @@ const InvoiceManagement = () => {
                   Cancel
                 </button>
                 <button type="submit" className="px-3 py-1.5 text-sm bg-amber-600 text-white rounded-md hover:bg-amber-700 shadow-md shadow-amber-500/30">
-                  Create Staff Invoice
+                  {staffFormData.invoice_id ? "Update Staff Invoice" : "Create Staff Invoice"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteInvoiceTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !isDeletingInvoice && setDeleteInvoiceTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-invoice-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 id="delete-invoice-title" className="text-lg font-bold text-slate-900">Delete invoice?</h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete invoice <strong>{deleteInvoiceTarget.invoice_number}</strong> for <strong>{deleteInvoiceTarget.student_name}</strong>? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteInvoiceTarget(null)}
+                disabled={isDeletingInvoice}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={confirmDeleteInvoice}
+                disabled={isDeletingInvoice}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeletingInvoice ? "Deleting..." : "Yes, delete invoice"}</button>
+            </div>
           </div>
         </div>
       )}

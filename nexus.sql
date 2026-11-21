@@ -911,7 +911,7 @@ CREATE INDEX idx_grade_computation_period ON grade_computation_settings(period_i
 CREATE TABLE tuition_fee_setup (
     fee_setup_id INT AUTO_INCREMENT PRIMARY KEY,
     program_id INT,
-    year_level ENUM('1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year') NOT NULL,
+    year_level ENUM('All Levels', '1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year') NOT NULL,
     academic_period_id INT,
     
     tuition_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
@@ -921,12 +921,26 @@ CREATE TABLE tuition_fee_setup (
     registration_fee DECIMAL(10,2) DEFAULT 0.00,
     id_fee DECIMAL(10,2) DEFAULT 0.00,
     miscellaneous_fee DECIMAL(10,2) DEFAULT 0.00,
+    admission_fee DECIMAL(10,2) DEFAULT 0.00,
+    entrance_fee DECIMAL(10,2) DEFAULT 0.00,
+    guidance_fee DECIMAL(10,2) DEFAULT 0.00,
+    handbook_fee DECIMAL(10,2) DEFAULT 0.00,
+    medical_dental_fee DECIMAL(10,2) DEFAULT 0.00,
+    computer_fee DECIMAL(10,2) DEFAULT 0.00,
+    cultural_fee DECIMAL(10,2) DEFAULT 0.00,
+    development_fee DECIMAL(10,2) DEFAULT 0.00,
+    nstp_fee DECIMAL(10,2) DEFAULT 0.00,
     other_fees DECIMAL(10,2) DEFAULT 0.00,
+    discount_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    scholarship_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     
-    total_fee DECIMAL(10,2) GENERATED ALWAYS AS (
+    total_fee DECIMAL(10,2) GENERATED ALWAYS AS (GREATEST(0.00,
         tuition_fee + laboratory_fee + library_fee + athletic_fee + 
-        registration_fee + id_fee + miscellaneous_fee + other_fees
-    ) STORED,
+        registration_fee + id_fee + miscellaneous_fee + admission_fee +
+        entrance_fee + guidance_fee + handbook_fee + medical_dental_fee +
+        computer_fee + cultural_fee + development_fee + nstp_fee + other_fees -
+        discount_amount - scholarship_amount
+    )) STORED,
     
     is_active BOOLEAN DEFAULT TRUE,
     created_by INT,

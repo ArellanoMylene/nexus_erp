@@ -40,6 +40,25 @@ const validateEnrollmentData = (data) => {
   return cleanData;
 };
 
+const ensureCourseCurriculum = async (courseIds, curriculumType) => {
+  if (!curriculumType || !courseIds.length) return;
+  const normalizeCurriculum = (value) => String(value || "Old")
+    .trim()
+    .replace(/\s+curriculum$/i, "")
+    .toLowerCase();
+  const placeholders = courseIds.map(() => "?").join(", ");
+  const [rows] = await db.query(
+    `SELECT course_id, COALESCE(NULLIF(curriculum_type, ''), 'Old') AS curriculum_type
+     FROM courses WHERE course_id IN (${placeholders})`,
+    courseIds,
+  );
+  const expected = normalizeCurriculum(curriculumType);
+  const mismatched = rows.filter((row) => normalizeCurriculum(row.curriculum_type) !== expected);
+  if (mismatched.length) {
+    throw new Error(`Selected course(s) do not belong to the ${curriculumType} Curriculum.`);
+  }
+};
+
 // Get all enrollments
 export const listEnrollments = async (filters = {}) => {
   return await enrollmentModel.getAllEnrollments(filters);
@@ -63,6 +82,7 @@ export const getEnrollment = async (id) => {
 // bulk, via runSectioning().
 export const addEnrollment = async (data) => {
   const cleanData = validateEnrollmentData(data);
+  await ensureCourseCurriculum([cleanData.course_id], cleanData.curriculum_type);
 
   const exists = await enrollmentModel.checkEnrollmentExists(
     cleanData.student_id,
@@ -136,6 +156,8 @@ export const addEnrollments = async (data) => {
     .map((courseId) => String(courseId)))];
   if (!studentIds.length) throw new Error("At least one Student ID is required");
   if (!courseIds.length) throw new Error("At least one Course ID is required");
+  if (!data.curriculum_type) throw new Error("Curriculum Type is required for bulk enrollment");
+  await ensureCourseCurriculum(courseIds, data.curriculum_type);
 
   const cleanEnrollments = studentIds.flatMap((studentId) => courseIds.map((courseId) =>
     validateEnrollmentData({
@@ -295,6 +317,27 @@ export const removeEnrollment = async (id) => {
   return await enrollmentModel.deleteEnrollment(id);
 };
 
+export const transferStudentSection = async (data) => {
+  const { student_id, period_id, program_id, year_level, section_id } = data;
+  if (!student_id || !period_id || !program_id || !year_level || !section_id) {
+    throw new Error("Student, academic period, program, year level, and section are required");
+  }
+  const targetSection = await SectionsModel.getSectionById(section_id);
+  if (!targetSection || targetSection.status === "inactive") {
+    throw new Error("Selected section is unavailable");
+  }
+  return enrollmentModel.transferStudentSection({
+    student_id, period_id, program_id, year_level, section_id,
+  });
+};
+
+export const removeStudentPeriodEnrollments = async (student_id, period_id) => {
+  if (!student_id || !period_id) throw new Error("Student and academic period are required");
+  const deleted = await enrollmentModel.deleteStudentPeriodEnrollments(student_id, period_id);
+  if (!deleted) throw new Error("No enrollment records were found for this student and period");
+  return deleted;
+};
+
 // Get enrolled students by faculty assignment ID
 export const listStudentsByAssignment = async (assignmentId) => {
   return await enrollmentModel.getStudentsByAssignment(assignmentId);
@@ -317,31 +360,31 @@ export const runSectioning = async ({
 }) => {
   if (!period_id) throw new Error("Academic Period ID is required");
   if (!year_level) throw new Error("Year Level is required to run sectioning");
+  if (!curriculum_type) throw new Error("Curriculum Type is required to run sectioning");
 
-  const selectedCourseIds = Array.isArray(course_ids) && course_ids.length
-    ? course_ids
-    : course_id ? [course_id] : [];
-
-  const unsectioned = await enrollmentModel.getUnsectionedEnrollments(
-    selectedCourseIds,
+  // Load the cohort first so we can replace its courses with the selected
+  // curriculum's complete course set before assigning sections.
+  const cohortEnrollments = await enrollmentModel.getUnsectionedEnrollments(
+    [],
     period_id,
     program_id || null,
     year_level || null,
-    curriculum_type || null,
+    null,
   );
 
-  if (unsectioned.length === 0) {
+  if (cohortEnrollments.length === 0) {
     return {
       assigned: [],
       failed: [],
       unassigned: [],
+      skipped: [],
       summary: { totalEnrollments: 0, totalStudents: 0, assigned: 0, failed: 0, unassigned: 0 },
     };
   }
 
   // Group selected enrollment rows by program, then place each student once.
   const enrollmentsByProgram = new Map();
-  for (const item of unsectioned) {
+  for (const item of cohortEnrollments) {
     const progKey = item.program_id ? String(item.program_id) : "unspecified";
     if (!enrollmentsByProgram.has(progKey)) {
       enrollmentsByProgram.set(progKey, []);
@@ -352,14 +395,53 @@ export const runSectioning = async ({
   const assigned = [];
   const failed = [];
   const unassigned = [];
+  const skipped = [];
   const plannedAssignments = [];
+  let synchronizedEnrollments = 0;
+  let removedEnrollments = 0;
   // Fetch all sections for the period so legacy sections with a NULL
   // year_level remain eligible. The migration may not have been able to
   // infer a year from every existing section name.
   const sectionsForPeriod = await SectionsModel.getSectionsForPeriod(period_id);
+  const requestedCourseIds = Array.isArray(course_ids) && course_ids.length
+    ? course_ids
+    : course_id ? [course_id] : [];
 
   for (const [progKey, studentsInProg] of enrollmentsByProgram.entries()) {
     const progId = progKey === "unspecified" ? null : Number(progKey);
+    const candidateStudentIds = [...new Set(studentsInProg.map((item) => String(item.student_id)))];
+    const selectedCourseIds = await enrollmentModel.getSectioningCourseIds(
+      progId,
+      candidateStudentIds,
+      period_id,
+      year_level,
+      curriculum_type,
+      requestedCourseIds,
+    );
+    if (!selectedCourseIds.length) {
+      throw new Error(`No ${curriculum_type} Curriculum courses are available for this program, year level, and semester.`);
+    }
+    const syncResult = await enrollmentModel.synchronizeCohortCurriculum(
+      candidateStudentIds, selectedCourseIds, period_id, year_level,
+    );
+    synchronizedEnrollments += syncResult.added;
+    removedEnrollments += syncResult.removed;
+    const curriculumEnrollments = await enrollmentModel.getUnsectionedEnrollments(
+      selectedCourseIds,
+      period_id,
+      progId,
+      year_level,
+      curriculum_type,
+    );
+    const existingSections = await enrollmentModel.getExistingSectionAssignments(
+      candidateStudentIds,
+      period_id,
+      progId,
+      year_level,
+    );
+    const eligibleEnrollments = curriculumEnrollments;
+    if (!eligibleEnrollments.length) continue;
+
     const sections = sectionsForPeriod.filter(
       (section) => String(section.program_id ?? "") === String(progId ?? "")
         && (!section.year_level || String(section.year_level).trim().toLowerCase() === String(year_level).trim().toLowerCase()),
@@ -367,8 +449,8 @@ export const runSectioning = async ({
 
     const activeSections = sections.filter((section) => section.status !== "inactive");
     if (!activeSections.length) {
-      const progLabel = studentsInProg[0]?.program_code || studentsInProg[0]?.student_course || "Unspecified";
-      for (const item of studentsInProg) {
+      const progLabel = eligibleEnrollments[0]?.program_code || eligibleEnrollments[0]?.student_course || "Unspecified";
+      for (const item of eligibleEnrollments) {
         unassigned.push({
           enrollment_id: item.enrollment_id,
           student_id: item.student_id,
@@ -379,35 +461,53 @@ export const runSectioning = async ({
     }
 
     const enrollmentsByStudent = new Map();
-    for (const enrollment of studentsInProg) {
+    for (const enrollment of eligibleEnrollments) {
       const studentKey = String(enrollment.student_id);
       if (!enrollmentsByStudent.has(studentKey)) enrollmentsByStudent.set(studentKey, []);
       enrollmentsByStudent.get(studentKey).push(enrollment);
     }
     const validSectionIds = new Set(activeSections.map((section) => String(section.section_id)));
-    // Remove the selected cohort from current section occupancy before
-    // redistributing it, so reruns can correct an earlier uneven split.
-    for (const studentEnrollments of enrollmentsByStudent.values()) {
-      const previousSections = new Set(studentEnrollments
-        .map((enrollment) => String(enrollment.section_id || ""))
-        .filter((sectionId) => sectionId && validSectionIds.has(sectionId)));
-      for (const previousSectionId of previousSections) {
-        const previousSection = activeSections.find(
-          (section) => String(section.section_id) === previousSectionId,
-        );
-        if (previousSection) {
-          previousSection.current_enrolled = Math.max(0, Number(previousSection.current_enrolled || 0) - 1);
-        }
+    const existingRowsByStudent = new Map();
+    const currentCohortBySection = new Map();
+    for (const existing of existingSections) {
+      const studentKey = String(existing.student_id);
+      if (!existingRowsByStudent.has(studentKey)) existingRowsByStudent.set(studentKey, []);
+      existingRowsByStudent.get(studentKey).push(existing);
+      if (!existing.section_id || !validSectionIds.has(String(existing.section_id))) continue;
+      if (!currentCohortBySection.has(String(existing.section_id))) {
+        currentCohortBySection.set(String(existing.section_id), new Set());
       }
+      currentCohortBySection.get(String(existing.section_id)).add(studentKey);
     }
 
-    const studentIds = [...enrollmentsByStudent.keys()];
+    // Remove this cohort's current occupancy before balancing the full cohort
+    // so a rerun can redistribute both existing and newly enrolled students.
+    const balancingSections = activeSections.map((section) => ({
+      ...section,
+      current_enrolled: Math.max(
+        0,
+        (Number(section.current_enrolled) || 0)
+          - (currentCohortBySection.get(String(section.section_id))?.size || 0),
+      ),
+    }));
+    const studentsToPlace = [...enrollmentsByStudent.keys()];
 
     const { assignments, unassigned: unassignedIds } =
-      SectionsService.computeBalancedAssignment(activeSections, studentIds);
+      SectionsService.computeBalancedAssignment(balancingSections, studentsToPlace);
 
     for (const assignment of assignments) {
-      for (const enrollment of enrollmentsByStudent.get(String(assignment.id)) || []) {
+      const studentKey = String(assignment.id);
+      const rowsToUpdate = new Map();
+      for (const enrollment of enrollmentsByStudent.get(studentKey) || []) {
+        rowsToUpdate.set(String(enrollment.enrollment_id), enrollment);
+      }
+      // The selected curriculum chooses the students to section. Reassign all
+      // of those students' semester course rows together, including courses
+      // that were previously enrolled under the other curriculum.
+      for (const enrollment of existingRowsByStudent.get(studentKey) || []) {
+        rowsToUpdate.set(String(enrollment.enrollment_id), enrollment);
+      }
+      for (const enrollment of rowsToUpdate.values()) {
         plannedAssignments.push({
           enrollment_id: enrollment.enrollment_id,
           student_id: enrollment.student_id,
@@ -443,12 +543,19 @@ export const runSectioning = async ({
     assigned,
     failed,
     unassigned,
+    skipped,
+    synchronizedEnrollments,
+    removedEnrollments,
     summary: {
-      totalEnrollments: unsectioned.length,
-      totalStudents: new Set(unsectioned.map((item) => String(item.student_id))).size,
+      totalEnrollments: assigned.length + failed.length + unassigned.length,
+      totalStudents: new Set(assigned.map((item) => String(item.student_id))).size
+        + new Set(unassigned.map((item) => String(item.student_id))).size,
       assigned: assigned.length,
       failed: failed.length,
       unassigned: unassigned.length,
+      skippedStudents: new Set(skipped.map((item) => String(item.student_id))).size,
+      synchronizedEnrollments,
+      removedEnrollments,
     },
   };
 };
