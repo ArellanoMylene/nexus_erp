@@ -8,9 +8,11 @@ export const getAllEnrollments = async (filters = {}) => {
   let query = `SELECT 
         e.enrollment_id,
         e.student_id,
-        CONCAT(u.first_name, ' ', u.last_name) AS student_name,
+        CONCAT_WS(' ', u.first_name, NULLIF(TRIM(u.middle_name), ''), u.last_name, NULLIF(TRIM(u.suffix), '')) AS student_name,
         u.first_name,
+        u.middle_name,
         u.last_name,
+        u.suffix,
         sd.student_number,
         COALESCE(e.year_level, sd.year_level) AS year_level,
         sd.course AS student_course,

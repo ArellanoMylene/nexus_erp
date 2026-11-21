@@ -20,6 +20,8 @@ const StaffLeave = () => {
   const [showModal, setShowModal] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [pendingDecision, setPendingDecision] = useState(null);
+  const [isSubmittingDecision, setIsSubmittingDecision] = useState(false);
   const [summary, setSummary] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -148,32 +150,38 @@ const StaffLeave = () => {
   };
 
   const handleApprove = async (id) => {
-    if (window.confirm("Approve this leave request?")) {
-      try {
-        await api.patch(`/api/staff-leave/${id}/approve`, {
-          approved_by: 1, // Replace with actual user ID
-        });
-        fetchLeaves();
-        fetchSummary();
-      } catch (error) {
-        console.error("Error approving leave:", error);
-        toast.error("Failed to approve leave request");
-      }
+    setIsSubmittingDecision(true);
+    try {
+      await api.patch(`/api/staff-leave/${id}/approve`, {
+        approved_by: 1, // Replace with actual user ID
+      });
+      setPendingDecision(null);
+      fetchLeaves();
+      fetchSummary();
+      toast.success("Leave request approved");
+    } catch (error) {
+      console.error("Error approving leave:", error);
+      toast.error(error.response?.data?.message || "Failed to approve leave request");
+    } finally {
+      setIsSubmittingDecision(false);
     }
   };
 
   const handleReject = async (id) => {
-    if (window.confirm("Reject this leave request?")) {
-      try {
-        await api.patch(`/api/staff-leave/${id}/reject`, {
-          approved_by: 1, // Replace with actual user ID
-        });
-        fetchLeaves();
-        fetchSummary();
-      } catch (error) {
-        console.error("Error rejecting leave:", error);
-        toast.error("Failed to reject leave request");
-      }
+    setIsSubmittingDecision(true);
+    try {
+      await api.patch(`/api/staff-leave/${id}/reject`, {
+        approved_by: 1, // Replace with actual user ID
+      });
+      setPendingDecision(null);
+      fetchLeaves();
+      fetchSummary();
+      toast.success("Leave request rejected");
+    } catch (error) {
+      console.error("Error rejecting leave:", error);
+      toast.error(error.response?.data?.message || "Failed to reject leave request");
+    } finally {
+      setIsSubmittingDecision(false);
     }
   };
 
@@ -384,14 +392,14 @@ const StaffLeave = () => {
                         {leave.status === "Pending" && (
                           <>
                             <button
-                              onClick={() => handleApprove(leave.leave_id)}
+                              onClick={() => setPendingDecision({ type: "approve", id: leave.leave_id })}
                               title="Approve"
                               className="text-green-600 hover:text-green-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                             >
                               <CheckCircle size={14} />
                             </button>
                             <button
-                              onClick={() => handleReject(leave.leave_id)}
+                              onClick={() => setPendingDecision({ type: "reject", id: leave.leave_id })}
                               title="Reject"
                               className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                             >
@@ -660,6 +668,42 @@ const StaffLeave = () => {
                 disabled={isDeleting}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
               >{isDeleting ? "Deleting..." : "Yes, delete request"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pendingDecision && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !isSubmittingDecision && setPendingDecision(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="leave-decision-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="leave-decision-title" className="text-lg font-bold text-slate-900">
+              {pendingDecision.type === "approve" ? "Approve leave request?" : "Reject leave request?"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Confirm that you want to {pendingDecision.type} this leave request.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setPendingDecision(null)}
+                disabled={isSubmittingDecision}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={() => pendingDecision.type === "approve" ? handleApprove(pendingDecision.id) : handleReject(pendingDecision.id)}
+                disabled={isSubmittingDecision}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 ${pendingDecision.type === "approve" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"}`}
+              >{isSubmittingDecision ? "Saving..." : pendingDecision.type === "approve" ? "Yes, approve" : "Yes, reject"}</button>
             </div>
           </div>
         </div>
