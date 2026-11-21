@@ -64,6 +64,7 @@ const findOptionByValue = (options, value) => {
 };
 
 const ALL_COURSES_VALUE = "__all_courses__";
+const normalizeSemester = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
 const ALL_STUDENTS_VALUE = "__all_students__";
 
 // Form-data mapping for enrollment creation/editing. Includes section_id
@@ -187,7 +188,7 @@ const ConfirmModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4"
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-[80] p-4"
       onClick={onClose}
     >
       <div
@@ -214,6 +215,72 @@ const ConfirmModal = ({
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+const StudentSectionModal = ({ isOpen, student, sections, onClose, onSave, loading }) => {
+  const [sectionId, setSectionId] = useState("");
+  const [confirmMoveOpen, setConfirmMoveOpen] = useState(false);
+  const matchingSections = sections.filter((section) =>
+    String(section.period_id) === String(student?.period_id)
+    && String(section.program_id) === String(student?.program_id)
+    && String(section.year_level || "").trim().toLowerCase() === String(student?.year_level || "").trim().toLowerCase()
+    && section.status !== "inactive",
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      setSectionId(student?.section_id ? String(student.section_id) : "");
+      setConfirmMoveOpen(false);
+    }
+  }, [isOpen, student]);
+
+  if (!isOpen || !student) return null;
+  const selectedOption = matchingSections.find((section) => String(section.section_id) === sectionId);
+  const hasChanged = sectionId && sectionId !== String(student.section_id || "");
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+      <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+        <div className="flex items-start justify-between border-b border-slate-200 px-6 py-4">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Edit Student Section</h2>
+            <p className="mt-1 text-sm text-slate-500">{student.student_name} · {student.program_code} · {student.year_level}</p>
+          </div>
+          <button type="button" onClick={onClose} disabled={loading} className="rounded p-1 text-slate-500 hover:bg-slate-100" aria-label="Close section editor"><X size={20} /></button>
+        </div>
+        <div className="space-y-3 px-6 py-5">
+          <label className="block text-sm font-semibold text-slate-700" htmlFor="student-section-transfer">Section</label>
+          <Select
+            inputId="student-section-transfer"
+            value={selectedOption ? { value: String(selectedOption.section_id), label: selectedOption.section_name } : null}
+            onChange={(option) => setSectionId(option?.value || "")}
+            options={matchingSections.map((section) => ({ value: String(section.section_id), label: section.section_name }))}
+            placeholder="Select matching section..."
+            isClearable={false}
+            isDisabled={loading || !matchingSections.length}
+          />
+          <p className="text-xs text-slate-500">All of this student’s subject enrollments in this academic period will move together. Only sections for the same program and year level are listed.</p>
+          {!matchingSections.length && <p className="text-sm text-amber-700">No active sections match this student’s program, year level, and period.</p>}
+        </div>
+        <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <button type="button" onClick={onClose} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">Cancel</button>
+          <button type="button" onClick={() => setConfirmMoveOpen(true)} disabled={loading || !hasChanged} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Move Student</button>
+        </div>
+      </div>
+      <ConfirmModal
+        isOpen={confirmMoveOpen}
+        onClose={() => !loading && setConfirmMoveOpen(false)}
+        onConfirm={() => {
+          setConfirmMoveOpen(false);
+          onSave(sectionId);
+        }}
+        message={<>Are you sure you want to move <strong>{student.student_name}</strong> from <strong>{student.section_name || "Unsectioned"}</strong> to <strong>{selectedOption?.section_name}</strong>? All of the student’s subject enrollments in this academic period will move together.</>}
+        confirmLabel="Yes, Move Student"
+        tone="success"
+        loading={loading}
+      />
     </div>
   );
 };
@@ -287,7 +354,7 @@ const EnrollmentModal = ({
 
   const selectedProgram = findOptionByValue(programs, formData.program_id);
   const selectedPeriod = findOptionByValue(periods, formData.period_id);
-  const selectedSemester = String(selectedPeriod?.semester || "").trim().toLowerCase();
+  const selectedSemester = normalizeSemester(selectedPeriod?.semester);
   const programMatches = (value) => !selectedProgram || [selectedProgram.code, selectedProgram.name]
     .some((programValue) => programValue && String(programValue).trim().toLowerCase() === String(value || "").trim().toLowerCase());
   const eligibleStudents = students.filter((student) =>
@@ -296,7 +363,7 @@ const EnrollmentModal = ({
   );
   const eligibleCourses = courses.filter((course) =>
     (!formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
-    && (!selectedSemester || String(course.semester_offer || "").trim().toLowerCase() === selectedSemester)
+    && (!selectedSemester || normalizeSemester(course.semester_offer) === selectedSemester)
     && (!selectedProgram?.department_id || String(course.department_id) === String(selectedProgram.department_id)),
   );
   const curriculumOptions = Array.from(new Set(
@@ -347,6 +414,12 @@ const EnrollmentModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
+    if (mode === "add" && !formData.curriculum_type) {
+      toast.error("Please select a curriculum before adding enrollment(s).", {
+        position: "top-center",
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
@@ -494,7 +567,9 @@ const EnrollmentModal = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">Curriculum Type (Optional)</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                  Curriculum Type {mode === "add" ? "*" : "(Optional)"}
+                </label>
                 <Select
                   value={findOptionByValue(curriculumOptions, formData.curriculum_type)}
                   onChange={(selected) => setFormData((prev) => ({
@@ -506,9 +581,11 @@ const EnrollmentModal = ({
                     section_id: null,
                   }))}
                   options={curriculumOptions}
-                  placeholder={formData.year_level ? "All Curricula" : "Select year level first..."}
+                  placeholder={formData.year_level
+                    ? mode === "add" ? "Select New or Old Curriculum..." : "All Curricula"
+                    : "Select year level first..."}
                   isDisabled={mode === "edit" || !formData.year_level || !curriculumOptions.length}
-                  isClearable
+                  isClearable={mode !== "add"}
                   styles={{ control: (base) => ({ ...base, minHeight: "42px" }) }}
                 />
               </div>
@@ -540,8 +617,12 @@ const EnrollmentModal = ({
                     { value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` },
                     ...filteredCourses,
                   ]}
-                  placeholder={formData.year_level ? "Select one or more courses..." : "Select year level first..."}
-                  isDisabled={mode === "edit" || !formData.year_level}
+                  placeholder={!formData.year_level
+                    ? "Select year level first..."
+                    : mode === "add" && !formData.curriculum_type
+                      ? "Select curriculum first..."
+                      : "Select one or more courses..."}
+                  isDisabled={mode === "edit" || !formData.year_level || (mode === "add" && !formData.curriculum_type)}
                   isClearable
                   isMulti
                   closeMenuOnSelect={false}
@@ -580,6 +661,11 @@ const EnrollmentModal = ({
                     }),
                   }}
                 />
+                {mode === "add" && formData.curriculum_type && (
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    Only {formData.curriculum_type} courses are available for this enrollment batch.
+                  </p>
+                )}
               </div>
 
             </div>
@@ -871,7 +957,7 @@ const EnrollmentModal = ({
 // Runs AFTER enrollment. Students are automatically grouped into sections
 // that correspond to their academic program offering (e.g. BPA students into
 // BPA sections like BPA - 1A, BAHISTO students into BAHISTO sections like BAHISTO-1A).
-const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, periods, programs }) => {
+const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, periods, programs, enrollments = [] }) => {
   const [formData, setFormData] = useState({
     period_id: null,
     program_id: null,
@@ -881,9 +967,30 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
     select_all_courses: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmRerunOpen, setConfirmRerunOpen] = useState(false);
+  const [pendingSectioningData, setPendingSectioningData] = useState(null);
 
+  const selectedPeriod = findOptionByValue(periods, formData.period_id);
+  const selectedSemester = normalizeSemester(selectedPeriod?.semester);
+  const selectedProgram = findOptionByValue(programs, formData.program_id);
+  const enrolledMatchingCourseIds = new Set((enrollments || [])
+    .filter((row) =>
+      String(row.period_id) === String(formData.period_id)
+      && normalizeSemester(row.course_semester_offer) === selectedSemester
+      && (!formData.year_level || String(row.year_level || row.course_year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
+      && (!formData.curriculum_type || String(row.course_curriculum_type || "Old").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase())
+      && (!formData.program_id || String(row.student_program_id) === String(formData.program_id)),
+    )
+    .map((row) => String(row.course_id)));
+  const coursesForFilters = courses.filter((course) =>
+    (!selectedSemester || normalizeSemester(course.semester_offer) === selectedSemester)
+    && (!selectedProgram?.department_id
+      || String(course.department_id) === String(selectedProgram.department_id)
+      || enrolledMatchingCourseIds.has(String(course.value)))
+  );
   const courseYearLevels = () => Array.from(new Set(
-    (courses || [])
+    coursesForFilters
+      .filter((course) => !formData.curriculum_type || String(course.curriculum_type || "Old").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase())
       .map((course) => String(course.year_level || "").trim())
       .filter(Boolean),
   )).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
@@ -892,23 +999,32 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
     value: yearLevel,
     label: yearLevel,
   }));
-  const selectedProgram = findOptionByValue(programs, formData.program_id);
-  const coursesForFilters = courses.filter((course) =>
-    (!formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase())
-    && (!selectedProgram?.department_id || String(course.department_id) === String(selectedProgram.department_id)),
+  const filteredCoursesForSectioning = coursesForFilters.filter((course) =>
+    !formData.year_level || String(course.year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase(),
   );
   const curriculumTypeOptions = Array.from(new Set(
-    coursesForFilters
+    filteredCoursesForSectioning
       .map((course) => String(course.curriculum_type || "").trim())
       .filter(Boolean),
   )).sort((a, b) => a.localeCompare(b)).map((curriculumType) => ({
     value: curriculumType,
     label: `${curriculumType} Curriculum`,
   }));
-  const filteredCourses = coursesForFilters.filter((course) =>
-    !formData.curriculum_type
-    || String(course.curriculum_type || "").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase(),
+  const filteredCourses = filteredCoursesForSectioning.filter((course) =>
+    formData.curriculum_type
+    && String(course.curriculum_type || "Old").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase(),
   );
+
+  const runSectioning = async (sectioningData) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(sectioningData);
+    } finally {
+      setIsSubmitting(false);
+      setPendingSectioningData(null);
+      setConfirmRerunOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -940,18 +1056,39 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
       });
       return;
     }
-    setIsSubmitting(true);
-    try {
-      const { select_all_courses, ...sectioningData } = formData;
-      // The picker shows the program's curriculum courses. When "All Courses"
-      // is selected, omit that list so the backend sections every matching
-      // year/curriculum enrollment for those students, including GE courses
-      // owned by another department.
-      if (select_all_courses) sectioningData.course_ids = [];
-      await onSubmit(sectioningData);
-    } finally {
-      setIsSubmitting(false);
+    if (!formData.curriculum_type) {
+      toast.error("Please select New or Old Curriculum before running sectioning.", {
+        position: "top-center",
+      });
+      return;
     }
+    const { select_all_courses, ...sectioningData } = formData;
+    // "All Courses" omits course IDs so the backend can include shared
+    // subjects too. The backend still filters by the selected curriculum
+    // and the academic period's semester.
+    if (select_all_courses) sectioningData.course_ids = [];
+    const selectedCourseIds = new Set((sectioningData.course_ids || []).map(String));
+    const matchingCohortStudentIds = new Set(enrollments.filter((row) =>
+      String(row.period_id) === String(formData.period_id)
+      && String(row.year_level || row.course_year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase()
+      && String(row.course_curriculum_type || "Old").trim().toLowerCase() === String(formData.curriculum_type).trim().toLowerCase()
+      && normalizeSemester(row.course_semester_offer) === selectedSemester
+      && (!formData.program_id || String(row.student_program_id) === String(formData.program_id))
+      && (!selectedCourseIds.size || selectedCourseIds.has(String(row.course_id)))
+    ).map((row) => String(row.student_id)));
+    const matchingAlreadySectioned = enrollments.some((row) =>
+      matchingCohortStudentIds.has(String(row.student_id))
+      && String(row.period_id) === String(formData.period_id)
+      && String(row.year_level || row.course_year_level || "").trim().toLowerCase() === String(formData.year_level).trim().toLowerCase()
+      && normalizeSemester(row.course_semester_offer) === selectedSemester
+      && row.section_id,
+    );
+    if (matchingAlreadySectioned) {
+      setPendingSectioningData(sectioningData);
+      setConfirmRerunOpen(true);
+      return;
+    }
+    await runSectioning(sectioningData);
   };
 
   if (!isOpen) return null;
@@ -997,6 +1134,10 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
                   setFormData((prev) => ({
                     ...prev,
                     period_id: selected?.value || null,
+                    year_level: null,
+                    curriculum_type: null,
+                    course_ids: [],
+                    select_all_courses: false,
                   }))
                 }}
                 options={periods}
@@ -1055,7 +1196,7 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Curriculum Type (Optional)
+                Curriculum Type <span className="text-red-500">*</span>
               </label>
               <Select
                 value={findOptionByValue(curriculumTypeOptions, formData.curriculum_type)}
@@ -1070,9 +1211,9 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
                 options={curriculumTypeOptions}
                 placeholder={coursesLoading
                   ? "Loading curriculum types..."
-                  : "All Curricula"}
-                isClearable
-                isDisabled={coursesLoading || !curriculumTypeOptions.length}
+                  : formData.year_level ? "Select New or Old Curriculum..." : "Select year level first..."}
+                isClearable={false}
+                isDisabled={coursesLoading || !formData.year_level || !curriculumTypeOptions.length}
               />
             </div>
 
@@ -1101,23 +1242,25 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
                   { value: ALL_COURSES_VALUE, label: `All Courses (${filteredCourses.length})` },
                   ...filteredCourses,
                 ]}
-                placeholder={formData.year_level
+                placeholder={!formData.curriculum_type
+                  ? "Select curriculum first..."
+                  : formData.year_level
                   ? `All ${formData.year_level} subjects (or select courses)...`
                   : "All Subjects (or select courses)..."}
                 isClearable
                 isMulti
-                isDisabled={coursesLoading || !filteredCourses.length}
+                isDisabled={coursesLoading || !formData.curriculum_type || !filteredCourses.length}
               />
               {formData.year_level && (
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Showing this program's {formData.year_level} courses. All Courses also sections shared subjects enrolled by matching students.
+                  Showing this program's {selectedPeriod?.semester || "semester"} subjects, plus matching shared courses already enrolled for this cohort.
                 </p>
               )}
             </div>
 
             <div className="md:col-span-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-900">
               <span className="font-semibold block mb-0.5">Program Section Matching:</span>
-              Students enrolled in <strong>BPA</strong> will only be placed into <strong>BPA</strong> sections, and students in <strong>BAHISTO</strong> into <strong>BAHISTO</strong> sections.
+              Sectioning keeps only the selected curriculum’s courses for this period, program, and year level. It adds any missing selected-curriculum courses to the cohort, removes enrollments from the other curriculum, and assigns every remaining subject enrollment to the student’s section.
             </div>
           </div>
 
@@ -1140,6 +1283,19 @@ const SectioningModal = ({ isOpen, onClose, onSubmit, courses, coursesLoading, p
           </div>
         </form>
       </div>
+      <ConfirmModal
+        isOpen={confirmRerunOpen}
+        onClose={() => {
+          if (isSubmitting) return;
+          setConfirmRerunOpen(false);
+          setPendingSectioningData(null);
+        }}
+        onConfirm={() => pendingSectioningData && runSectioning(pendingSectioningData)}
+        message={<>This cohort already has section assignments. Re-sectioning will keep only the selected curriculum’s courses, remove other-curriculum enrollments for this semester and year, and rebalance students. Students may move to different sections. Continue?</>}
+        confirmLabel="Yes, Re-section Students"
+        tone="danger"
+        loading={isSubmitting}
+      />
     </div>
   );
 };
@@ -1162,6 +1318,10 @@ const EnrollmentRecords = () => {
   const [currentRecord, setCurrentRecord] = useState(null);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [studentSectionTarget, setStudentSectionTarget] = useState(null);
+  const [studentSectionLoading, setStudentSectionLoading] = useState(false);
+  const [studentDeleteTarget, setStudentDeleteTarget] = useState(null);
+  const [studentDeleteLoading, setStudentDeleteLoading] = useState(false);
   const [sectioningModalOpen, setSectioningModalOpen] = useState(false);
   const [bulkExporting, setBulkExporting] = useState(false);
   const [bulkExportProgress, setBulkExportProgress] = useState(null);
@@ -1625,17 +1785,17 @@ const EnrollmentRecords = () => {
         `${API_BASE}/api/enrollments/run-sectioning`,
         data,
       );
-      const { summary, failed, unassigned } = res.data;
+      const { summary, failed, unassigned, synchronizedEnrollments = 0, removedEnrollments = 0 } = res.data;
       const studentCount = summary.totalStudents ?? summary.totalEnrollments;
 
       if (summary.totalEnrollments === 0) {
         toast.info(
-          "No enrollment records found matching the selected criteria.",
+          "No enrollments matched the selected period, year, and curriculum.",
           { position: "top-center" },
         );
       } else if (summary.assigned > 0) {
         toast.success(
-          `Sectioned ${summary.assigned}/${summary.totalEnrollments} enrollment(s) for ${studentCount} student(s).`,
+          `Aligned ${summary.assigned} course section assignment(s) for ${studentCount} student(s).${synchronizedEnrollments ? ` Added ${synchronizedEnrollments} selected-curriculum subject enrollment(s).` : ""}${removedEnrollments ? ` Removed ${removedEnrollments} other-curriculum subject enrollment(s).` : ""}`,
           { position: "top-center" },
         );
       }
@@ -1660,8 +1820,7 @@ const EnrollmentRecords = () => {
         console.error("Sectioning failures:", failed);
       }
 
-      fetchEnrollments();
-      fetchSections();
+      await Promise.all([fetchEnrollments(), fetchSections()]);
       setSectioningModalOpen(false);
     } catch (err) {
       console.error("Error running sectioning:", err);
@@ -1699,6 +1858,48 @@ const EnrollmentRecords = () => {
     } finally {
       setDeleteLoading(false);
       setDeleteTargetId(null);
+    }
+  };
+
+  const saveStudentSection = async (sectionId) => {
+    if (!studentSectionTarget || !sectionId) return;
+    setStudentSectionLoading(true);
+    try {
+      await axios.put(
+        `${API_BASE}/api/enrollments/student/${studentSectionTarget.student_id}/section`,
+        {
+          period_id: studentSectionTarget.period_id,
+          program_id: studentSectionTarget.program_id,
+          year_level: studentSectionTarget.year_level,
+          section_id: sectionId,
+        },
+      );
+      await Promise.all([fetchEnrollments(), fetchSections()]);
+      setStudentSectionTarget(null);
+      toast.success("Student and subject enrollments moved to the new section.", { position: "top-center" });
+    } catch (err) {
+      console.error("Error transferring student section:", err);
+      toast.error(getErrorMessage(err, "Failed to move student to the selected section."), { position: "top-center" });
+    } finally {
+      setStudentSectionLoading(false);
+    }
+  };
+
+  const confirmDeleteStudent = async () => {
+    if (!studentDeleteTarget) return;
+    setStudentDeleteLoading(true);
+    try {
+      await axios.delete(
+        `${API_BASE}/api/enrollments/student/${studentDeleteTarget.student_id}/period/${studentDeleteTarget.period_id}`,
+      );
+      await Promise.all([fetchEnrollments(), fetchSections()]);
+      setStudentDeleteTarget(null);
+      toast.success("Student’s enrollments for this academic period were deleted.", { position: "top-center" });
+    } catch (err) {
+      console.error("Error deleting student period enrollments:", err);
+      toast.error(getErrorMessage(err, "Failed to delete the student’s enrollments."), { position: "top-center" });
+    } finally {
+      setStudentDeleteLoading(false);
     }
   };
 
@@ -1880,16 +2081,32 @@ const EnrollmentRecords = () => {
             {displayed.length > 0 ? displayed.map((group) => {
               const enrollment = group.matching_enrollment;
               const studentKey = String(group.student_id);
-              const courseCodes = [...new Set(group.enrollments.map((row) => row.course_code).filter(Boolean))];
-              const periods = [...new Set(group.enrollments
+              const periodEnrollments = group.enrollments.filter((row) => String(row.period_id) === String(enrollment.period_id));
+              const uniquePeriodCourses = [...new Map(periodEnrollments.map((row) => [
+                String(row.course_id ?? row.course_code ?? row.course_title),
+                row,
+              ])).values()];
+              const courseCodes = uniquePeriodCourses.map((row) => row.course_code || row.course_title).filter(Boolean);
+              const coursesByCurriculum = uniquePeriodCourses.reduce((counts, row) => {
+                const curriculum = String(row.course_curriculum_type || "Old").trim() || "Old";
+                counts[curriculum] = (counts[curriculum] || 0) + 1;
+                return counts;
+              }, {});
+              const curriculumSummary = Object.entries(coursesByCurriculum)
+                .map(([curriculum, count]) => `${curriculum}: ${count}`)
+                .join(" · ");
+              const periods = [...new Set(periodEnrollments
                 .map((row) => row.school_year && row.semester ? `${row.school_year} · ${row.semester}` : null)
                 .filter(Boolean))];
-              const yearLevels = [...new Set(group.enrollments.map((row) => row.year_level).filter(Boolean))];
+              const yearLevels = [...new Set(periodEnrollments.map((row) => row.year_level).filter(Boolean))];
+              const cohortYearLevel = enrollment.year_level || enrollment.course_year_level || yearLevels[0] || "";
+              const cohortProgramId = enrollment.student_program_id || enrollment.section_program_id || "";
+              const currentStudentSection = periodEnrollments.find((row) => row.section_id);
               // A section belongs to the student cohort. Older enrollments can
               // have a null section even when another course row for this
               // student already carries the cohort section.
-              const sectionsForStudent = [...new Set(group.enrollments.map((row) => row.section_name).filter(Boolean))];
-              const statuses = [...new Set(group.enrollments.map((row) => row.status).filter(Boolean))];
+              const sectionsForStudent = [...new Set(periodEnrollments.map((row) => row.section_name).filter(Boolean))];
+              const statuses = [...new Set(periodEnrollments.map((row) => row.status).filter(Boolean))];
               const isExporting = String(singleExportingId) === String(enrollment.enrollment_id);
 
               return (
@@ -1914,6 +2131,9 @@ const EnrollmentRecords = () => {
                       <div className="mt-0.5 max-w-[200px] truncate text-xs text-slate-500">
                         {courseCodes.slice(0, 3).join(", ")}{courseCodes.length > 3 ? ", …" : ""}
                       </div>
+                      <div className="mt-0.5 text-[11px] text-slate-500" title="Course count by curriculum">
+                        {curriculumSummary}
+                      </div>
                     </td>
                     <td className="px-3 py-2 text-xs text-slate-600">
                       {periods[0] || "N/A"}{periods.length > 1 ? ` +${periods.length - 1} more` : ""}
@@ -1937,7 +2157,39 @@ const EnrollmentRecords = () => {
                     </td>
                     <td className="px-3 py-2 text-right">
                       <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => setCoursesStudent(group)} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50" title="View enrolled courses" aria-label={`View courses for ${group.student_name}`}>
+                        <button
+                          type="button"
+                          onClick={() => setStudentSectionTarget({
+                            student_id: group.student_id,
+                            student_name: group.student_name,
+                            program_id: cohortProgramId,
+                            program_code: group.student_program_code || group.student_course || "Program",
+                            year_level: cohortYearLevel,
+                            period_id: enrollment.period_id,
+                            section_id: currentStudentSection?.section_id || "",
+                            section_name: currentStudentSection?.section_name || "",
+                          })}
+                          disabled={!cohortProgramId || !cohortYearLevel}
+                          className="rounded p-1 text-indigo-600 hover:bg-slate-100 disabled:opacity-40"
+                          title="Edit student section"
+                          aria-label={`Edit section for ${group.student_name}`}
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setStudentDeleteTarget({
+                            student_id: group.student_id,
+                            student_name: group.student_name,
+                            period_id: enrollment.period_id,
+                          })}
+                          className="rounded p-1 text-red-600 hover:bg-red-50"
+                          title="Delete student enrollments for this period"
+                          aria-label={`Delete ${group.student_name}'s enrollments`}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                        <button type="button" onClick={() => setCoursesStudent({ ...group, enrollments: periodEnrollments })} className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50" title="View enrolled courses in this period" aria-label={`View courses for ${group.student_name}`}>
                           <Eye size={15} /> View courses
                         </button>
                         <button
@@ -1996,11 +2248,12 @@ const EnrollmentRecords = () => {
                 </div>
                 <div className="overflow-x-auto rounded border border-slate-200">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-slate-100 text-left text-xs font-bold uppercase text-slate-700"><tr><th className="px-3 py-2">Course</th><th className="px-3 py-2">Period / Year</th><th className="px-3 py-2">Section</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Grades</th><th className="px-3 py-2 text-right">Actions</th></tr></thead>
+                    <thead className="bg-slate-100 text-left text-xs font-bold uppercase text-slate-700"><tr><th className="px-3 py-2">Course</th><th className="px-3 py-2">Curriculum</th><th className="px-3 py-2">Period / Year</th><th className="px-3 py-2">Section</th><th className="px-3 py-2">Status</th><th className="px-3 py-2">Grades</th><th className="px-3 py-2 text-right">Actions</th></tr></thead>
                     <tbody className="divide-y divide-slate-100">
                       {coursesStudent.enrollments.map((courseEnrollment) => (
                         <tr key={courseEnrollment.enrollment_id}>
                           <td className="px-3 py-2"><span className="font-medium">{courseEnrollment.course_code}</span><span className="ml-2 text-slate-500">{courseEnrollment.course_title}</span></td>
+                          <td className="px-3 py-2">{courseEnrollment.course_curriculum_type || "Old"}</td>
                           <td className="px-3 py-2">{courseEnrollment.school_year} · {courseEnrollment.semester} · {courseEnrollment.year_level || "N/A"}</td>
                           <td className="px-3 py-2"><SectionBadge sectionName={courseEnrollment.section_name || studentSectionName} /></td>
                           <td className="px-3 py-2"><StatusBadge status={courseEnrollment.status} /></td>
@@ -2033,6 +2286,15 @@ const EnrollmentRecords = () => {
         sections={sections}
       />
 
+      <StudentSectionModal
+        isOpen={Boolean(studentSectionTarget)}
+        student={studentSectionTarget}
+        sections={sections}
+        onClose={() => !studentSectionLoading && setStudentSectionTarget(null)}
+        onSave={saveStudentSection}
+        loading={studentSectionLoading}
+      />
+
       <SectioningModal
         isOpen={sectioningModalOpen}
         onClose={() => setSectioningModalOpen(false)}
@@ -2041,6 +2303,7 @@ const EnrollmentRecords = () => {
         periods={periods}
         programs={programs}
         coursesLoading={coursesLoading}
+        enrollments={enrollments}
       />
 
       <ConfirmModal
@@ -2056,6 +2319,16 @@ const EnrollmentRecords = () => {
         confirmLabel="Yes, Delete"
         tone="danger"
         loading={deleteLoading}
+      />
+
+      <ConfirmModal
+        isOpen={Boolean(studentDeleteTarget)}
+        onClose={() => !studentDeleteLoading && setStudentDeleteTarget(null)}
+        onConfirm={confirmDeleteStudent}
+        message={<>Delete all of <strong>{studentDeleteTarget?.student_name}’s</strong> subject enrollment records for this academic period? This does not delete the student’s account or enrollments in other periods.</>}
+        confirmLabel="Delete Period Enrollments"
+        tone="danger"
+        loading={studentDeleteLoading}
       />
 
       <ToastContainer

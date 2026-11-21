@@ -115,6 +115,10 @@ export const enforceApiAccess = (req, res, next) => {
       const requestedRole = String(req.query?.role || "").trim().toLowerCase();
       if (requestedRole === "student" && roleIs(req.user, "Admin", "HR", "Accounting", "Staff")) return next();
       if (requestedRole === "faculty" && roleIs(req.user, "Admin", "HR", "Staff")) return next();
+      // Accounting needs role-filtered recipients for student and employee
+      // invoices. Keep this limited to the known invoice recipient roles.
+      const invoiceRecipientRoles = new Set(["faculty", "admin", "hr", "accounting", "staff"]);
+      if (invoiceRecipientRoles.has(requestedRole) && roleIs(req.user, "Accounting")) return next();
     }
     if (/^\/users\/[^/]+$/.test(resourcePath) && method === "GET"
       && resourcePath.split("/").at(-1) === userId) return next();

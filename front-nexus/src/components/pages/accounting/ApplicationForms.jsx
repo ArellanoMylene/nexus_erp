@@ -11,6 +11,8 @@ const ApplicationForms = () => {
   const [students, setStudents] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [currentApp, setCurrentApp] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -137,16 +139,19 @@ const ApplicationForms = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this application?")) {
-      try {
-        await api.delete(`/api/scholarships/applications/${id}`);
-        await fetchApplications();
-        await fetchStatistics();
-        setCurrentPage(1);
-      } catch (error) {
-        console.error("Error deleting application:", error);
-        toast.error(error.response?.data?.error || "Error deleting application");
-      }
+    setDeleting(true);
+    try {
+      await api.delete(`/api/scholarships/applications/${id}`);
+      setDeleteTargetId(null);
+      await fetchApplications();
+      await fetchStatistics();
+      setCurrentPage(1);
+      toast.success("Scholarship application deleted successfully");
+    } catch (error) {
+      console.error("Error deleting application:", error);
+      toast.error(error.response?.data?.error || "Error deleting application");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -265,7 +270,7 @@ const ApplicationForms = () => {
                     <td className="px-4 py-2 text-right">
                       <div className="flex justify-end gap-1">
                         <button onClick={() => handleEdit(app)} className="text-blue-600 hover:text-blue-800   transition-colors p-1 rounded-full hover:bg-slate-200 " title="Edit"><Edit size={14} /></button>
-                        <button onClick={() => handleDelete(app.application_id)} className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 " title="Delete"><Trash2 size={14} /></button>
+                        <button onClick={() => setDeleteTargetId(app.application_id)} className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 " title="Delete"><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>
@@ -341,6 +346,42 @@ const ApplicationForms = () => {
                 <button type="submit" className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/30">{currentApp ? "Update" : "Submit"} Application</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !deleting && setDeleteTargetId(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-application-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-application-title" className="text-lg font-bold text-slate-900">
+              Delete scholarship application?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete this application? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetId(null)}
+                disabled={deleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteTargetId)}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{deleting ? "Deleting..." : "Yes, delete application"}</button>
+            </div>
           </div>
         </div>
       )}

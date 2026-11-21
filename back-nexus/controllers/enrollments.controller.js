@@ -64,6 +64,9 @@ export const createEnrollment = async (req, res) => {
   try {
     if (!isStudent(req) && !isAdmin(req)) return denyEnrollmentAccess(res);
     const data = isStudent(req) ? { ...req.body, student_id: req.user.userId } : req.body;
+    if (isAdmin(req) && !data.curriculum_type) {
+      throw new Error("Please select a curriculum before adding enrollment(s).");
+    }
     const isAdminCourseBatch = isAdmin(req) && Array.isArray(data.course_ids);
     const enrollment = isAdminCourseBatch
       ? await enrollmentService.addEnrollments(data)
@@ -111,6 +114,33 @@ export const deleteEnrollment = async (req, res) => {
     }
     await enrollmentService.removeEnrollment(id);
     res.json({ message: "Enrollment deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export const transferStudentSection = async (req, res) => {
+  try {
+    if (!isAdmin(req)) return denyEnrollmentAccess(res);
+    const { studentId } = req.params;
+    const updated = await enrollmentService.transferStudentSection({
+      ...req.body,
+      student_id: studentId,
+    });
+    res.json({ message: "Student section updated successfully", updated });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export const deleteStudentPeriodEnrollments = async (req, res) => {
+  try {
+    if (!isAdmin(req)) return denyEnrollmentAccess(res);
+    const { studentId, periodId } = req.params;
+    const deleted = await enrollmentService.removeStudentPeriodEnrollments(studentId, periodId);
+    res.json({ message: "Student period enrollments deleted successfully", deleted });
   } catch (err) {
     console.error(err);
     res.status(400).json({ message: err.message });

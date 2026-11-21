@@ -19,6 +19,8 @@ const PayslipGenerator = () => {
   const [payslips, setPayslips] = useState([]);
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showPayslipModal, setShowPayslipModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedSetup, setSelectedSetup] = useState(null);
   const [eligibleEmployees, setEligibleEmployees] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -60,7 +62,7 @@ const PayslipGenerator = () => {
     notes: "",
   });
 
-  const periodTypes = ["Monthly", "Semi-Monthly", "Weekly", "Daily"];
+  const periodTypes = ["Monthly", "Weekly", "Daily"];
   const setupStatuses = ["Draft", "Processing", "Completed", "Cancelled"];
 
   useEffect(() => {
@@ -436,24 +438,32 @@ const resolveDepartment = (user) => {
   };
 
   const handleDeleteSetup = async (id) => {
-    if (window.confirm("Delete this payroll setup?")) {
-      try {
-        await api.delete(`/api/payroll/setups/${id}`);
-        fetchPayrollSetups();
-      } catch (error) {
-        console.error("Error deleting payroll setup:", error);
-      }
+    setIsDeleting(true);
+    try {
+      await api.delete(`/api/payroll/setups/${id}`);
+      setDeleteTarget(null);
+      fetchPayrollSetups();
+      toast.success("Payroll setup deleted successfully");
+    } catch (error) {
+      console.error("Error deleting payroll setup:", error);
+      toast.error(error.response?.data?.message || "Failed to delete payroll setup");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleDeletePayslip = async (id) => {
-    if (window.confirm("Delete this payslip?")) {
-      try {
-        await api.delete(`/api/payroll/payslips/${id}`);
-        if (selectedSetup) fetchPayslips(selectedSetup);
-      } catch (error) {
-        console.error("Error deleting payslip:", error);
-      }
+    setIsDeleting(true);
+    try {
+      await api.delete(`/api/payroll/payslips/${id}`);
+      setDeleteTarget(null);
+      if (selectedSetup) fetchPayslips(selectedSetup);
+      toast.success("Payslip deleted successfully");
+    } catch (error) {
+      console.error("Error deleting payslip:", error);
+      toast.error(error.response?.data?.message || "Failed to delete payslip");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -616,7 +626,7 @@ const resolveDepartment = (user) => {
                           <button onClick={() => handleEditSetup(setup)} className="text-indigo-600 hover:text-indigo-800   p-1 rounded-full hover:bg-slate-200 " title="Edit">
                             <Edit size={14} />
                           </button>
-                          <button onClick={() => handleDeleteSetup(setup.payroll_setup_id)} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
+                          <button onClick={() => setDeleteTarget({ type: "setup", id: setup.payroll_setup_id })} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
                             <Trash2 size={14} />
                           </button>
                         </div>
@@ -741,7 +751,7 @@ const resolveDepartment = (user) => {
                               <button onClick={() => handleEditPayslip(payslip)} className="text-indigo-600 hover:text-indigo-800   p-1 rounded-full hover:bg-slate-200 " title="Edit">
                                 <Edit size={14} />
                               </button>
-                              <button onClick={() => handleDeletePayslip(payslip.payslip_id)} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
+                              <button onClick={() => setDeleteTarget({ type: "payslip", id: payslip.payslip_id })} className="text-red-600 hover:text-red-800   p-1 rounded-full hover:bg-slate-200 " title="Delete">
                                 <Trash2 size={14} />
                               </button>
                             </div>
@@ -946,6 +956,42 @@ const resolveDepartment = (user) => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {deleteTarget && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !isDeleting && setDeleteTarget(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-payroll-item-title"
+              className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2 id="delete-payroll-item-title" className="text-lg font-bold text-slate-900">
+                Delete {deleteTarget.type === "setup" ? "payroll setup" : "payslip"}?
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Are you sure you want to delete this {deleteTarget.type === "setup" ? "payroll setup" : "payslip"}? This action cannot be undone.
+              </p>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={isDeleting}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >Cancel</button>
+                <button
+                  type="button"
+                  onClick={() => deleteTarget.type === "setup" ? handleDeleteSetup(deleteTarget.id) : handleDeletePayslip(deleteTarget.id)}
+                  disabled={isDeleting}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                >{isDeleting ? "Deleting..." : "Yes, delete"}</button>
+              </div>
             </div>
           </div>
         )}

@@ -15,6 +15,14 @@ import {
 } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const toDateInputValue = (value) => {
+  if (!value) return "";
+  if (!(value instanceof Date)) return String(value).slice(0, 10);
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 const BookCatalog = () => {
   const [books, setBooks] = useState([]);
@@ -23,6 +31,10 @@ const BookCatalog = () => {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentBook, setCurrentBook] = useState(null);
+  const [isLoadingBook, setIsLoadingBook] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -114,6 +126,8 @@ const BookCatalog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       if (editMode) {
         await axios.put(
@@ -123,58 +137,91 @@ const BookCatalog = () => {
       } else {
         await axios.post(`${API_BASE}/api/library/books`, formData);
       }
-      fetchBooks();
-      fetchStatistics();
+      await Promise.all([fetchBooks(), fetchStatistics()]);
       closeModal();
       toast.success(editMode ? "Book updated successfully." : "Book saved successfully.");
     } catch (error) {
       console.error("Error saving book:", error);
-      toast.error(error.response?.data?.error || "Error saving book.");
+      toast.error(
+        error.response?.data?.error
+          || error.response?.data?.message
+          || error.message
+          || "Error saving book.",
+      );
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleEdit = (book) => {
-    setCurrentBook(book);
-    setFormData({
-      isbn: book.isbn || "",
-      title: book.title,
-      author: book.author,
-      publisher: book.publisher || "",
-      publication_year: book.publication_year || "",
-      edition: book.edition || "",
-      category: book.category,
-      subcategory: book.subcategory || "",
-      language: book.language || "English",
-      pages: book.pages || "",
-      quantity_total: book.quantity_total,
-      quantity_available: book.quantity_available,
-      shelf_location: book.shelf_location || "",
-      dewey_decimal: book.dewey_decimal || "",
-      call_number: book.call_number || "",
-      description: book.description || "",
-      cover_image_url: book.cover_image_url || "",
-      price: book.price || "",
-      date_acquired: book.date_acquired || "",
-      status: book.status,
-      is_reference: book.is_reference || false,
-      borrowable: book.borrowable !== undefined ? book.borrowable : true,
-      created_by: book.created_by,
-    });
-    setEditMode(true);
-    setShowModal(true);
+  const handleEdit = async (book) => {
+    setIsLoadingBook(true);
+    try {
+      const response = await axios.get(`${API_BASE}/api/library/books/${book.book_id}`);
+      const details = response.data;
+      setCurrentBook(details);
+      setFormData({
+        isbn: details.isbn ?? "",
+        title: details.title ?? "",
+        author: details.author ?? "",
+        publisher: details.publisher ?? "",
+        publication_year: details.publication_year ?? "",
+        edition: details.edition ?? "",
+        category: details.category ?? "",
+        subcategory: details.subcategory ?? "",
+        language: details.language ?? "English",
+        pages: details.pages ?? "",
+        quantity_total: details.quantity_total ?? 1,
+        quantity_available: details.quantity_available ?? 1,
+        shelf_location: details.shelf_location ?? "",
+        dewey_decimal: details.dewey_decimal ?? "",
+        call_number: details.call_number ?? "",
+        description: details.description ?? "",
+        cover_image_url: details.cover_image_url ?? "",
+        price: details.price ?? "",
+        date_acquired: toDateInputValue(details.date_acquired),
+        status: details.status ?? "Available",
+        is_reference: details.is_reference === true || Number(details.is_reference) === 1,
+        borrowable: details.borrowable === undefined
+          ? true
+          : details.borrowable === true || Number(details.borrowable) === 1,
+        created_by: details.created_by ?? "",
+      });
+      setEditMode(true);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error loading book details:", error);
+      toast.error(
+        error.response?.data?.error
+          || error.response?.data?.message
+          || "Could not load this book’s saved details.",
+      );
+    } finally {
+      setIsLoadingBook(false);
+    }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      try {
-        await axios.delete(`${API_BASE}/api/library/books/${id}`);
-        fetchBooks();
-        fetchStatistics();
-        toast.success("Book deleted successfully.");
-      } catch (error) {
-        console.error("Error deleting book:", error);
-        toast.error(error.response?.data?.error || "Error deleting book.");
-      }
+  const handleDelete = (book) => {
+    setDeleteTarget(book);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await axios.delete(`${API_BASE}/api/library/books/${deleteTarget.book_id}`);
+      await Promise.all([fetchBooks(), fetchStatistics()]);
+      setDeleteTarget(null);
+      toast.success("Book deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting book:", error);
+      toast.error(
+        error.response?.data?.error
+          || error.response?.data?.message
+          || error.message
+          || "Error deleting book.",
+      );
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -478,7 +525,7 @@ const BookCatalog = () => {
                             {book.quantity_available}/{book.quantity_total}
                           </span>
                         </div>
-                        {book.is_reference && (
+                        {Boolean(book.is_reference) && (
                           <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700  ">
                             Reference
                           </span>
@@ -497,13 +544,14 @@ const BookCatalog = () => {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleEdit(book)}
-                            className="text-indigo-600 hover:text-indigo-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
-                            title="Edit"
+                            disabled={isLoadingBook}
+                            className="text-indigo-600 hover:text-indigo-800 transition-colors p-1 rounded-full hover:bg-slate-200 disabled:cursor-wait disabled:opacity-50"
+                            title={isLoadingBook ? "Loading saved book details..." : "Edit"}
                           >
                             <Edit size={14} />
                           </button>
                           <button
-                            onClick={() => handleDelete(book.book_id)}
+                            onClick={() => handleDelete(book)}
                             className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                             title="Delete"
                           >
@@ -849,12 +897,51 @@ const BookCatalog = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/30"
+                  disabled={isSaving}
+                  className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {editMode ? "Update Book" : "Add Book"}
+                  {isSaving ? "Saving..." : editMode ? "Update Book" : "Add Book"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-book-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3 id="delete-book-title" className="text-lg font-bold text-slate-900">Delete book?</h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete <span className="font-semibold text-slate-900">{deleteTarget.title}</span>? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {isDeleting ? "Deleting..." : "Yes, delete book"}
+              </button>
+            </div>
           </div>
         </div>
       )}

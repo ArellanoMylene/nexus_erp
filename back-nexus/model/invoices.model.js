@@ -129,6 +129,7 @@ const Invoice = {
         si.*,
         (si.total_amount - COALESCE(si.amount_paid, 0)) AS balance,
         CONCAT(s.first_name, ' ', s.last_name) as student_name,
+        s.role as recipient_role,
         sd.student_number,
         p.name as program_name,
         ap.school_year,
@@ -189,6 +190,7 @@ const Invoice = {
         si.*,
         (si.total_amount - si.amount_paid) AS balance,
         CONCAT(s.first_name, ' ', s.last_name) as student_name,
+        s.role as recipient_role,
         s.email as student_email,
         sd.student_number,
         sd.year_level,
@@ -238,7 +240,7 @@ const Invoice = {
           admission_fee = ?, entrance_fee = ?, guidance_fee = ?, handbook_fee = ?,
           medical_dental_fee = ?, computer_fee = ?, cultural_fee = ?, development_fee = ?, nstp_fee = ?,
           subtotal = ?, discount_amount = ?, scholarship_amount = ?, 
-          total_amount = ?, due_date = ?, status = ?, notes = ?
+          total_amount = ?, invoice_date = ?, due_date = ?, status = ?, notes = ?
       WHERE invoice_id = ?
     `;
     const [result] = await db.query(query, [
@@ -266,6 +268,7 @@ const Invoice = {
       data.discount_amount    || 0,
       data.scholarship_amount || 0,
       data.total_amount,
+      data.invoice_date,
       data.due_date,
       data.status,
       data.notes,
@@ -342,6 +345,9 @@ const Invoice = {
       parseFloat(fee.cultural_fee       || 0) +
       parseFloat(fee.development_fee    || 0) +
       parseFloat(fee.nstp_fee           || 0);
+    const discountAmount = parseFloat(fee.discount_amount || 0);
+    const scholarshipAmount = parseFloat(fee.scholarship_amount || 0);
+    const totalAmount = Math.max(subtotal - discountAmount - scholarshipAmount, 0);
 
     const [students] = await db.query(
       `SELECT DISTINCT sd.user_id, e.enrollment_id
@@ -351,8 +357,10 @@ const Invoice = {
          ON e.student_id = sd.user_id 
          AND e.academic_period_id = ?
          AND e.status IN ('Enrolled','Active')
-       WHERE p.program_id = ? AND sd.year_level = ?`,
-      [fee.academic_period_id, fee.program_id, fee.year_level],
+       WHERE p.program_id = ?
+         AND (? = 'All Levels' OR sd.year_level = ?)
+         AND sd.year_level IS NOT NULL AND sd.year_level <> ''`,
+      [fee.academic_period_id, fee.program_id, fee.year_level, fee.year_level],
     );
 
     if (!students || students.length === 0) {
@@ -395,7 +403,7 @@ const Invoice = {
           medical_dental_fee, computer_fee, cultural_fee, development_fee, nstp_fee,
           subtotal, discount_amount, scholarship_amount, total_amount,
           invoice_date, due_date, status, notes, created_by)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, 'Pending', ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?)`,
         [
           invoiceNumber,
           student.user_id,
@@ -419,7 +427,9 @@ const Invoice = {
           fee.development_fee    || 0,
           fee.nstp_fee           || 0,
           subtotal,
-          subtotal,
+          discountAmount,
+          scholarshipAmount,
+          totalAmount,
           today,
           today,
           `Auto-generated from fee setup: ${fee.program_name} ${fee.year_level}`,

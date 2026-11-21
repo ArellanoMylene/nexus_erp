@@ -18,6 +18,8 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 const StaffLeave = () => {
   const [leaves, setLeaves] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [summary, setSummary] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -130,14 +132,18 @@ const StaffLeave = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this leave request?")) {
-      try {
-        await api.delete(`/api/staff-leave/${id}`);
-        fetchLeaves();
-        fetchSummary();
-      } catch (error) {
-        console.error("Error deleting leave:", error);
-      }
+    setIsDeleting(true);
+    try {
+      await api.delete(`/api/staff-leave/${id}`);
+      setDeleteTargetId(null);
+      fetchLeaves();
+      fetchSummary();
+      toast.success("Leave request deleted successfully");
+    } catch (error) {
+      console.error("Error deleting leave:", error);
+      toast.error(error.response?.data?.message || "Failed to delete leave request");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -401,7 +407,7 @@ const StaffLeave = () => {
                           <Edit size={14} />
                         </button>
                         <button
-                          onClick={() => handleDelete(leave.leave_id)}
+                          onClick={() => setDeleteTargetId(leave.leave_id)}
                           title="Delete"
                           className="text-red-600 hover:text-red-800   transition-colors p-1 rounded-full hover:bg-slate-200 "
                         >
@@ -619,6 +625,42 @@ const StaffLeave = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !isDeleting && setDeleteTargetId(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-leave-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-leave-title" className="text-lg font-bold text-slate-900">
+              Delete leave request?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete this leave request? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetId(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteTargetId)}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeleting ? "Deleting..." : "Yes, delete request"}</button>
+            </div>
           </div>
         </div>
       )}

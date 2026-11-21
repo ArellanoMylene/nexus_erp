@@ -7,6 +7,8 @@ const ScholarshipFundAllocation = () => {
   const [programs, setPrograms] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [showProgramModal, setShowProgramModal] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [filters, setFilters] = useState({
     scholarship_type: "",
     academic_period_id: "",
@@ -86,13 +88,17 @@ const ScholarshipFundAllocation = () => {
   };
 
   const handleDeleteProgram = async (id) => {
-    if (window.confirm("Delete this scholarship program?")) {
-      try {
-        await api.delete(`/api/scholarships/programs/${id}`);
-        fetchPrograms();
-      } catch (error) {
-        console.error("Error deleting program:", error);
-      }
+    setDeleting(true);
+    try {
+      await api.delete(`/api/scholarships/programs/${id}`);
+      setDeleteTargetId(null);
+      fetchPrograms();
+      toast.success("Scholarship program deleted successfully");
+    } catch (error) {
+      console.error("Error deleting program:", error);
+      toast.error(error.response?.data?.message || "Failed to delete scholarship program");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -228,7 +234,7 @@ const ScholarshipFundAllocation = () => {
                     <Edit size={16} />
                   </button>
                   <button
-                    onClick={() => handleDeleteProgram(program.scholarship_id)}
+                    onClick={() => setDeleteTargetId(program.scholarship_id)}
                     className="text-red-600  hover:text-red-800  transition-colors"
                   >
                     <Trash2 size={16} />
@@ -579,6 +585,42 @@ const ScholarshipFundAllocation = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !deleting && setDeleteTargetId(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-scholarship-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-scholarship-title" className="text-lg font-bold text-slate-900">
+              Delete scholarship program?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete this scholarship program? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTargetId(null)}
+                disabled={deleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={() => handleDeleteProgram(deleteTargetId)}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{deleting ? "Deleting..." : "Yes, delete program"}</button>
+            </div>
           </div>
         </div>
       )}

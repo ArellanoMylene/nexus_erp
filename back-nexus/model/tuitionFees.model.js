@@ -6,9 +6,11 @@ const TuitionFee = {
     const query = `
       INSERT INTO tuition_fee_setup 
       (program_id, year_level, academic_period_id, tuition_fee, laboratory_fee, 
-       library_fee, athletic_fee, registration_fee, id_fee, miscellaneous_fee, 
-       other_fees, is_active, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       library_fee, athletic_fee, registration_fee, id_fee, miscellaneous_fee,
+       admission_fee, entrance_fee, guidance_fee, handbook_fee, medical_dental_fee,
+       computer_fee, cultural_fee, development_fee, nstp_fee, other_fees,
+       discount_amount, scholarship_amount, is_active, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const [result] = await db.query(
       query,
@@ -23,7 +25,18 @@ const TuitionFee = {
         data.registration_fee || 0,
         data.id_fee || 0,
         data.miscellaneous_fee || 0,
+        data.admission_fee || 0,
+        data.entrance_fee || 0,
+        data.guidance_fee || 0,
+        data.handbook_fee || 0,
+        data.medical_dental_fee || 0,
+        data.computer_fee || 0,
+        data.cultural_fee || 0,
+        data.development_fee || 0,
+        data.nstp_fee || 0,
         data.other_fees || 0,
+        data.discount_amount || 0,
+        data.scholarship_amount || 0,
         data.is_active !== undefined ? data.is_active : true,
         data.created_by,
       ]
@@ -98,7 +111,10 @@ const TuitionFee = {
       SET program_id = ?, year_level = ?, academic_period_id = ?, 
           tuition_fee = ?, laboratory_fee = ?, library_fee = ?, 
           athletic_fee = ?, registration_fee = ?, id_fee = ?, 
-          miscellaneous_fee = ?, other_fees = ?, is_active = ?
+          miscellaneous_fee = ?, admission_fee = ?, entrance_fee = ?,
+          guidance_fee = ?, handbook_fee = ?, medical_dental_fee = ?,
+          computer_fee = ?, cultural_fee = ?, development_fee = ?, nstp_fee = ?,
+          other_fees = ?, discount_amount = ?, scholarship_amount = ?, is_active = ?
       WHERE fee_setup_id = ?
     `;
     const [result] = await db.query(
@@ -114,7 +130,18 @@ const TuitionFee = {
         data.registration_fee || 0,
         data.id_fee || 0,
         data.miscellaneous_fee || 0,
+        data.admission_fee || 0,
+        data.entrance_fee || 0,
+        data.guidance_fee || 0,
+        data.handbook_fee || 0,
+        data.medical_dental_fee || 0,
+        data.computer_fee || 0,
+        data.cultural_fee || 0,
+        data.development_fee || 0,
+        data.nstp_fee || 0,
         data.other_fees || 0,
+        data.discount_amount || 0,
+        data.scholarship_amount || 0,
         data.is_active,
         id,
       ]
@@ -133,10 +160,11 @@ const TuitionFee = {
   getFeeByDetails: async (program_id, year_level, academic_period_id) => {
     const query = `
       SELECT * FROM tuition_fee_setup 
-      WHERE program_id = ? AND year_level = ? AND academic_period_id = ? AND is_active = TRUE
+      WHERE program_id = ? AND year_level IN (?, 'All Levels') AND academic_period_id = ? AND is_active = TRUE
+      ORDER BY CASE WHEN year_level = ? THEN 0 ELSE 1 END
       LIMIT 1
     `;
-    const [rows] = await db.query(query, [program_id, year_level, academic_period_id]);
+    const [rows] = await db.query(query, [program_id, year_level, academic_period_id, year_level]);
     return rows;
   },
 
@@ -174,9 +202,10 @@ const TuitionFee = {
        FROM tuition_fee_setup tfs
        JOIN programs p ON tfs.program_id = p.program_id
        JOIN academic_periods ap ON tfs.academic_period_id = ap.period_id
-       WHERE tfs.program_id = ? AND tfs.year_level = ? AND tfs.academic_period_id = ? AND tfs.is_active = TRUE
+       WHERE tfs.program_id = ? AND tfs.year_level IN (?, 'All Levels') AND tfs.academic_period_id = ? AND tfs.is_active = TRUE
+       ORDER BY CASE WHEN tfs.year_level = ? THEN 0 ELSE 1 END
        LIMIT 1`,
-      [program_id, year_level, period_id]
+      [program_id, year_level, period_id, year_level]
     );
 
     if (!feeSetup || feeSetup.length === 0) {

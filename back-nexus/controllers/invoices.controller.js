@@ -126,7 +126,7 @@ const invoiceController = {
 
       const result = await Invoice.update(id, data);
 
-      if (result.affectedRows === 0) {
+      if (result.affectedRows === 0 && (await Invoice.getById(id)).length === 0) {
         return res.status(404).json({
           success: false,
           message: "Invoice not found",

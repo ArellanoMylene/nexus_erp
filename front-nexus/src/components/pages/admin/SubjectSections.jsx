@@ -175,7 +175,7 @@ const ViewStudentsModal = ({ isOpen, onClose, section }) => {
       }
       const student = byStudent.get(key);
       if (row.course_code || row.course_title) {
-        student.subjects.add(row.course_code || row.course_title);
+        student.subjects.add(String(row.course_id ?? row.course_code ?? row.course_title));
       }
       return byStudent;
     }, new Map()).values(),
