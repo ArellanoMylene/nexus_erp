@@ -50,6 +50,7 @@ const LMSAssignments = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const assignmentModelAnswerFile = selectedAssignment?.model_answer_file_url || null;
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -264,7 +265,7 @@ const LMSAssignments = () => {
     fetchFacultyAssignments();
   }, [fetchAcademicPeriods, fetchAssignments, fetchFacultyAssignments]);
 
-  const fetchSubmissions = async (assignmentId) => {
+  const fetchSubmissions = useCallback(async (assignmentId) => {
     try {
       const response = await axios.get(
         `${API_BASE}/api/lms/assignments/${assignmentId}/submissions`
@@ -275,7 +276,14 @@ const LMSAssignments = () => {
     } catch (error) {
       console.error("Error fetching submissions:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const assignmentId = selectedAssignment?.id ?? selectedAssignment?.assignment_id;
+    if (!showSubmissionsModal || !assignmentId) return undefined;
+    const refreshTimer = window.setInterval(() => fetchSubmissions(assignmentId), 4000);
+    return () => window.clearInterval(refreshTimer);
+  }, [showSubmissionsModal, selectedAssignment, fetchSubmissions]);
 
   const openGradeModal = (submission) => {
     setSelectedSubmission(submission);
@@ -433,9 +441,9 @@ const LMSAssignments = () => {
   };
 
   const handleAiCheck = async () => {
-    if (!aiModelAnswer.trim() && !aiModelAnswerFile) {
+    if (!aiModelAnswer.trim() && !aiModelAnswerFile && !assignmentModelAnswerFile) {
       toast.warn(
-        "Please enter a model answer or upload a PDF/DOCX before running the AI check."
+        "This assignment has no model answer yet. Enter an answer or upload a PDF/DOCX to continue."
       );
       return;
     }
@@ -451,7 +459,8 @@ const LMSAssignments = () => {
         return;
       }
 
-      let modelAnswerFileUrl = null;
+      let modelAnswerFileUrl = assignmentModelAnswerFile;
+      let modelAnswerText = aiModelAnswer.trim();
 
       // Upload the AI model answer file if provided
       if (aiModelAnswerFile) {
@@ -466,18 +475,24 @@ const LMSAssignments = () => {
           {
             file_base64: base64,
             file_name: aiModelAnswerFile.name,
+            extract_text: true,
           }
         );
 
-        if (uploadRes.data.success) {
-          modelAnswerFileUrl = uploadRes.data.file_url;
+        if (!uploadRes.data.success || !uploadRes.data.file_url) {
+          throw new Error(uploadRes.data.message || "The model-answer file could not be uploaded.");
+        }
+        modelAnswerFileUrl = uploadRes.data.file_url;
+        if (!modelAnswerText) modelAnswerText = String(uploadRes.data.extracted_text || "").trim();
+        if (!modelAnswerText) {
+          throw new Error("No readable answer text was found in this file. Try a text-based PDF/DOCX or paste the expected answer.");
         }
       }
 
       const response = await axios.post(
         `${API_BASE}/api/lms/assignments/submissions/${submissionId}/ai-check`,
         {
-          model_answer: aiModelAnswer,
+          model_answer: modelAnswerText,
           model_answer_file_url: modelAnswerFileUrl,
           assignment_id: assignmentId,
           student_id: selectedSubmission?.student_id,
@@ -1302,7 +1317,9 @@ Ans: C`}
                               : "bg-yellow-100 text-yellow-600"
                           }`}
                         >
-                          {submission.status}
+                            {submission.status === "graded" && !submission.graded_by
+                              ? "AI graded"
+                              : submission.status}
                         </span>
                       </div>
 
@@ -1418,9 +1435,15 @@ Ans: C`}
                   </span>
                 </div>
                 <p className="text-xs text-indigo-600">
-                  Provide the expected answer as text, a PDF/DOCX file, or both.
-                  The AI will compare it against the student&apos;s submission.
+                  The AI will use the model answer saved with this assignment. You can edit the text below or upload a replacement file.
                 </p>
+
+                {selectedAssignment?.model_answer_file_url && (
+                  <div className="inline-flex items-center gap-2 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700">
+                    <FileUp className="h-4 w-4" />
+                    Using assignment file: {decodeURIComponent(String(selectedAssignment.model_answer_file_url).split("/").pop().replace(/^\d+-/, ""))}
+                  </div>
+                )}
 
                 {/* Text model answer */}
                 <textarea
@@ -1444,7 +1467,7 @@ Ans: C`}
                     <FileUp className="w-4 h-4" />
                     {aiModelAnswerFileName
                       ? aiModelAnswerFileName
-                      : "Upload PDF/DOCX as model answer"}
+                      : assignmentModelAnswerFile ? "Upload replacement PDF/DOCX (optional)" : "Upload PDF/DOCX as model answer"}
                     <input
                       type="file"
                       accept=".pdf,.doc,.docx"

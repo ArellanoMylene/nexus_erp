@@ -664,7 +664,7 @@ const fetchSubmissionForAi = async ({ submissionId, assignmentId, studentId }) =
 
   if (submissionId) {
     const [rows] = await db.query(
-      `SELECT las.*, la.total_points, la.title, la.model_answer
+      `SELECT las.*, la.total_points, la.title, la.model_answer, la.model_answer_file_url
        FROM lms_assignment_submissions las
        JOIN lms_assignments la ON las.assignment_id = la.id
        WHERE las.id = ?`,
@@ -675,7 +675,7 @@ const fetchSubmissionForAi = async ({ submissionId, assignmentId, studentId }) =
 
   if (!submission && assignmentId && studentId) {
     const [rows] = await db.query(
-      `SELECT las.*, la.total_points, la.title, la.model_answer
+      `SELECT las.*, la.total_points, la.title, la.model_answer, la.model_answer_file_url
        FROM lms_assignment_submissions las
        JOIN lms_assignments la ON las.assignment_id = la.id
        WHERE las.assignment_id = ? AND las.student_id = ?`,
@@ -693,53 +693,91 @@ const extractSubmissionText = async (submission) => {
   if (submission.file_url) {
     const filePath = resolveUploadPath(submission.file_url);
     if (fs.existsSync(filePath)) {
-      const ext = path.extname(submission.file_name || submission.file_url).toLowerCase();
       try {
-        if (ext === ".pdf") {
-          const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default;
-          const buffer = fs.readFileSync(filePath);
-          const pdfData = await pdfParse(buffer);
-          studentText = pdfData.text || studentText;
-        } else if (ext === ".docx" || ext === ".doc") {
-          const mammoth = (await import("mammoth")).default;
-          const result = await mammoth.extractRawText({ path: filePath });
-          studentText = result.value || studentText;
-        }
+        const fileText = await extractModelAnswerFileText(filePath, submission.file_name || submission.file_url);
+        if (fileText) studentText = fileText;
       } catch (parseErr) {
         console.warn("[AI Check] Could not parse file, using text fallback:", parseErr.message);
       }
     }
   }
 
+  if (submission.file_url && studentText.trim() === "Assignment submitted via Student Portal") {
+    return "";
+  }
   return studentText;
+};
+
+const extractModelAnswerFileText = async (filePath, fileName = filePath) => {
+  const ext = path.extname(fileName).toLowerCase();
+  if (ext === ".pdf") {
+    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default;
+    const pdfData = await pdfParse(fs.readFileSync(filePath));
+    return pdfData.text || "";
+  }
+  if (ext === ".docx") {
+    const mammoth = (await import("mammoth")).default;
+    const result = await mammoth.extractRawText({ path: filePath });
+    const readableText = String(result.value || "").trim();
+    if (readableText) return readableText;
+
+    // Scanned DOCX files often contain page images instead of selectable text.
+    // OCR those embedded images so faculty can use the model answer already
+    // attached to the assignment.
+    const images = [];
+    await mammoth.convertToHtml({ path: filePath }, {
+      convertImage: mammoth.images.imgElement((image) => image.read("base64").then((base64) => {
+        if (images.length < 50) images.push(Buffer.from(base64, "base64"));
+        return { src: `data:${image.contentType};base64,${base64}` };
+      })),
+    });
+    if (!images.length) return "";
+
+    const { createWorker } = await import("tesseract.js");
+    const worker = await createWorker("eng");
+    try {
+      const recognizedPages = [];
+      for (const imageBuffer of images) {
+        const result = await worker.recognize(imageBuffer);
+        const pageText = String(result.data?.text || "").trim();
+        if (pageText) recognizedPages.push(pageText);
+      }
+      return recognizedPages.join("\n\n");
+    } finally {
+      await worker.terminate();
+    }
+  }
+  return "";
 };
 
 const runAiCheck = async ({ submission, modelAnswer, modelAnswerFileUrl }) => {
   let finalModelAnswer = modelAnswer || "";
+  let modelAnswerFileFound = false;
 
-  // ✅ Extract text from model answer file if provided
   if (modelAnswerFileUrl) {
+    try {
       const filePath = resolveUploadPath(modelAnswerFileUrl);
-    if (fs.existsSync(filePath)) {
-      const ext = path.extname(modelAnswerFileUrl).toLowerCase();
-      try {
-        if (ext === ".pdf") {
-          const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default;
-          const buffer = fs.readFileSync(filePath);
-          const pdfData = await pdfParse(buffer);
-          finalModelAnswer = pdfData.text || finalModelAnswer;
-        } else if (ext === ".docx" || ext === ".doc") {
-          const mammoth = (await import("mammoth")).default;
-          const result = await mammoth.extractRawText({ path: filePath });
-          finalModelAnswer = result.value || finalModelAnswer;
-        }
-      } catch (err) {
-        console.warn("[AI Check] Could not parse model answer file:", err.message);
+      if (fs.existsSync(filePath)) {
+        modelAnswerFileFound = true;
+        finalModelAnswer = await extractModelAnswerFileText(filePath, modelAnswerFileUrl) || finalModelAnswer;
+      } else {
+        console.warn("[AI Check] Model answer file is missing on disk:", filePath);
       }
+    } catch (err) {
+      console.warn("[AI Check] Could not parse model answer file:", err.message);
     }
   }
 
   if (!finalModelAnswer.trim()) {
+    if (modelAnswerFileUrl && modelAnswerFileFound) {
+      throw new AiCheckError(
+        400,
+        "The saved assignment file was found, but it contains no extractable text (it may be scanned images). Paste the expected answer in the text box; you do not need to upload the file again.",
+      );
+    }
+    if (modelAnswerFileUrl) {
+      throw new AiCheckError(400, "The saved assignment file could not be read. Paste the expected answer in the text box to continue.");
+    }
     throw new AiCheckError(400, "Model answer is required for AI checking");
   }
 
@@ -1106,8 +1144,10 @@ const lmsAssignmentsController = {
       let score = null;
       let feedback = null;
       let status = "submitted";
+      let autoGradeStatus = "manual_required";
+      let autoGradeError = null;
 
-      if (assignment && assignment.assignment_type === "quiz") {
+      if (assignment && String(assignment.assignment_type || "").toLowerCase() === "quiz") {
         const questions = await LMSAssignments.getQuizQuestionsWithAnswers(assignment_id);
         const studentAnswers = JSON.parse(submission_text || "{}");
 
@@ -1121,6 +1161,7 @@ const lmsAssignmentsController = {
 
         score = calculatedScore;
         status = "completed";
+        autoGradeStatus = "graded";
       }
 
       const submissionId = await LMSAssignments.submitAssignment({
@@ -1134,9 +1175,10 @@ const lmsAssignmentsController = {
         await LMSAssignments.gradeSubmission(submissionId, {
           score,
           feedback: "Auto-graded quiz",
-          graded_by: submissionData.student_id,
+          graded_by: null,
         });
       } else if (assignment?.model_answer?.trim() || modelAnswerFileUrl) {
+        autoGradeStatus = "grading";
         try {
           const submission = await fetchSubmissionForAi({ submissionId });
           if (submission) {
@@ -1154,10 +1196,13 @@ const lmsAssignmentsController = {
 
             score = aiResult.score;
             feedback = aiResult.feedback;
+            autoGradeStatus = "graded";
           }
         } catch (error) {
           const message = error instanceof AiCheckError ? error.message : error.message || error;
           console.warn("[AI Check] Auto-grading skipped:", message);
+          autoGradeStatus = "failed";
+          autoGradeError = message;
         }
       }
 
@@ -1167,6 +1212,8 @@ const lmsAssignmentsController = {
         submissionId,
         score,
         feedback,
+        auto_grade_status: autoGradeStatus,
+        ...(autoGradeError ? { auto_grade_error: autoGradeError } : {}),
       });
     } catch (error) {
       console.error("Error submitting assignment:", error);
@@ -1343,7 +1390,7 @@ const lmsAssignmentsController = {
   // Upload assignment file
   uploadFile: async (req, res) => {
     try {
-      const { file_base64, file_name } = req.body;
+      const { file_base64, file_name, extract_text } = req.body;
 
       if (!file_base64 || !file_name) {
         return res.status(400).json({
@@ -1363,11 +1410,20 @@ const lmsAssignmentsController = {
       fs.writeFileSync(filepath, buffer);
 
       const fileUrl = `/uploads/assignments/${uniqueFilename}`;
+      let extractedText = "";
+      if (extract_text) {
+        try {
+          extractedText = await extractModelAnswerFileText(filepath, file_name);
+        } catch (parseError) {
+          console.warn("[LMS Upload] Could not extract text from uploaded model answer:", parseError.message);
+        }
+      }
 
       res.status(200).json({
         success: true,
         message: "File uploaded successfully",
         file_url: fileUrl,
+        extracted_text: extractedText,
       });
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -1383,7 +1439,7 @@ const lmsAssignmentsController = {
   aiCheckSubmission: async (req, res) => {
     try {
       const { submission_id } = req.params;
-      const { model_answer, assignment_id, student_id } = req.body;
+      const { model_answer, model_answer_file_url, assignment_id, student_id } = req.body;
 
       const submission = await fetchSubmissionForAi({
         submissionId: submission_id,
@@ -1396,7 +1452,11 @@ const lmsAssignmentsController = {
       }
 
       const modelAnswer = model_answer?.trim() || submission.model_answer;
-      const aiResult = await runAiCheck({ submission, modelAnswer });
+      const aiResult = await runAiCheck({
+        submission,
+        modelAnswer,
+        modelAnswerFileUrl: model_answer_file_url || submission.model_answer_file_url,
+      });
 
       return res.json({
         success: true,
