@@ -431,10 +431,45 @@ const resolveDepartment = (user) => {
   };
 
   const handleEditPayslip = (payslip) => {
+    const userId = payslip.user_id == null ? "" : String(payslip.user_id);
+    setSelectedUserId(userId);
+
+    // Keep the current employee selectable even if they are no longer in the
+    // active-employee list used when generating new payslips.
+    if (
+      userId &&
+      !eligibleEmployees.some((employee) => String(employee.user_id) === userId)
+    ) {
+      setEligibleEmployees((employees) => [
+        ...employees,
+        {
+          user_id: payslip.user_id,
+          employee_id: payslip.employee_id,
+          employee_number: payslip.employee_number,
+          first_name: payslip.first_name,
+          last_name: payslip.last_name,
+          role: payslip.role || "Employee",
+        },
+      ]);
+    }
+
     setPayslipFormData({
-      ...payslip,
+      payslip_id: payslip.payslip_id,
+      setup_id: payslip.payroll_setup_id ?? selectedSetup ?? "",
+      employee_id: payslip.employee_id ?? "",
       basic_pay: payslip.basic_salary ?? payslip.basic_pay ?? "",
+      overtime_pay: payslip.overtime_pay ?? "",
+      // The database stores holiday and night differential together.
+      holiday_pay: payslip.other_earnings ?? "",
+      night_differential: "",
+      allowances: payslip.allowances ?? "",
+      bonus: payslip.bonus ?? "",
+      sss_deduction: payslip.sss_deduction ?? "",
+      philhealth_deduction: payslip.philhealth_deduction ?? "",
+      pagibig_deduction: payslip.pagibig_deduction ?? "",
       tax_deduction: payslip.withholding_tax ?? payslip.tax_deduction ?? "",
+      loan_deduction: payslip.loan_deduction ?? "",
+      other_deductions: payslip.other_deductions ?? "",
       notes: payslip.remarks ?? payslip.notes ?? "",
     });
     setShowPayslipModal(true);

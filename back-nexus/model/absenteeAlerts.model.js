@@ -8,6 +8,7 @@ const AbsenteeAlertsModel = {
         aa.*,
         CONCAT(u.first_name, ' ', u.last_name) AS user_name,
         u.email,
+        u.phone,
         CASE 
           WHEN aa.user_type = 'student' THEN sd.student_number
           WHEN aa.user_type IN ('faculty', 'staff') THEN ed.employee_id
@@ -85,6 +86,7 @@ const AbsenteeAlertsModel = {
         aa.*,
         CONCAT(u.first_name, ' ', u.last_name) AS user_name,
         u.email,
+        u.phone,
         CASE 
           WHEN aa.user_type = 'student' THEN sd.student_number
           WHEN aa.user_type IN ('faculty', 'staff') THEN ed.employee_id

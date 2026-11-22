@@ -214,7 +214,9 @@ const GradeEntriesService = {
           MIN(e.enrollment_id) as enrollment_id
         FROM lms_assignment_submissions las
         INNER JOIN lms_assignments la ON las.assignment_id = la.id
-        INNER JOIN enrollments e ON las.student_id = e.student_id AND la.course_id = e.course_id
+        INNER JOIN enrollments e ON las.student_id = e.student_id
+          AND la.course_id = e.course_id
+          AND (la.section_id IS NULL OR la.section_id = e.section_id)
         WHERE la.course_id = ? 
           AND e.period_id = ?
           AND (las.score IS NOT NULL OR las.status = 'submitted')

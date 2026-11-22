@@ -23,6 +23,8 @@ const SyllabusRepository = () => {
   const [courses, setCourses] = useState([]);
   const [periods, setPeriods] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentSyllabus, setCurrentSyllabus] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -153,15 +155,19 @@ const SyllabusRepository = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this syllabus?")) {
-      try {
-        await axios.delete(`${API_BASE}/api/syllabus/${id}`);
-        fetchSyllabi();
-      } catch (error) {
-        console.error("Error deleting syllabus:", error);
-        toast.error(error.response?.data?.error || "Error deleting syllabus");
-      }
+  const handleDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await axios.delete(`${API_BASE}/api/syllabus/${deleteTarget.syllabus_id}`);
+      setDeleteTarget(null);
+      toast.success("Syllabus deleted successfully");
+      fetchSyllabi();
+    } catch (error) {
+      console.error("Error deleting syllabus:", error);
+      toast.error(error.response?.data?.error || "Error deleting syllabus");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -462,7 +468,7 @@ const SyllabusRepository = () => {
                             <Edit size={14} />
                           </button>
                           <button
-                            onClick={() => handleDelete(syllabus.syllabus_id)}
+                            onClick={() => setDeleteTarget(syllabus)}
                             className="text-red-600 hover:text-red-800 transition-colors p-1 rounded-full hover:bg-slate-200"
                             title="Delete"
                           >
@@ -639,6 +645,42 @@ const SyllabusRepository = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-syllabus-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-syllabus-title" className="text-lg font-bold text-slate-900">
+              Delete syllabus?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete “{deleteTarget.file_name}”? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeleting ? "Deleting..." : "Yes, delete syllabus"}</button>
+            </div>
           </div>
         </div>
       )}

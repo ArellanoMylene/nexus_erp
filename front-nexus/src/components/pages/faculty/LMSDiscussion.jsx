@@ -20,6 +20,19 @@ import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
+const getStoredUserId = () => {
+  let userIdFromUser = "";
+  try {
+    userIdFromUser = JSON.parse(localStorage.getItem("user") || "null")?.user_id || "";
+  } catch {
+    userIdFromUser = "";
+  }
+  return localStorage.getItem("userId")
+    || localStorage.getItem("user_id")
+    || sessionStorage.getItem("userId")
+    || userIdFromUser;
+};
+
 const getCurrentAcademicPeriodId = async () => {
   try {
     const response = await axios.get(`${API_BASE}/api/academic-periods/active`);
@@ -36,6 +49,8 @@ const LMSDiscussion = () => {
   const [facultyAssignments, setFacultyAssignments] = useState([]);
   const [academicPeriods, setAcademicPeriods] = useState([]);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -69,15 +84,26 @@ const LMSDiscussion = () => {
 
   const fetchFacultyAssignments = useCallback(async () => {
     try {
-      const userId = localStorage.getItem("userId");
+      const userId = getStoredUserId();
+      if (!userId) {
+        setFacultyAssignments([]);
+        toast.error("Faculty account not found. Please log in again.");
+        return;
+      }
       const response = await axios.get(
         `${API_BASE}/api/faculty-assignments/faculty/${userId}`,
       );
-      if (response.data.success) {
-        setFacultyAssignments(response.data.data);
-      }
+      const assignments = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.data)
+        ? response.data.data
+        : [];
+      setFacultyAssignments(assignments);
+      if (!assignments.length) toast.info("No courses are assigned to this faculty account yet.");
     } catch (error) {
       console.error("Error fetching faculty assignments:", error);
+      setFacultyAssignments([]);
+      toast.error(error.response?.data?.message || "Could not load your assigned courses.");
     }
   }, []);
 
@@ -200,23 +226,24 @@ const LMSDiscussion = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this discussion?")) {
-      return;
-    }
-
+  const handleDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
     try {
       const response = await axios.delete(
-        `${API_BASE}/api/lms/discussions/${id}`,
+        `${API_BASE}/api/lms/discussions/${deleteTarget.id}`,
       );
 
       if (response.data.success) {
         toast.success("Discussion deleted successfully!");
+        setDeleteTarget(null);
         fetchDiscussions();
       }
     } catch (error) {
       console.error("Error deleting discussion:", error);
-      toast.error("Failed to delete discussion");
+      toast.error(error.response?.data?.message || "Failed to delete discussion");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -367,8 +394,9 @@ const LMSDiscussion = () => {
                       <Pin className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => handleDelete(discussion.id)}
+                      onClick={() => setDeleteTarget(discussion)}
                       className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
+                      title="Delete discussion"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -484,8 +512,10 @@ const LMSDiscussion = () => {
                     <option value="">Select Course</option>
                     {[
                       ...new Map(
-                        facultyAssignments.map((item) => [
-                          item.course_id,
+                        facultyAssignments
+                          .filter((item) => !formData.academic_period_id || String(item.academic_period_id) === String(formData.academic_period_id))
+                          .map((item) => [
+                          String(item.course_id),
                           item,
                         ]),
                       ).values(),
@@ -514,13 +544,12 @@ const LMSDiscussion = () => {
                   >
                     <option value="">Select Section</option>
                     {facultyAssignments
-                      .filter(
-                        (a) => a.course_id === parseInt(formData.course_id),
-                      )
+                      .filter((a) => String(a.course_id) === String(formData.course_id)
+                        && (!formData.academic_period_id || String(a.academic_period_id) === String(formData.academic_period_id)))
                       .map((assignment) => (
                         <option
-                          key={assignment.section_id}
-                          value={assignment.section_id}
+                          key={`${assignment.assignment_id}-${assignment.section_id || assignment.section}`}
+                          value={assignment.section_id || ""}
                         >
                           {assignment.section}
                         </option>
@@ -536,7 +565,12 @@ const LMSDiscussion = () => {
                 <select
                   name="academic_period_id"
                   value={formData.academic_period_id}
-                  onChange={handleInputChange}
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    academic_period_id: e.target.value,
+                    course_id: "",
+                    section_id: "",
+                  }))}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                 >
@@ -702,6 +736,42 @@ const LMSDiscussion = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-discussion-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-discussion-title" className="text-lg font-bold text-slate-900">
+              Delete discussion?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete “{deleteTarget.title}”? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeleting ? "Deleting..." : "Yes, delete discussion"}</button>
             </div>
           </div>
         </div>

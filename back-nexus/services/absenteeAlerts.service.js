@@ -1,4 +1,6 @@
 import AbsenteeAlertsModel from "../model/absenteeAlerts.model.js";
+import { sendAbsenteeAlertEmail } from "./email.service.js";
+import { getUserByIdService } from "./user.service.js";
 
 const AbsenteeAlertsService = {
   // Get all absentee alerts
@@ -21,6 +23,28 @@ const AbsenteeAlertsService = {
     } catch (error) {
       throw new Error(`Error fetching absentee alert: ${error.message}`);
     }
+  },
+
+  async notifyStudent(id, message, notifierUserId) {
+    const alert = await AbsenteeAlertsModel.getById(id);
+    if (!alert) throw new Error("Absentee alert not found");
+    const notifier = await getUserByIdService(notifierUserId);
+    if (!notifier) throw new Error("Logged-in faculty account was not found");
+    const firstName = String(alert.user_name || "Student").split(" ")[0];
+    const senderName = [notifier.first_name, notifier.middle_name, notifier.last_name]
+      .filter(Boolean)
+      .join(" ")
+      .trim() || "Faculty";
+    return sendAbsenteeAlertEmail({
+      to: alert.email,
+      firstName,
+      course: alert.course_title || alert.course_code || "",
+      absenceCount: alert.absence_count || 0,
+      alertDate: alert.alert_date,
+      message,
+      senderName,
+      senderEmail: notifier.email,
+    });
   },
 
   // Create absentee alert

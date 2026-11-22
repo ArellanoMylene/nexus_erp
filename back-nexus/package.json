@@ -35,9 +35,14 @@
     "nodemailer": "^10.0.6",
     "nodemon": "^3.1.14",
     "pdf-parse": "^1.1.1",
+<<<<<<< HEAD
     "zod": "^4.6.6",
     "proxy-addr": "^2.0.8"
     
+=======
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.4.3"
+>>>>>>> a510f61ef282648ca47eec26b65e80a08eaec586
   },
   "overrides": {
     "@tensorflow/tfjs-converter": "4.22.0",

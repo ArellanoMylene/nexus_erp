@@ -24,7 +24,10 @@ const getTransporter = () => {
 
   const port = Number(process.env.SMTP_PORT) || 587;
   // Port 465 uses direct SSL (secure: true). Port 587 uses STARTTLS (secure: false).
-  const secure = port === 465;
+  const secureSetting = String(process.env.SMTP_SECURE || "").trim().toLowerCase();
+  const secure = secureSetting
+    ? ["true", "1", "yes"].includes(secureSetting)
+    : port === 465;
 
   _transporter = nodemailer.createTransport({
     host,
@@ -43,6 +46,13 @@ const getTransporter = () => {
   });
 
   return _transporter;
+};
+
+const getFromAddress = (displayName, fallbackAddress = "noreply@nexus.edu") => {
+  const configuredFrom = String(process.env.SMTP_FROM || "").trim();
+  if (configuredFrom) return configuredFrom;
+  const mailbox = String(process.env.SMTP_USER || "").trim();
+  return `"${displayName}" <${mailbox || fallbackAddress}>`;
 };
 
 /**
@@ -295,7 +305,7 @@ export const sendVerificationEmail = async ({
   code,
   expiresMinutes = 15,
 }) => {
-  const from = process.env.SMTP_FROM || `"Nexus Portal" <noreply@nexus.edu>`;
+  const from = getFromAddress("Nexus Portal");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -357,7 +367,7 @@ export const sendAccountWelcomeEmail = async ({
   identifier = "",
   loginUrl = process.env.CLIENT_URL || "http://localhost:5173",
 }) => {
-  const from = process.env.SMTP_FROM || `"Nexus Portal" <noreply@nexus.edu>`;
+  const from = getFromAddress("Nexus Portal");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -427,7 +437,7 @@ export const sendPasswordChangedEmail = async ({
   changedByAdmin = false,
   loginUrl = process.env.CLIENT_URL || "http://localhost:5173",
 }) => {
-  const from = process.env.SMTP_FROM || `"Nexus Security" <noreply@nexus.edu>`;
+  const from = getFromAddress("Nexus Security");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -459,7 +469,7 @@ export const sendAdmissionSubmittedEmail = async ({
   program = "",
   loginUrl = process.env.CLIENT_URL || "http://localhost:5173",
 }) => {
-  const from = process.env.SMTP_FROM || `"Nexus Admissions" <noreply@nexus.edu>`;
+  const from = getFromAddress("Nexus Admissions");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -518,8 +528,7 @@ export const sendAdmissionStatusEmail = async ({
     return { delivered: false, error: "Invalid recipient email address", mode: "validation-error" };
   }
 
-  const rawFrom = process.env.SMTP_FROM || `"Nexus Admissions" <noreply@nexus.edu>`;
-  const from = rawFrom.replace(/^"(.*)"$/, "$1");
+  const from = getFromAddress("Nexus Admissions");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -591,7 +600,7 @@ export const sendEnrollmentSubmittedEmail = async ({
   semester = "",
   loginUrl = process.env.CLIENT_URL || "http://localhost:5173",
 }) => {
-  const from = process.env.SMTP_FROM || `"Nexus Registrar" <noreply@nexus.edu>`;
+  const from = getFromAddress("Nexus Registrar");
   const transporter = getTransporter();
 
   if (!transporter) {
@@ -632,6 +641,60 @@ export const sendEnrollmentSubmittedEmail = async ({
     return { delivered: true, mode: "smtp" };
   } catch (error) {
     console.error("⚠️ Failed to send enrollment submitted email via SMTP:", error.message);
+    return { delivered: false, error: error.message, mode: "smtp-error" };
+  }
+};
+
+export const sendAbsenteeAlertEmail = async ({
+  to,
+  firstName = "Student",
+  course = "",
+  absenceCount = 0,
+  alertDate = "",
+  message = "",
+  senderName = "Faculty",
+  senderEmail = "",
+}) => {
+  if (!to || typeof to !== "string" || !to.includes("@")) {
+    return { delivered: false, error: "Invalid recipient email address", mode: "validation-error" };
+  }
+
+  const transporter = getTransporter();
+  if (!transporter) return { delivered: false, mode: "smtp-unavailable" };
+
+  // Keep the authenticated Hostinger mailbox as the actual sender address,
+  // while showing the logged-in faculty member as the sender name.
+  const fromAddress = String(process.env.SMTP_USER || "").trim();
+  const from = { name: senderName, address: fromAddress };
+  const safeCourse = escapeHtml(course || "your course");
+  const safeMessage = escapeHtml(message || `Our records show ${absenceCount} absence(s).`);
+  const html = renderUnifiedEmailHtml({
+    headerTitle: "NexusERP Academic Portal",
+    headerSubtitle: "Attendance Notice",
+    greetingName: firstName,
+    introMessage: `Please review this attendance notice for <strong>${safeCourse}</strong>.`,
+    details: [
+      { label: "Course", value: course || "N/A" },
+      { label: "Attendance Status", value: "Absent", isBadge: true, badgeType: "danger" },
+      { label: "Recorded Absences", value: absenceCount },
+      ...(alertDate ? [{ label: "Alert Date", value: alertDate }] : []),
+    ],
+    alertBox: { type: "warning", title: "Attendance Alert", message: safeMessage },
+    additionalNote: "Please contact your instructor or the school office if you believe this notice is incorrect.",
+  });
+
+  try {
+    await transporter.sendMail({
+      from,
+      ...(senderEmail && senderEmail.includes("@") ? { replyTo: { name: senderName, address: senderEmail } } : {}),
+      to,
+      subject: `Nexus Attendance Notice${course ? `: ${course}` : ""}`,
+      text: `Dear ${firstName},\n\n${message}\n\nRegards,\n${senderName}`,
+      html,
+    });
+    return { delivered: true, mode: "smtp" };
+  } catch (error) {
+    console.error("Failed to send absentee alert email:", error.message);
     return { delivered: false, error: error.message, mode: "smtp-error" };
   }
 };

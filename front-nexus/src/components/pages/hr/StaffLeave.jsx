@@ -129,7 +129,30 @@ const StaffLeave = () => {
   };
 
   const handleEdit = (leave) => {
-    setFormData(leave);
+    // The table row includes employee details, but the form's select is keyed
+    // by user_id. Normalize the joined row and SQL date values for form inputs.
+    const toDateInputValue = (value) => {
+      if (!value) return "";
+      if (typeof value === "string") {
+        const datePart = value.slice(0, 10);
+        return /^\d{4}-\d{2}-\d{2}$/.test(datePart) ? datePart : "";
+      }
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+    };
+
+    setFormData({
+      leave_id: leave.leave_id,
+      user_id: String(leave.user_id ?? ""),
+      leave_type: leave.leave_type || "Sick Leave",
+      start_date: toDateInputValue(leave.start_date),
+      end_date: toDateInputValue(leave.end_date),
+      reason: leave.reason || "",
+      status: leave.status || "Pending",
+      approved_by: leave.approved_by || "",
+      approval_date: leave.approved_date || "",
+      notes: leave.notes || "",
+    });
     setShowModal(true);
   };
 

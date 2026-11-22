@@ -376,12 +376,24 @@ export const bulkUpdateEnrollments = async ({ student_ids, course_ids, period_id
   }
 };
 
+const normalizeYearLevel = (value) => {
+  const text = String(value || "").trim().toLowerCase();
+  const ordinal = text.match(/\b(1st|first|1|2nd|second|2|3rd|third|3|4th|fourth|4)\b/);
+  const yearNumber = { "1st": "1", first: "1", "2nd": "2", second: "2", "3rd": "3", third: "3", "4th": "4", fourth: "4" };
+  return ordinal ? yearNumber[ordinal[1]] || ordinal[1] : text.replace(/\s+/g, " ");
+};
+
+const sectionYearLevel = (section) => {
+  if (String(section?.year_level || "").trim()) return section.year_level;
+  return String(section?.section_name || "").match(/-(\d+)\s*$/)?.[1] || "";
+};
+
 export const transferStudentSection = async ({ student_id, period_id, program_id, year_level, section_id }) => {
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
     const [sectionRows] = await connection.query(
-      `SELECT section_id, period_id, program_id, year_level, max_capacity
+      `SELECT section_id, section_name, period_id, program_id, year_level, max_capacity
        FROM sections WHERE section_id = ? FOR UPDATE`,
       [section_id],
     );
@@ -389,7 +401,7 @@ export const transferStudentSection = async ({ student_id, period_id, program_id
     if (!target) throw new Error("Selected section does not exist");
     if (String(target.period_id) !== String(period_id)
       || String(target.program_id) !== String(program_id)
-      || String(target.year_level || "").trim().toLowerCase() !== String(year_level).trim().toLowerCase()) {
+      || normalizeYearLevel(sectionYearLevel(target)) !== normalizeYearLevel(year_level)) {
       throw new Error("Section must match the student’s academic period, program, and year level");
     }
 

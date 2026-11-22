@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import Select from "react-select";
 import * as XLSX from "xlsx-js-style";
 import { unzipSync, zipSync } from "fflate";
 import { Download, Save, Upload, Award, Plus } from "lucide-react";
@@ -19,15 +20,24 @@ const COMPONENTS = [
 ];
 const QUIZ_WEIGHT = 10;
 const DEFAULT_MAX_SCORES = { quizzes: [10, 10, 10], performance: 100, attendance: 100, project: 100, prelim: 60, midterm: 20, finals: 60 };
-const EMPTY_ROW = (quizCount = DEFAULT_QUIZ_COUNT) => ({ quizzes: Array(quizCount).fill(""), performance: "", attendance: "", project: "", prelim: "", midterm: "", finals: "" });
+const EMPTY_ROW = (quizCount = DEFAULT_QUIZ_COUNT) => ({ quizzes: Array(quizCount).fill(""), lmsScores: {}, performance: "", attendance: "", project: "", prelim: "", midterm: "", finals: "" });
 const parseScore = (value) => value === "" || value === null || value === undefined || !Number.isFinite(Number(value)) ? null : Number(value);
 const transmuted = (score, max) => score === null || !max ? null : Math.min(100, 30 + (70 * score / max));
 const percentageRating = (score, max) => score === null || Number(max) <= 0 ? null : Math.min(100, score / Number(max) * 100);
 
-function getGrade(row, maxScores) {
-  const quizTotal = row.quizzes.reduce((sum, value) => sum + (parseScore(value) ?? 0), 0);
-  const quizMax = maxScores.quizzes.reduce((sum, value) => sum + (Number(value) || 0), 0);
-  const quizEntered = row.quizzes.some((value) => parseScore(value) !== null);
+function getGrade(row, maxScores, lmsActivities = [], activitySlots = {}) {
+  const activityBySlot = new Map(lmsActivities
+    .filter((activity) => Number.isInteger(activitySlots[activity.id]))
+    .map((activity) => [activitySlots[activity.id], activity]));
+  const quizValues = Array.from({ length: maxScores.quizzes.length }, (_, index) => {
+    const activity = activityBySlot.get(index);
+    return activity
+      ? { score: row.lmsScores?.[activity.id], max: activity.maxScore }
+      : { score: row.quizzes[index], max: maxScores.quizzes[index] };
+  });
+  const quizTotal = quizValues.reduce((sum, item) => sum + (parseScore(item.score) ?? 0), 0);
+  const quizMax = quizValues.reduce((sum, item) => sum + (Number(item.max) || 0), 0);
+  const quizEntered = quizValues.some((item) => parseScore(item.score) !== null);
   const quizRating = quizEntered ? transmuted(quizTotal, quizMax) : null;
   const parts = [
     quizRating === null ? null : quizRating * QUIZ_WEIGHT / 100,
@@ -260,6 +270,40 @@ function setStudentColumnWidths(xml, students) {
   return setWidth(setWidth(xml, 1, studentIdWidth), 2, studentNameWidth);
 }
 
+function setWorksheetColumnWidth(xml, targetColumn, width) {
+  return xml.replace(/<cols>([\s\S]*?)<\/cols>/, (whole, columnsXml) => {
+    const columns = columnsXml.match(/<col\b[^>]*\/>/g) || [];
+    const nextColumns = [];
+    let widthSet = false;
+    columns.forEach((columnXml) => {
+      const min = Number(columnXml.match(/\bmin="(\d+)"/)?.[1]);
+      const max = Number(columnXml.match(/\bmax="(\d+)"/)?.[1]);
+      if (!Number.isFinite(min) || !Number.isFinite(max) || targetColumn < min || targetColumn > max) {
+        nextColumns.push(columnXml);
+        return;
+      }
+      const withRange = (start, end, columnWidth = null) => {
+        let updated = columnXml
+          .replace(/\bmin="\d+"/, `min="${start}"`)
+          .replace(/\bmax="\d+"/, `max="${end}"`);
+        if (columnWidth !== null) {
+          if (/\bwidth="[^"]*"/.test(updated)) updated = updated.replace(/\bwidth="[^"]*"/, `width="${columnWidth}"`);
+          else updated = updated.replace(/\/>$/, ` width="${columnWidth}"/>`);
+          if (!/\bcustomWidth=/.test(updated)) updated = updated.replace(/\/>$/, ' customWidth="1"/>');
+        }
+        return updated;
+      };
+      if (min < targetColumn) nextColumns.push(withRange(min, targetColumn - 1));
+      nextColumns.push(withRange(targetColumn, targetColumn, width.toFixed(2)));
+      if (targetColumn < max) nextColumns.push(withRange(targetColumn + 1, max));
+      widthSet = true;
+    });
+    if (!widthSet) nextColumns.push(`<col min="${targetColumn}" max="${targetColumn}" width="${width.toFixed(2)}" customWidth="1"/>`);
+    nextColumns.sort((left, right) => Number(left.match(/\bmin="(\d+)"/)?.[1] || 0) - Number(right.match(/\bmin="(\d+)"/)?.[1] || 0));
+    return `<cols>${nextColumns.join("")}</cols>`;
+  });
+}
+
 function updateBccHeader(files, headerBytes) {
   [1, 2].forEach((index) => {
     const relationshipPath = `xl/drawings/_rels/drawing${index}.xml.rels`;
@@ -286,15 +330,22 @@ export default function BCCGradeEncoding() {
   const [loading, setLoading] = useState(false);
   const [maxScores, setMaxScores] = useState(DEFAULT_MAX_SCORES);
   const [quizCount, setQuizCount] = useState(DEFAULT_QUIZ_COUNT);
+  const [lmsActivities, setLmsActivities] = useState([]);
+  const [lmsActivitySlots, setLmsActivitySlots] = useState({});
+  const [lmsSyncVersion, setLmsSyncVersion] = useState(0);
   const savingRowsRef = useRef(new Set());
 
   useEffect(() => {
     if (!courseId || !periodId) return;
     try {
       const saved = JSON.parse(localStorage.getItem(`bcc-grade-max:${courseId}:${periodId}`) || "null");
-      const count = Math.max(DEFAULT_QUIZ_COUNT, saved?.quizzes?.length || 0);
+      // Only counts recorded by the explicit Add column button should extend
+      // the three default slots. Ignore the legacy count that included LMS items.
+      const savedColumnCount = Number(localStorage.getItem(`bcc-grade-manual-quiz-count-v3:${courseId}:${periodId}`));
+      const count = Math.max(DEFAULT_QUIZ_COUNT, Number.isInteger(savedColumnCount) ? savedColumnCount : DEFAULT_QUIZ_COUNT);
       setQuizCount(count);
-      setMaxScores(saved?.quizzes?.length ? { ...DEFAULT_MAX_SCORES, ...saved } : DEFAULT_MAX_SCORES);
+      const savedQuizMaxima = Array.from({ length: count }, (_, index) => saved?.quizzes?.[index] ?? 10);
+      setMaxScores(saved ? { ...DEFAULT_MAX_SCORES, ...saved, quizzes: savedQuizMaxima } : DEFAULT_MAX_SCORES);
     } catch { setQuizCount(DEFAULT_QUIZ_COUNT); setMaxScores(DEFAULT_MAX_SCORES); }
   }, [courseId, periodId]);
 
@@ -330,9 +381,12 @@ export default function BCCGradeEncoding() {
         setPeriodLabel([semester, schoolYear ? `F.Y. ${schoolYear}` : ""].filter(Boolean).join(" "));
         const assignmentSections = new Map();
         currentAssignments.forEach((item) => {
-          const code = normalizeCourseCode(item.course_code);
-          if (!assignmentSections.has(code)) assignmentSections.set(code, new Set());
-          assignmentSections.get(code).add(normalizeSectionName(item.section));
+          const id = String(item.course_id);
+          if (!assignmentSections.has(id)) assignmentSections.set(id, []);
+          assignmentSections.get(id).push({
+            section: normalizeSectionName(item.section),
+            sectionId: item.section_id == null ? "" : String(item.section_id),
+          });
         });
         const coursesById = new Map();
         currentAssignments.forEach((item) => {
@@ -381,10 +435,14 @@ export default function BCCGradeEncoding() {
           sectionId: item.section_id || null,
         }));
         setStudents(enrolled.filter((student) => {
-          const sections = assignmentSections.get(normalizeCourseCode(student.courseCode));
-          return sections && (!activePeriodId || String(student.periodId) === activePeriodId) && sections.has(normalizeSectionName(student.section));
+          const assignments = assignmentSections.get(String(student.courseId));
+          if (!assignments?.length || (activePeriodId && String(student.periodId) !== activePeriodId)) return false;
+          return assignments.some(({ section, sectionId }) => {
+            if (sectionId && student.sectionId) return sectionId === String(student.sectionId);
+            return !section || section === normalizeSectionName(student.section);
+          });
         }));
-        setPeriodId(String(active?.period_id ?? active?.id ?? active?.periodId ?? ""));
+        setPeriodId(String(active?.period_id ?? active?.id ?? active?.periodId ?? currentAssignments[0]?.academic_period_id ?? ""));
       } catch (error) {
         console.error("Unable to load faculty grading data", error);
         toast.error("Unable to load courses and students.");
@@ -394,13 +452,12 @@ export default function BCCGradeEncoding() {
   }, []);
 
   const selectedCourse = courses.find((course) => String(course.id) === String(courseId));
+  const selectedCourseOption = selectedCourse
+    ? { value: String(selectedCourse.id), label: selectedCourse.label }
+    : null;
   const courseStudents = useMemo(() => {
     if (!selectedCourse) return [];
-    const selectedCode = normalizeCourseCode(selectedCourse.code);
-    return students.filter((student) =>
-      String(student.courseId) === String(courseId)
-      || (selectedCode && normalizeCourseCode(student.courseCode) === selectedCode),
-    );
+    return students.filter((student) => String(student.courseId) === String(courseId));
   }, [students, selectedCourse, courseId]);
   const selectedCourseIds = useMemo(
     () => [...new Set([courseId, ...courseStudents.map((student) => student.courseId)].filter(Boolean).map(String))],
@@ -409,6 +466,55 @@ export default function BCCGradeEncoding() {
   const visibleStudents = useMemo(() => courseStudents.filter((student) =>
     `${formatStudentName(student)} ${student.studentId}`.toLowerCase().includes(search.toLowerCase()),
   ), [courseStudents, search]);
+  const totalQuizCount = quizCount;
+  const activityBySlot = new Map(lmsActivities
+    .filter((activity) => Number.isInteger(lmsActivitySlots[activity.id]))
+    .map((activity) => [lmsActivitySlots[activity.id], activity]));
+  const totalQuizMaxScores = Array.from({ length: quizCount }, (_, index) =>
+    activityBySlot.get(index)?.maxScore ?? maxScores.quizzes[index] ?? 10,
+  );
+
+  useEffect(() => {
+    if (!courseId || !periodId) { setLmsActivities([]); setLmsActivitySlots({}); return; }
+    let cancelled = false;
+    setLmsActivities([]);
+    setLmsActivitySlots({});
+    const loadLmsActivities = async () => {
+      const facultyId = Number(localStorage.getItem("userId") || localStorage.getItem("user_id") || 0);
+      if (!facultyId) return;
+      try {
+        const response = await axios.get(`${API_BASE}/api/lms/assignments/faculty`, {
+          params: { faculty_id: facultyId, academic_period_id: periodId },
+        });
+        const activities = (response.data?.assignments || [])
+          .filter((item) => String(item.course_id) === String(courseId)
+            && ["assignment", "quiz"].includes(String(item.assignment_type || "assignment").toLowerCase()))
+          .sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0))
+          .map((item) => ({
+            id: String(item.id),
+            title: String(item.title || item.assignment_name || "Activity").trim(),
+            type: String(item.assignment_type || "assignment").toLowerCase(),
+            maxScore: Number(item.total_points) || 100,
+          }));
+        if (cancelled) return;
+        setLmsActivities(activities);
+        try {
+          await axios.post(
+            `${API_BASE}/api/grade-entries/sync/submissions?course_id=${courseId}&period_id=${periodId}`,
+            { submitted_by: facultyId },
+          );
+        } catch (error) {
+          console.error("Could not sync LMS submission scores", error);
+        }
+        if (!cancelled) setLmsSyncVersion((version) => version + 1);
+      } catch (error) {
+        console.error("Unable to load LMS assignments and quizzes for the grading sheet", error);
+        if (!cancelled) setLmsActivities([]);
+      }
+    };
+    loadLmsActivities();
+    return () => { cancelled = true; };
+  }, [courseId, periodId]);
 
   useEffect(() => {
     if (!courseId || !periodId || !courseStudents.length) { setRows({}); setEntryIds({}); setLocked({}); return; }
@@ -421,6 +527,9 @@ export default function BCCGradeEncoding() {
         ));
         const entries = responses.flatMap((response) => response.data?.data || []);
         const current = entries.filter(isBccGradeEntry);
+        const lmsEntries = entries.filter((entry) =>
+          !isBccGradeEntry(entry) && ["assignment", "quiz"].includes(String(entry.component_type || "").toLowerCase()),
+        );
         const nextRows = {};
         const nextIds = {};
         const nextLocks = {};
@@ -435,12 +544,10 @@ export default function BCCGradeEncoding() {
           const quizMatch = String(entry.component_name).match(/^BCC Quiz \/ Activity (\d+)$/i);
           if (quizMatch) {
             const index = Number(quizMatch[1]) - 1;
-            if (index >= 0) {
-              row.quizzes[index] = entry.raw_score ?? "";
-              setQuizCount((count) => Math.max(count, index + 1));
-            }
-            if (index >= 0 && Number(entry.max_score) > 0) {
-              setMaxScores((prev) => ({ ...prev, quizzes: Array.from({ length: Math.max(prev.quizzes.length, index + 1) }, (_, i) => i === index ? Number(entry.max_score) : (prev.quizzes[i] ?? 10)) }));
+            if (index < 0 || index >= quizCount) return;
+            row.quizzes[index] = entry.raw_score ?? "";
+            if (Number(entry.max_score) > 0) {
+              setMaxScores((prev) => ({ ...prev, quizzes: Array.from({ length: quizCount }, (_, i) => i === index ? Number(entry.max_score) : (prev.quizzes[i] ?? 10)) }));
             }
           } else {
             const component = COMPONENTS.find((item) => entry.component_name === `BCC ${item.title}`);
@@ -454,7 +561,41 @@ export default function BCCGradeEncoding() {
           nextIds[key] = entry.entry_id;
           if (entry.is_locked) nextLocks[key] = true;
         });
-        if (!cancelled) { setRows(nextRows); setEntryIds(nextIds); setLocked(nextLocks); }
+        const bccQuizEntries = current.map((entry) => ({
+          entry,
+          index: Number(String(entry.component_name || "").match(/^BCC Quiz \/ Activity (\d+)$/i)?.[1]) - 1,
+          student: studentByUserAndCourse.get(`${entry.student_id}:${entry.course_id}`),
+        })).filter(({ index, student }) => student && Number.isInteger(index) && index >= 0 && index < quizCount);
+        const effectiveQuizCount = quizCount;
+        const occupiedSlots = new Set(bccQuizEntries
+          .filter(({ entry }) => parseScore(entry.raw_score) !== null)
+          .map(({ index }) => index));
+        const nextActivitySlots = {};
+        let nextAvailableSlot = 0;
+        lmsActivities.forEach((activity) => {
+          while (occupiedSlots.has(nextAvailableSlot) && nextAvailableSlot < effectiveQuizCount) nextAvailableSlot += 1;
+          if (nextAvailableSlot < effectiveQuizCount) {
+            nextActivitySlots[activity.id] = nextAvailableSlot;
+            occupiedSlots.add(nextAvailableSlot);
+            nextAvailableSlot += 1;
+          }
+        });
+        lmsEntries.forEach((entry) => {
+          const student = studentByUserAndCourse.get(`${entry.student_id}:${entry.course_id}`);
+          if (!student) return;
+          const activity = lmsActivities.find((item) => item.title === String(entry.component_name || "").trim()
+            && item.type === String(entry.component_type || "").toLowerCase());
+          if (!activity) return;
+          const row = nextRows[student.id] || EMPTY_ROW(quizCount);
+          row.lmsScores = { ...(row.lmsScores || {}), [activity.id]: entry.raw_score ?? "" };
+          nextRows[student.id] = row;
+        });
+        if (!cancelled) {
+          setRows(nextRows);
+          setEntryIds(nextIds);
+          setLocked(nextLocks);
+          setLmsActivitySlots(nextActivitySlots);
+        }
       } catch (error) {
         console.error("Unable to load saved BCC grade entries", error);
         toast.error("Unable to load saved grades.");
@@ -462,7 +603,7 @@ export default function BCCGradeEncoding() {
     };
     loadEntries();
     return () => { cancelled = true; };
-  }, [courseId, periodId, courseStudents, selectedCourseIds]);
+  }, [courseId, periodId, courseStudents, selectedCourseIds, lmsActivities, lmsSyncVersion, quizCount]);
   const updateRow = (studentId, key, index, value) => setRows((prev) => {
     const row = { ...(prev[studentId] || EMPTY_ROW(quizCount)) };
     if (key === "quizzes") { row.quizzes = [...row.quizzes]; row.quizzes[index] = value; }
@@ -472,6 +613,9 @@ export default function BCCGradeEncoding() {
   const addQuizColumn = () => {
     const nextCount = quizCount + 1;
     setQuizCount(nextCount);
+    if (courseId && periodId) localStorage.setItem(`bcc-grade-manual-quiz-count-v3:${courseId}:${periodId}`, String(nextCount));
+    const nextActivity = lmsActivities.find((activity) => !Number.isInteger(lmsActivitySlots[activity.id]));
+    if (nextActivity) setLmsActivitySlots((previous) => ({ ...previous, [nextActivity.id]: nextCount - 1 }));
     setMaxScores((prev) => {
       const next = { ...prev, quizzes: [...prev.quizzes, 10] };
       if (courseId && periodId) localStorage.setItem(`bcc-grade-max:${courseId}:${periodId}`, JSON.stringify(next));
@@ -496,7 +640,7 @@ export default function BCCGradeEncoding() {
     try {
       const row = rows[student.id] || EMPTY_ROW(quizCount);
       const entries = [
-        ...row.quizzes.map((score, index) => ({ key: "quizzes", index, score, max: maxScores.quizzes[index], weight: QUIZ_WEIGHT / quizCount })),
+        ...row.quizzes.slice(0, quizCount).map((score, index) => ({ key: "quizzes", index, score, max: maxScores.quizzes[index], weight: QUIZ_WEIGHT / quizCount })).filter(({ index }) => !activityBySlot.has(index)),
         ...COMPONENTS.map(({ key, weight }) => ({ key, index: null, score: row[key], max: maxScores[key], weight })),
       ];
       const operations = [];
@@ -578,7 +722,7 @@ export default function BCCGradeEncoding() {
         if (!student.userId) return;
         const row = rows[student.id] || EMPTY_ROW(quizCount);
         const entries = [
-          ...row.quizzes.map((score, index) => ({ key: "quizzes", index, score, max: maxScores.quizzes[index], weight: QUIZ_WEIGHT / quizCount })),
+          ...row.quizzes.slice(0, quizCount).map((score, index) => ({ key: "quizzes", index, score, max: maxScores.quizzes[index], weight: QUIZ_WEIGHT / quizCount })).filter(({ index }) => !activityBySlot.has(index)),
           ...COMPONENTS.map(({ key, weight }) => ({ key, index: null, score: row[key], max: maxScores[key], weight })),
         ];
         entries.forEach(({ key, index, score, max, weight }) => {
@@ -661,12 +805,13 @@ export default function BCCGradeEncoding() {
       let gradingXml = decoder.decode(files["xl/worksheets/sheet1.xml"]);
       let ratingXml = decoder.decode(files["xl/worksheets/sheet2.xml"]);
       if (!gradingXml || !ratingXml) throw new Error("The BCC workbook is missing a required sheet.");
-      const addedQuizColumns = Math.max(0, quizCount - DEFAULT_QUIZ_COUNT);
+      const addedQuizColumns = Math.max(0, totalQuizCount - DEFAULT_QUIZ_COUNT);
       gradingXml = insertWorksheetColumns(gradingXml, 7, addedQuizColumns, 6);
       const columnNumber = (letters) => [...letters].reduce((sum, letter) => sum * 26 + letter.charCodeAt(0) - 64, 0);
       const columnLetters = (number) => { let letters = ""; while (number) { number -= 1; letters = String.fromCharCode(65 + number % 26) + letters; number = Math.floor(number / 26); } return letters; };
       const col = (original) => columnLetters(columnNumber(original) >= 7 ? columnNumber(original) + addedQuizColumns : columnNumber(original));
-      const quizCols = Array.from({ length: quizCount }, (_, index) => columnLetters(4 + index));
+      const quizCols = Array.from({ length: totalQuizCount }, (_, index) => columnLetters(4 + index));
+      quizCols.forEach((column) => { gradingXml = setWorksheetColumnWidth(gradingXml, columnNumber(column), 9); });
       gradingXml = setStudentColumnWidths(gradingXml, visibleStudents);
       const rosterTemplateRows = 21;
       const extraRows = Math.max(0, visibleStudents.length - rosterTemplateRows);
@@ -688,12 +833,18 @@ export default function BCCGradeEncoding() {
       gradingXml = setWorksheetCell(gradingXml, `B${signatureNameRow}`, String(selectedCourse?.facultyName || "").toUpperCase());
       gradingXml = setWorksheetCell(gradingXml, `${col("G")}${signatureNameRow}`, String(selectedCourse?.departmentHeadName || "").toUpperCase());
       gradingXml = setWorksheetCell(gradingXml, `${col("G")}${signatureTitleRow}`, coordinatorLabelFor(selectedCourse?.departmentName));
-      quizCols.forEach((column, index) => { gradingXml = setWorksheetCell(gradingXml, `${column}13`, Number(maxScores.quizzes[index]) || 10); });
+      quizCols.forEach((column, index) => {
+        const activity = activityBySlot.get(index);
+        const activityKind = activity?.type === "quiz" ? "Quiz" : "Assignment";
+        const heading = activity ? activityKind : `Quiz / Activity ${index + 1}`;
+        gradingXml = setWorksheetCell(gradingXml, `${column}12`, heading);
+        gradingXml = setWorksheetCell(gradingXml, `${column}13`, Number(totalQuizMaxScores[index]) || 10);
+      });
       gradingXml = setWorksheetFormula(
         gradingXml,
         `${col("G")}13`,
         `SUM(${quizCols[0]}13:${quizCols[quizCols.length - 1]}13)`,
-        maxScores.quizzes.reduce((sum, score) => sum + (Number(score) || 0), 0),
+        totalQuizMaxScores.reduce((sum, score) => sum + (Number(score) || 0), 0),
       );
       [[col("J"), maxScores.performance], [col("L"), maxScores.attendance], [col("O"), maxScores.project], [col("Q"), maxScores.prelim], [col("T"), maxScores.midterm], [col("W"), maxScores.finals]]
         .forEach(([column, value]) => { gradingXml = setWorksheetCell(gradingXml, `${column}13`, Number(value) || 100); });
@@ -705,7 +856,12 @@ export default function BCCGradeEncoding() {
         const excelRow = 14 + index;
         gradingXml = setWorksheetCell(gradingXml, `A${excelRow}`, student ? String(student.studentId) : "");
         gradingXml = setWorksheetCell(gradingXml, `B${excelRow}`, student ? formatStudentName(student) : "");
-        quizCols.forEach((column, quizIndex) => { gradingXml = setWorksheetCell(gradingXml, `${column}${excelRow}`, row.quizzes[quizIndex] === "" ? "" : Number(row.quizzes[quizIndex])); });
+        quizCols.forEach((column, quizIndex) => {
+          const value = activityBySlot.get(quizIndex)
+            ? row.lmsScores?.[activityBySlot.get(quizIndex).id]
+            : row.quizzes[quizIndex];
+          gradingXml = setWorksheetCell(gradingXml, `${column}${excelRow}`, value === "" || value == null ? "" : Number(value));
+        });
         [[col("J"), "performance"], [col("L"), "attendance"], [col("O"), "project"], [col("Q"), "prelim"], [col("T"), "midterm"], [col("W"), "finals"]]
           .forEach(([column, key]) => { gradingXml = setWorksheetCell(gradingXml, `${column}${excelRow}`, row[key] === "" ? "" : Number(row[key])); });
         const totalCol = col("G"), ratingCol = col("H"), quizWeightCol = col("I");
@@ -720,7 +876,7 @@ export default function BCCGradeEncoding() {
         const quizMaxRange = `${quizCols[0]}$13:${quizCols[quizCols.length - 1]}$13`;
         const equivalentFormula = [[96.5, "1.00"], [93.5, "1.25"], [90.5, "1.50"], [87.5, "1.75"], [84.5, "2.00"], [81.5, "2.25"], [78.5, "2.50"], [75.5, "2.75"], [75, "3.00"]]
           .reduceRight((formula, [threshold, equivalent]) => `IF(${finalGradeCol}${excelRow}>=${threshold},"${equivalent}",${formula})`, '"5.00"');
-        const computedGrade = getGrade(row, maxScores);
+        const computedGrade = getGrade(row, maxScores, lmsActivities, lmsActivitySlots);
         const performanceRating = percentageRating(parseScore(row.performance), maxScores.performance);
         const attendanceRating = percentageRating(parseScore(row.attendance), maxScores.attendance);
         const projectRating = percentageRating(parseScore(row.project), maxScores.project);
@@ -728,7 +884,9 @@ export default function BCCGradeEncoding() {
         const midtermRating = transmuted(parseScore(row.midterm), Number(maxScores.midterm));
         const finalsRating = transmuted(parseScore(row.finals), Number(maxScores.finals));
         const cachedValues = {
-          [totalCol]: row.quizzes.reduce((sum, score) => sum + (parseScore(score) ?? 0), 0),
+          [totalCol]: Array.from({ length: quizCount }, (_, index) => activityBySlot.get(index)
+            ? row.lmsScores?.[activityBySlot.get(index).id]
+            : row.quizzes[index]).reduce((sum, score) => sum + (parseScore(score) ?? 0), 0),
           [ratingCol]: computedGrade.quizRating ?? "", [quizWeightCol]: computedGrade.quizRating === null ? "" : computedGrade.quizRating * 0.1,
           [performanceWeightCol]: performanceRating === null ? "" : performanceRating * 0.1,
           [attendanceWeightCol]: attendanceRating === null ? "" : attendanceRating * 0.1,
@@ -788,9 +946,19 @@ export default function BCCGradeEncoding() {
       }));
       const downloadLink = document.createElement("a");
       downloadLink.href = downloadUrl;
-      downloadLink.download = "BCC-Grading-Sheet.xlsx";
+      const safeFilePart = (value) => String(value || "")
+        .trim()
+        .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
+        .replace(/\s+/g, "-")
+        .slice(0, 48);
+      const downloadStamp = new Date().toISOString().replace(/[:.]/g, "-");
+      downloadLink.download = ["BCC-Grading-Sheet", safeFilePart(courseCode), safeFilePart(periodLabel), downloadStamp]
+        .filter(Boolean)
+        .join("-") + ".xlsx";
+      document.body.appendChild(downloadLink);
       downloadLink.click();
-      URL.revokeObjectURL(downloadUrl);
+      downloadLink.remove();
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
     } catch (error) {
       console.error("Unable to export the BCC template", error);
       toast.error(error.message || "Could not export the BCC grading sheet.");
@@ -853,15 +1021,39 @@ export default function BCCGradeEncoding() {
       </div>
     </div>
     <div className="flex flex-wrap gap-3">
-      <select value={courseId} onChange={(event) => { const value = event.target.value; setCourseId(value); if (periodId) localStorage.setItem(`bcc-grade-course:${periodId}`, value); }} className="min-w-64 rounded border px-3 py-2 text-sm"><option value="">Select course</option>{courses.map((course) => <option key={course.id} value={course.id}>{course.label}</option>)}</select>
+      <Select
+        inputId="bcc-grade-course-select"
+        value={selectedCourseOption}
+        onChange={(option) => {
+          const value = option?.value || "";
+          setCourseId(value);
+          if (periodId) localStorage.setItem(`bcc-grade-course:${periodId}`, value);
+        }}
+        options={courses.map((course) => ({ value: String(course.id), label: course.label }))}
+        placeholder="Select course"
+        isSearchable
+        isClearable
+        className="min-w-64 text-sm"
+        classNamePrefix="bcc-course-select"
+        styles={{
+          control: (base, state) => ({
+            ...base,
+            minHeight: 40,
+            borderColor: state.isFocused ? "#6366f1" : "#cbd5e1",
+            boxShadow: state.isFocused ? "0 0 0 1px #6366f1" : "none",
+            "&:hover": { borderColor: "#6366f1" },
+          }),
+          menu: (base) => ({ ...base, zIndex: 30 }),
+        }}
+      />
       <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students" className="rounded border px-3 py-2 text-sm" />
       <span className="self-center text-xs text-slate-500">Press Enter in a grade field to save that student's row and move to the next input. Quiz/exam rating: 30 + (score ÷ maximum × 70). Other ratings use score ÷ maximum × 100. Passing starts at 75.</span>
     </div>
     <div className="overflow-x-auto rounded border border-slate-300 bg-white">
       <table className="min-w-full border-collapse text-xs">
         <thead className="bg-slate-100">
-          <tr><th colSpan={26 + quizCount} className="border px-2 py-1 bg-black text-center font-bold text-white">GRADING SHEET FOR {periodLabel || ""}</th></tr>
-          <tr><th colSpan={26 + quizCount} className="border p-0">
+          <tr><th colSpan={26 + totalQuizCount} className="border px-2 py-1 bg-black text-center font-bold text-white">GRADING SHEET FOR {periodLabel || ""}</th></tr>
+          <tr><th colSpan={26 + totalQuizCount} className="border p-0">
             <div className="grid grid-cols-[22%_1fr] text-left font-semibold">
               <div className="border-r bg-yellow-300 px-2 py-1">Course Code {selectedCourse?.code || ""}</div>
               <div className="bg-yellow-300 px-2 py-1">Subject Title: {(selectedCourse?.title || "").toUpperCase()}</div>
@@ -869,7 +1061,7 @@ export default function BCCGradeEncoding() {
           </th></tr>
           <tr>
             <th colSpan="2" rowSpan="3" className="border px-2 py-2 text-center">Name of Students</th>
-            <th colSpan={8 + quizCount} className="border px-2 py-2 bg-blue-600 text-white">CLASS STANDING</th>
+            <th colSpan={8 + totalQuizCount} className="border px-2 py-2 bg-blue-600 text-white">CLASS STANDING</th>
             <th colSpan="2" rowSpan="2" className="border px-2 py-2 bg-green-500">PROJECT</th>
             <th colSpan="9" className="border px-2 py-2 bg-orange-400">MAJOR EXAM</th>
             <th rowSpan="3" className="border px-2 py-2 bg-stone-200"><span className="[writing-mode:vertical-rl] rotate-180">Final Grade</span></th>
@@ -878,7 +1070,7 @@ export default function BCCGradeEncoding() {
             <th colSpan="2" className="border px-2 py-2 bg-stone-200">REMOVAL</th>
           </tr>
           <tr>
-            <th colSpan={quizCount + 3} className="border px-2 py-2 bg-blue-100">Quizzes / Activities 10% <button type="button" onClick={addQuizColumn} className="ml-2 inline-flex items-center gap-1 rounded bg-blue-600 px-2 py-1 text-white"><Plus size={13} /> Add column</button></th>
+            <th colSpan={totalQuizCount + 3} className="border px-2 py-2 bg-blue-100">Quizzes / Activities 10% <button type="button" onClick={addQuizColumn} className="ml-2 inline-flex items-center gap-1 rounded bg-blue-600 px-2 py-1 text-white"><Plus size={13} /> Add column</button>{lmsActivities.length > Object.keys(lmsActivitySlots).length && <span className="ml-2 text-xs font-normal text-amber-800">{lmsActivities.length - Object.keys(lmsActivitySlots).length} LMS item(s) did not fit in the {quizCount} available columns; only blank columns are used.</span>}</th>
             <th colSpan="2" className="border px-2 py-2 bg-emerald-100">Performance 10%</th>
             <th colSpan="2" className="border px-2 py-2 bg-amber-100">Attendance 10%</th>
             <th rowSpan="2" className="border px-2 py-2 bg-blue-200"><span className="[writing-mode:vertical-rl] rotate-180">Class Standing 30%</span></th>
@@ -889,7 +1081,15 @@ export default function BCCGradeEncoding() {
             <th rowSpan="2" className="border px-2 py-2 bg-stone-200">Net Equivalent</th>
           </tr>
           <tr className="bg-white">
-            {Array.from({ length: quizCount }, (_, index) => <th key={index} className="border p-1">{maxInput("quizzes", index, `Quiz / Activity ${index + 1}`)}</th>)}
+            {Array.from({ length: quizCount }, (_, index) => {
+              const activity = activityBySlot.get(index);
+              return <th key={index} className="border p-1">
+                {activity ? <div className="min-w-24">
+                  <div className="font-medium">{activity.type === "quiz" ? "Quiz" : "Assignment"}</div>
+                  <div className="text-[10px] text-slate-500">/{activity.maxScore}</div>
+                </div> : maxInput("quizzes", index, `Quiz / Activity ${index + 1}`)}
+              </th>;
+            })}
             <th className="border px-2">Total</th><th className="border px-2">Rating</th><th className="border px-2">10%</th>
             <th className="border p-1">{maxInput("performance", null, "Performance")}</th><th className="border px-2">10%</th>
             <th className="border p-1">{maxInput("attendance", null, "Attendance")}</th><th className="border px-2">10%</th>
@@ -900,8 +1100,10 @@ export default function BCCGradeEncoding() {
           </tr>
         </thead>
         <tbody>{visibleStudents.length ? visibleStudents.map((student) => {
-          const row = rows[student.id] || EMPTY_ROW(quizCount); const grade = getGrade(row, maxScores);
-          const quizTotal = row.quizzes.reduce((sum, value) => sum + (parseScore(value) ?? 0), 0);
+          const row = rows[student.id] || EMPTY_ROW(quizCount); const grade = getGrade(row, maxScores, lmsActivities, lmsActivitySlots);
+          const quizTotal = Array.from({ length: quizCount }, (_, index) => activityBySlot.get(index)
+            ? row.lmsScores?.[activityBySlot.get(index).id]
+            : row.quizzes[index]).reduce((sum, value) => sum + (parseScore(value) ?? 0), 0);
           const quizRating = grade.quizRating;
           const performanceRating = percentageRating(parseScore(row.performance), maxScores.performance);
           const attendanceRating = percentageRating(parseScore(row.attendance), maxScores.attendance);
@@ -916,7 +1118,14 @@ export default function BCCGradeEncoding() {
           const shown = (rating) => rating === null ? "-" : rating.toFixed(2);
           return <tr key={student.id} className="hover:bg-slate-50">
             <td className="border px-2 py-2 whitespace-nowrap">{student.studentId}</td><td className="border px-2 py-2 whitespace-nowrap">{formatStudentName(student)}</td>
-            {Array.from({ length: quizCount }, (_, index) => <td key={index} className="border bg-blue-50 p-1 text-center">{input(student, "quizzes", index, maxScores.quizzes[index])}</td>)}
+            {Array.from({ length: quizCount }, (_, index) => {
+              const activity = activityBySlot.get(index);
+              return <td key={index} className="border bg-blue-50 p-1 text-center">
+                {activity
+                  ? (row.lmsScores?.[activity.id] ?? <span className="text-slate-400">—</span>)
+                  : input(student, "quizzes", index, maxScores.quizzes[index])}
+              </td>;
+            })}
             <td className="border bg-blue-100 px-2 text-center">{quizTotal || "-"}</td><td className="border bg-blue-100 px-2 text-center">{shown(quizRating)}</td><td className="border bg-blue-100 px-2 text-center">{weighted(quizRating, 10)}</td>
             <td className="border bg-emerald-50 p-1 text-center">{input(student, "performance", null, maxScores.performance)}</td><td className="border bg-emerald-100 px-2 text-center">{weighted(performanceRating, 10)}</td>
             <td className="border bg-amber-50 p-1 text-center">{input(student, "attendance", null, maxScores.attendance)}</td><td className="border bg-amber-100 px-2 text-center">{weighted(attendanceRating, 10)}</td>
@@ -928,7 +1137,7 @@ export default function BCCGradeEncoding() {
             <td className="border px-2 text-center font-bold">{grade.total ?? "-"}</td><td className="border px-2 text-center">{grade.equivalent}</td>
             <td className={`border px-2 text-center font-semibold ${grade.remarks === "PASSED" ? "text-green-700" : grade.remarks === "FAILED" ? "text-red-700" : "text-slate-400"}`}>{grade.remarks}</td><td className="border px-2 text-center">-</td><td className="border px-2 text-center">-</td>
           </tr>;
-        }) : <tr><td colSpan={26 + quizCount} className="px-4 py-8 text-center text-slate-500">{courseId ? "No students found for this course." : "Select a course to view enrolled students."}</td></tr>}</tbody>
+        }) : <tr><td colSpan={26 + totalQuizCount} className="px-4 py-8 text-center text-slate-500">{courseId ? "No students found for this course." : "Select a course to view enrolled students."}</td></tr>}</tbody>
       </table>
     </div>
   </div>;
