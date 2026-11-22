@@ -29,15 +29,17 @@ function getGrade(row, maxScores, lmsActivities = [], activitySlots = {}) {
   const activityBySlot = new Map(lmsActivities
     .filter((activity) => Number.isInteger(activitySlots[activity.id]))
     .map((activity) => [activitySlots[activity.id], activity]));
-  const quizValues = Array.from({ length: maxScores.quizzes.length }, (_, index) => {
+  const slotCount = Math.max(maxScores.quizzes.length, ...[...activityBySlot.keys()].map((slot) => slot + 1));
+  const quizValues = Array.from({ length: slotCount }, (_, index) => {
     const activity = activityBySlot.get(index);
     return activity
       ? { score: row.lmsScores?.[activity.id], max: activity.maxScore }
       : { score: row.quizzes[index], max: maxScores.quizzes[index] };
   });
-  const quizTotal = quizValues.reduce((sum, item) => sum + (parseScore(item.score) ?? 0), 0);
-  const quizMax = quizValues.reduce((sum, item) => sum + (Number(item.max) || 0), 0);
-  const quizEntered = quizValues.some((item) => parseScore(item.score) !== null);
+  const enteredQuizValues = quizValues.filter((item) => parseScore(item.score) !== null);
+  const quizTotal = enteredQuizValues.reduce((sum, item) => sum + Number(item.score), 0);
+  const quizMax = enteredQuizValues.reduce((sum, item) => sum + (Number(item.max) || 0), 0);
+  const quizEntered = enteredQuizValues.length > 0;
   const quizRating = quizEntered ? transmuted(quizTotal, quizMax) : null;
   const parts = [
     quizRating === null ? null : quizRating * QUIZ_WEIGHT / 100,
@@ -466,11 +468,11 @@ export default function BCCGradeEncoding() {
   const visibleStudents = useMemo(() => courseStudents.filter((student) =>
     `${formatStudentName(student)} ${student.studentId}`.toLowerCase().includes(search.toLowerCase()),
   ), [courseStudents, search]);
-  const totalQuizCount = quizCount;
+  const totalQuizCount = Math.max(quizCount, ...Object.values(lmsActivitySlots).map((slot) => slot + 1));
   const activityBySlot = new Map(lmsActivities
     .filter((activity) => Number.isInteger(lmsActivitySlots[activity.id]))
     .map((activity) => [lmsActivitySlots[activity.id], activity]));
-  const totalQuizMaxScores = Array.from({ length: quizCount }, (_, index) =>
+  const totalQuizMaxScores = Array.from({ length: totalQuizCount }, (_, index) =>
     activityBySlot.get(index)?.maxScore ?? maxScores.quizzes[index] ?? 10,
   );
 
@@ -489,15 +491,30 @@ export default function BCCGradeEncoding() {
         const activities = (response.data?.assignments || [])
           .filter((item) => String(item.course_id) === String(courseId)
             && ["assignment", "quiz"].includes(String(item.assignment_type || "assignment").toLowerCase()))
-          .sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0))
-          .map((item) => ({
-            id: String(item.id),
+          .sort((a, b) => new Date(a.due_date || a.created_at || 0) - new Date(b.due_date || b.created_at || 0));
+        const activitiesWithScores = await Promise.all(activities.map(async (item) => {
+          const id = String(item.id);
+          let scoreByStudent = {};
+          try {
+            const submissionResponse = await axios.get(`${API_BASE}/api/lms/assignments/${id}/submissions`);
+            (submissionResponse.data?.submissions || []).forEach((submission) => {
+              if (submission.score !== null && submission.score !== undefined) {
+                scoreByStudent[String(submission.student_id)] = submission.score;
+              }
+            });
+          } catch (error) {
+            console.error(`Unable to load submissions for LMS item ${id}`, error);
+          }
+          return {
+            id,
             title: String(item.title || item.assignment_name || "Activity").trim(),
             type: String(item.assignment_type || "assignment").toLowerCase(),
             maxScore: Number(item.total_points) || 100,
-          }));
+            scoreByStudent,
+          };
+        }));
         if (cancelled) return;
-        setLmsActivities(activities);
+        setLmsActivities(activitiesWithScores);
         try {
           await axios.post(
             `${API_BASE}/api/grade-entries/sync/submissions?course_id=${courseId}&period_id=${periodId}`,
@@ -527,9 +544,6 @@ export default function BCCGradeEncoding() {
         ));
         const entries = responses.flatMap((response) => response.data?.data || []);
         const current = entries.filter(isBccGradeEntry);
-        const lmsEntries = entries.filter((entry) =>
-          !isBccGradeEntry(entry) && ["assignment", "quiz"].includes(String(entry.component_type || "").toLowerCase()),
-        );
         const nextRows = {};
         const nextIds = {};
         const nextLocks = {};
@@ -566,29 +580,25 @@ export default function BCCGradeEncoding() {
           index: Number(String(entry.component_name || "").match(/^BCC Quiz \/ Activity (\d+)$/i)?.[1]) - 1,
           student: studentByUserAndCourse.get(`${entry.student_id}:${entry.course_id}`),
         })).filter(({ index, student }) => student && Number.isInteger(index) && index >= 0 && index < quizCount);
-        const effectiveQuizCount = quizCount;
         const occupiedSlots = new Set(bccQuizEntries
           .filter(({ entry }) => parseScore(entry.raw_score) !== null)
           .map(({ index }) => index));
         const nextActivitySlots = {};
         let nextAvailableSlot = 0;
         lmsActivities.forEach((activity) => {
-          while (occupiedSlots.has(nextAvailableSlot) && nextAvailableSlot < effectiveQuizCount) nextAvailableSlot += 1;
-          if (nextAvailableSlot < effectiveQuizCount) {
-            nextActivitySlots[activity.id] = nextAvailableSlot;
-            occupiedSlots.add(nextAvailableSlot);
-            nextAvailableSlot += 1;
-          }
+          while (occupiedSlots.has(nextAvailableSlot)) nextAvailableSlot += 1;
+          nextActivitySlots[activity.id] = nextAvailableSlot;
+          occupiedSlots.add(nextAvailableSlot);
+          nextAvailableSlot += 1;
         });
-        lmsEntries.forEach((entry) => {
-          const student = studentByUserAndCourse.get(`${entry.student_id}:${entry.course_id}`);
-          if (!student) return;
-          const activity = lmsActivities.find((item) => item.title === String(entry.component_name || "").trim()
-            && item.type === String(entry.component_type || "").toLowerCase());
-          if (!activity) return;
-          const row = nextRows[student.id] || EMPTY_ROW(quizCount);
-          row.lmsScores = { ...(row.lmsScores || {}), [activity.id]: entry.raw_score ?? "" };
-          nextRows[student.id] = row;
+        lmsActivities.forEach((activity) => {
+          Object.entries(activity.scoreByStudent || {}).forEach(([studentUserId, score]) => {
+            const student = studentByUserAndCourse.get(`${studentUserId}:${courseId}`);
+            if (!student) return;
+            const row = nextRows[student.id] || EMPTY_ROW(quizCount);
+            row.lmsScores = { ...(row.lmsScores || {}), [activity.id]: score };
+            nextRows[student.id] = row;
+          });
         });
         if (!cancelled) {
           setRows(nextRows);
@@ -614,8 +624,6 @@ export default function BCCGradeEncoding() {
     const nextCount = quizCount + 1;
     setQuizCount(nextCount);
     if (courseId && periodId) localStorage.setItem(`bcc-grade-manual-quiz-count-v3:${courseId}:${periodId}`, String(nextCount));
-    const nextActivity = lmsActivities.find((activity) => !Number.isInteger(lmsActivitySlots[activity.id]));
-    if (nextActivity) setLmsActivitySlots((previous) => ({ ...previous, [nextActivity.id]: nextCount - 1 }));
     setMaxScores((prev) => {
       const next = { ...prev, quizzes: [...prev.quizzes, 10] };
       if (courseId && periodId) localStorage.setItem(`bcc-grade-max:${courseId}:${periodId}`, JSON.stringify(next));
@@ -884,7 +892,7 @@ export default function BCCGradeEncoding() {
         const midtermRating = transmuted(parseScore(row.midterm), Number(maxScores.midterm));
         const finalsRating = transmuted(parseScore(row.finals), Number(maxScores.finals));
         const cachedValues = {
-          [totalCol]: Array.from({ length: quizCount }, (_, index) => activityBySlot.get(index)
+          [totalCol]: Array.from({ length: totalQuizCount }, (_, index) => activityBySlot.get(index)
             ? row.lmsScores?.[activityBySlot.get(index).id]
             : row.quizzes[index]).reduce((sum, score) => sum + (parseScore(score) ?? 0), 0),
           [ratingCol]: computedGrade.quizRating ?? "", [quizWeightCol]: computedGrade.quizRating === null ? "" : computedGrade.quizRating * 0.1,
@@ -899,7 +907,7 @@ export default function BCCGradeEncoding() {
           [remarksCol]: computedGrade.total === null ? "" : computedGrade.remarks,
         };
         const formulas = {
-          [totalCol]: `SUM(${quizRange})`, [ratingCol]: `IF(COUNT(${quizRange})=0,"",MIN(100,${totalCol}${excelRow}/SUM(${quizMaxRange})*70+30))`,
+          [totalCol]: `SUM(${quizRange})`, [ratingCol]: `IF(COUNT(${quizRange})=0,"",IFERROR(MIN(100,${totalCol}${excelRow}/SUMPRODUCT(--ISNUMBER(${quizRange}),${quizMaxRange})*70+30),""))`,
           [quizWeightCol]: `IF(${ratingCol}${excelRow}="","",${ratingCol}${excelRow}*0.1)`,
           [performanceWeightCol]: `IF(${performanceCol}${excelRow}="","",MIN(100,${performanceCol}${excelRow}/$${performanceCol}$13*100)*0.1)`,
           [attendanceWeightCol]: `IF(${attendanceCol}${excelRow}="","",MIN(100,${attendanceCol}${excelRow}/$${attendanceCol}$13*100)*0.1)`,
@@ -1047,7 +1055,6 @@ export default function BCCGradeEncoding() {
         }}
       />
       <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search students" className="rounded border px-3 py-2 text-sm" />
-      <span className="self-center text-xs text-slate-500">Press Enter in a grade field to save that student's row and move to the next input. Quiz/exam rating: 30 + (score ÷ maximum × 70). Other ratings use score ÷ maximum × 100. Passing starts at 75.</span>
     </div>
     <div className="overflow-x-auto rounded border border-slate-300 bg-white">
       <table className="min-w-full border-collapse text-xs">
