@@ -66,6 +66,17 @@ const findOptionByValue = (options, value) => {
 const ALL_COURSES_VALUE = "__all_courses__";
 const normalizeSemester = (value) => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
 const ALL_STUDENTS_VALUE = "__all_students__";
+const sectionYearLevel = (section) => {
+  if (String(section?.year_level || "").trim()) return section.year_level;
+  const suffix = String(section?.section_name || "").match(/-(\d+)\s*$/)?.[1];
+  return suffix ? `${suffix}` : "";
+};
+const normalizeYearLevel = (value) => {
+  const text = String(value || "").trim().toLowerCase();
+  const ordinal = text.match(/\b(1st|first|1|2nd|second|2|3rd|third|3|4th|fourth|4)\b/);
+  const yearNumber = { "1st": "1", first: "1", "2nd": "2", second: "2", "3rd": "3", third: "3", "4th": "4", fourth: "4" };
+  return ordinal ? yearNumber[ordinal[1]] || ordinal[1] : text.replace(/\s+/g, " ");
+};
 
 // Form-data mapping for enrollment creation/editing. Includes section_id
 // so that registrars can transfer/change a student's section directly in edit mode.
@@ -225,7 +236,7 @@ const StudentSectionModal = ({ isOpen, student, sections, onClose, onSave, loadi
   const matchingSections = sections.filter((section) =>
     String(section.period_id) === String(student?.period_id)
     && String(section.program_id) === String(student?.program_id)
-    && String(section.year_level || "").trim().toLowerCase() === String(student?.year_level || "").trim().toLowerCase()
+    && normalizeYearLevel(sectionYearLevel(section)) === normalizeYearLevel(student?.year_level)
     && section.status !== "inactive",
   );
 

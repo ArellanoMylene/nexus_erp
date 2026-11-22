@@ -330,9 +330,12 @@ export default function BCCGradeEncoding() {
         setPeriodLabel([semester, schoolYear ? `F.Y. ${schoolYear}` : ""].filter(Boolean).join(" "));
         const assignmentSections = new Map();
         currentAssignments.forEach((item) => {
-          const code = normalizeCourseCode(item.course_code);
-          if (!assignmentSections.has(code)) assignmentSections.set(code, new Set());
-          assignmentSections.get(code).add(normalizeSectionName(item.section));
+          const id = String(item.course_id);
+          if (!assignmentSections.has(id)) assignmentSections.set(id, []);
+          assignmentSections.get(id).push({
+            section: normalizeSectionName(item.section),
+            sectionId: item.section_id == null ? "" : String(item.section_id),
+          });
         });
         const coursesById = new Map();
         currentAssignments.forEach((item) => {
@@ -381,10 +384,14 @@ export default function BCCGradeEncoding() {
           sectionId: item.section_id || null,
         }));
         setStudents(enrolled.filter((student) => {
-          const sections = assignmentSections.get(normalizeCourseCode(student.courseCode));
-          return sections && (!activePeriodId || String(student.periodId) === activePeriodId) && sections.has(normalizeSectionName(student.section));
+          const assignments = assignmentSections.get(String(student.courseId));
+          if (!assignments?.length || (activePeriodId && String(student.periodId) !== activePeriodId)) return false;
+          return assignments.some(({ section, sectionId }) => {
+            if (sectionId && student.sectionId) return sectionId === String(student.sectionId);
+            return !section || section === normalizeSectionName(student.section);
+          });
         }));
-        setPeriodId(String(active?.period_id ?? active?.id ?? active?.periodId ?? ""));
+        setPeriodId(String(active?.period_id ?? active?.id ?? active?.periodId ?? currentAssignments[0]?.academic_period_id ?? ""));
       } catch (error) {
         console.error("Unable to load faculty grading data", error);
         toast.error("Unable to load courses and students.");
@@ -396,11 +403,7 @@ export default function BCCGradeEncoding() {
   const selectedCourse = courses.find((course) => String(course.id) === String(courseId));
   const courseStudents = useMemo(() => {
     if (!selectedCourse) return [];
-    const selectedCode = normalizeCourseCode(selectedCourse.code);
-    return students.filter((student) =>
-      String(student.courseId) === String(courseId)
-      || (selectedCode && normalizeCourseCode(student.courseCode) === selectedCode),
-    );
+    return students.filter((student) => String(student.courseId) === String(courseId));
   }, [students, selectedCourse, courseId]);
   const selectedCourseIds = useMemo(
     () => [...new Set([courseId, ...courseStudents.map((student) => student.courseId)].filter(Boolean).map(String))],

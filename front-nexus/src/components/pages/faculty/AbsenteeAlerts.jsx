@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import React, { useState, useEffect } from "react";
-import { Bell, AlertTriangle, Users, Calendar, Mail, Phone, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bell, AlertTriangle, Users, Calendar, Mail, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import dayjs from "dayjs";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -10,6 +10,9 @@ const AbsenteeAlerts = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [emailTarget, setEmailTarget] = useState(null);
+  const [emailMessage, setEmailMessage] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -136,29 +139,38 @@ const AbsenteeAlerts = () => {
     }
   };
 
-  const sendNotification = async (student) => {
+  const openEmailForm = (student) => {
+    setEmailTarget(student);
+    setEmailMessage(
+      `Dear ${student.name},\n\nYou are informed that you are absent today for ${student.course}.\n\nPlease contact me if you believe this attendance record is incorrect.`,
+    );
+  };
+
+  const sendNotification = async (event) => {
+    event.preventDefault();
+    if (!emailTarget || !emailMessage.trim() || isSendingEmail) return;
+    setIsSendingEmail(true);
     try {
       const response = await fetch(
-        `${API_BASE}/api/absentee-alerts/${student.id}/acknowledge`,
+        `${API_BASE}/api/absentee-alerts/${emailTarget.id}/notify`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            acknowledged_by: 1, // Replace with actual faculty ID from auth
-            resolution_notes: `Notification sent to ${student.name}`,
-          }),
+          body: JSON.stringify({ message: emailMessage.trim() }),
         }
       );
-      
-      if (response.ok) {
-        toast.info(`Notification sent to ${student.name}`);
-        fetchAbsentees();
-      }
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.message || "Email could not be sent");
+      toast.success(`Attendance email sent to ${emailTarget.name}`);
+      setEmailTarget(null);
+      setEmailMessage("");
     } catch (error) {
       console.error("Error sending notification:", error);
-      toast.error("Failed to send notification");
+      toast.error(error.message || "Failed to send notification");
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -316,14 +328,14 @@ const AbsenteeAlerts = () => {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center space-x-1">
                       <button
-                        onClick={() => sendNotification(student)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                        title="Send Notification"
+                        type="button"
+                        onClick={() => openEmailForm(student)}
+                        disabled={!student.email || student.email === "N/A"}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                        title={student.email && student.email !== "N/A" ? `Email ${student.email}` : "No email address available"}
+                        aria-label={`Email ${student.name}`}
                       >
                         <Mail className="w-3 h-3" />
-                      </button>
-                      <button className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors" title="Call">
-                        <Phone className="w-3 h-3" />
                       </button>
                     </div>
                   </td>
@@ -364,6 +376,72 @@ const AbsenteeAlerts = () => {
           </>
         )}
       </div>
+      {emailTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4"
+          onClick={() => !isSendingEmail && setEmailTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="attendance-email-title"
+            className="w-full max-w-xl rounded-xl border border-slate-200 bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+              <h2 id="attendance-email-title" className="text-lg font-bold text-slate-900">
+                Email attendance notice
+              </h2>
+              <button
+                type="button"
+                onClick={() => setEmailTarget(null)}
+                disabled={isSendingEmail}
+                className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+                aria-label="Close email form"
+              ><X size={20} /></button>
+            </div>
+            <form onSubmit={sendNotification} className="space-y-4 p-6">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">Student</label>
+                <input value={emailTarget.name} readOnly className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">To</label>
+                <input type="email" value={emailTarget.email} readOnly className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-slate-700">Attendance status:</span>
+                <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">Absent</span>
+              </div>
+              <div>
+                <label htmlFor="attendance-email-message" className="mb-1 block text-sm font-medium text-slate-700">Message</label>
+                <textarea
+                  id="attendance-email-message"
+                  value={emailMessage}
+                  onChange={(event) => setEmailMessage(event.target.value)}
+                  rows={7}
+                  required
+                  maxLength={5000}
+                  className="w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEmailTarget(null)}
+                  disabled={isSendingEmail}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >Cancel</button>
+                <button
+                  type="submit"
+                  disabled={isSendingEmail || !emailMessage.trim()}
+                  className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+                ><Mail size={16} />{isSendingEmail ? "Sending..." : "Send email"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

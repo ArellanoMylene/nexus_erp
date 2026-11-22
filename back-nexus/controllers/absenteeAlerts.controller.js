@@ -220,6 +220,32 @@ const AbsenteeAlertsController = {
     }
   },
 
+  async notifyStudent(req, res) {
+    try {
+      const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+      if (!message) {
+        return res.status(400).json({ success: false, message: "Email message is required" });
+      }
+      if (String(req.user?.role || "").toLowerCase() !== "faculty") {
+        return res.status(403).json({ success: false, message: "Only logged-in faculty can send attendance notices" });
+      }
+      const result = await AbsenteeAlertsService.notifyStudent(
+        req.params.id,
+        message,
+        req.user.userId ?? req.user.user_id,
+      );
+      if (!result.delivered) {
+        const message = result.mode === "smtp-unavailable"
+          ? "Email is not configured on the server"
+          : result.error || "Email could not be delivered";
+        return res.status(503).json({ success: false, message });
+      }
+      return res.status(200).json({ success: true, message: "Attendance notice email sent" });
+    } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  },
+
   async createAbsenteeAlert(req, res) {
     try {
       // req.body already validated — just use it

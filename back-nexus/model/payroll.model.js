@@ -248,6 +248,7 @@ const Payroll = {
       SELECT p.*, 
              u.first_name,
              u.last_name,
+             er.user_id,
              er.employee_number, er.department, er.position,
              er.bank_name, er.bank_account_number,
              er.tin_number, er.sss_number, er.philhealth_number, er.pagibig_number
@@ -264,7 +265,8 @@ const Payroll = {
   // Get eligible users for payslips (non-students with employee records)
   getEligibleUsersForPayslips: async () => {
     const query = `
-      SELECT er.employee_id, er.user_id, er.basic_salary, er.allowances,
+      SELECT er.employee_id, er.user_id, er.employee_number,
+             er.basic_salary, er.allowances,
              u.first_name, u.last_name, u.role
       FROM employee_records er
       INNER JOIN users u ON er.user_id = u.user_id
@@ -281,7 +283,7 @@ const Payroll = {
   getAllNonStudentUsers: async () => {
     const query = `
       SELECT u.user_id, u.first_name, u.last_name, u.role,
-             er.employee_id, er.basic_salary, er.allowances
+             er.employee_id, er.employee_number, er.basic_salary, er.allowances
       FROM users u
       LEFT JOIN employee_records er ON u.user_id = er.user_id
       WHERE u.role IN ('Admin', 'Faculty', 'HR', 'Accounting', 'Staff', 'Employee')

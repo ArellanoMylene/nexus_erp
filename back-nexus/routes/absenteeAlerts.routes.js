@@ -44,6 +44,7 @@ const router = express.Router();
 
 router.get("/", AbsenteeAlertsController.getAllAbsenteeAlerts);
 router.get("/statistics", AbsenteeAlertsController.getAlertStatistics); // ⚠️ Before /:id
+router.post("/:id/notify", AbsenteeAlertsController.notifyStudent);
 router.get("/:id", AbsenteeAlertsController.getAbsenteeAlertById);
 
 router.post("/", validate(createAbsenteeAlertSchema), AbsenteeAlertsController.createAbsenteeAlert);

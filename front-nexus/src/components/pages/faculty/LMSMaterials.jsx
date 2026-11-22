@@ -42,6 +42,8 @@ const LMSMaterials = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -208,61 +210,26 @@ const LMSMaterials = () => {
     }
   };
 
-  // Does the actual delete call — split out from the confirmation step below.
-  const performDelete = async (id) => {
+  const performDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
     try {
       const response = await axios.delete(
-        `${API_BASE}/api/lms/materials/${id}`,
+        `${API_BASE}/api/lms/materials/${deleteTarget.id}`,
       );
 
       if (response.data.success) {
         toast.success("Material deleted successfully!");
+        setDeleteTarget(null);
         fetchMaterials();
       }
     } catch (error) {
       console.error("Error deleting material:", error);
-      toast.error("Failed to delete material");
+      toast.error(error.response?.data?.message || "Failed to delete material");
+    } finally {
+      setIsDeleting(false);
     }
   };
-
-  // Replaces window.confirm(...) with an in-app toast that has its own
-const confirmDelete = (id) => {
-  toast(
-    ({ closeToast }) => (
-      <div>
-        <p className="font-medium text-gray-800 mb-3">
-          Are you sure you want to delete this material?
-        </p>
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={closeToast}
-            className="px-4 py-1.5 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              closeToast();
-              performDelete(id);
-            }}
-            className="px-4 py-1.5 text-sm rounded-full bg-red-600 text-white hover:bg-red-700 transition"
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    ),
-    {
-      containerId: "confirmDialog",
-      autoClose: false,
-      closeOnClick: false,
-      closeButton: false,
-      draggable: false,
-    },
-  );
-};
 
   const resetForm = () => {
     setFormData({
@@ -306,16 +273,7 @@ const confirmDelete = (id) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Renders the toast.success/toast.error/toast.warn notifications used
-          throughout this component. If a <ToastContainer /> is already
-          mounted higher up (e.g. App.jsx), remove this one to avoid a
-          duplicate. */}
       <ToastContainer position="top-center" autoClose={3000} />
-      <ToastContainer
-        containerId="confirmDialog"
-        className="confirm-toast-container"
-        position="top-center"
-      />
 
       <div className="mb-6">
         <div className="flex justify-between items-center">
@@ -420,7 +378,7 @@ const confirmDelete = (id) => {
                     View
                   </button>
                  <button
-  onClick={() => confirmDelete(material.id)}
+  onClick={() => setDeleteTarget(material)}
   className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition"
 >
   <Trash2 className="w-4 h-4" />
@@ -704,6 +662,42 @@ const confirmDelete = (id) => {
                   Download / View File
                 </a>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-material-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-material-title" className="text-lg font-bold text-slate-900">
+              Delete learning material?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete “{deleteTarget.title}”? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={performDelete}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeleting ? "Deleting..." : "Yes, delete material"}</button>
             </div>
           </div>
         </div>

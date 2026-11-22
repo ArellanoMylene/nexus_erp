@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   User,
@@ -7,7 +7,6 @@ import {
   Phone,
   MapPin,
   Save,
-  Camera,
   Lock,
   Edit,
   X,
@@ -58,7 +57,6 @@ const FormField = ({ label, children, span }) => (
 );
 
 const FacultyProfile = () => {
-  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -78,11 +76,8 @@ const FacultyProfile = () => {
     specialization: "",
     dateHired: "",
     employmentStatus: "",
-    profilePictureUrl: "",
   });
   const [formData, setFormData] = useState({});
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -138,7 +133,6 @@ const FacultyProfile = () => {
           userData.employment_status ||
           userData.status ||
           "",
-        profilePictureUrl: userData.profile_picture_url || "",
       };
       setProfileData(mapped);
       setFormData(mapped);
@@ -169,26 +163,6 @@ const FacultyProfile = () => {
   const f = (key) => (e) =>
     setFormData((prev) => ({ ...prev, [key]: e.target.value }));
 
-  /* ── Image handling ── */
-  const handleImageClick = () => fileInputRef.current?.click();
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.warning("File size must be less than 5MB");
-      return;
-    }
-    if (!file.type.startsWith("image/")) {
-      toast.warning("Please select an image file");
-      return;
-    }
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result);
-    reader.readAsDataURL(file);
-  };
-
   /* ── Save profile ── */
   const handleSave = async () => {
     try {
@@ -210,8 +184,6 @@ const FacultyProfile = () => {
         dateHired: formData.dateHired,
         specialization: formData.specialization,
       };
-      if (imagePreview) payload.profilePictureBase64 = imagePreview;
-
       await axios.put(
         `${API_BASE_URL}/users/employee/${userId}`,
         payload,
@@ -219,7 +191,6 @@ const FacultyProfile = () => {
       );
       setProfileData({ ...profileData, ...formData });
       setEditing(false);
-      setImageFile(null);
     } catch (error) {
       console.error("Error updating profile:", error);
       setSaveError(
@@ -266,13 +237,10 @@ const FacultyProfile = () => {
   };
 
   /* ── Derived values ── */
-  const avatarSrc = imagePreview || profileData.profilePictureUrl;
-  const resolvedAvatarSrc =
-    avatarSrc && avatarSrc.startsWith("http")
-      ? avatarSrc
-      : avatarSrc
-        ? `${API_BASE_URL.replace(/\/api$/, "")}${avatarSrc}`
-        : null;
+  const initials = [profileData.firstName, profileData.lastName]
+    .map((name) => String(name || "").trim().charAt(0))
+    .join("")
+    .toUpperCase() || "?";
 
   const fullName = [
     profileData.firstName,
@@ -321,33 +289,8 @@ const FacultyProfile = () => {
                 {/* Avatar */}
                 <div className="relative">
                   <div className="w-28 h-28 rounded-full overflow-hidden bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold">
-                    {resolvedAvatarSrc ? (
-                      <img
-                        src={resolvedAvatarSrc}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <>
-                        {profileData.firstName?.[0]}
-                        {profileData.lastName?.[0]}
-                      </>
-                    )}
+                    {initials}
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleImageClick}
-                    className="absolute bottom-0 right-0 p-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow transition-colors"
-                  >
-                    <Camera size={14} />
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                  />
                 </div>
 
                 <h3 className="mt-4 text-lg font-bold text-slate-900  leading-snug">
@@ -486,48 +429,6 @@ const FacultyProfile = () => {
                   {saveError}
                 </div>
               )}
-
-              {/* Profile Picture */}
-              <div>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                  Profile Picture
-                </h3>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shrink-0">
-                    {resolvedAvatarSrc ? (
-                      <img
-                        src={resolvedAvatarSrc}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <>
-                        {profileData.firstName?.[0]}
-                        {profileData.lastName?.[0]}
-                      </>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleImageClick}
-                    className="flex items-center gap-2 px-4 py-2 border border-slate-300  rounded-lg text-slate-600  text-sm font-medium hover:bg-slate-50  transition-colors"
-                  >
-                    <Camera size={14} /> Upload Photo
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                  />
-                  {imageFile && (
-                    <span className="text-xs text-slate-400 truncate max-w-[120px]">
-                      {imageFile.name}
-                    </span>
-                  )}
-                </div>
-              </div>
 
               {/* Personal */}
               <div>

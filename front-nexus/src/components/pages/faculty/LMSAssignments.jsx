@@ -47,6 +47,8 @@ const LMSAssignments = () => {
   const [showGradeModal, setShowGradeModal] = useState(false);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [viewingDocument, setViewingDocument] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
@@ -409,61 +411,25 @@ const LMSAssignments = () => {
     }
   };
 
-  // Does the actual delete call — split out from the confirmation step below.
-  const performDelete = async (id) => {
+  const performDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
     try {
       const response = await axios.delete(
-        `${API_BASE}/api/lms/assignments/${id}`
+        `${API_BASE}/api/lms/assignments/${deleteTarget.id}`
       );
 
       if (response.data.success) {
         toast.success("Assignment deleted successfully!");
+        setDeleteTarget(null);
         fetchAssignments();
       }
     } catch (error) {
       console.error("Error deleting assignment:", error);
-      toast.error("Failed to delete assignment");
+      toast.error(error.response?.data?.message || "Failed to delete assignment");
+    } finally {
+      setIsDeleting(false);
     }
-  };
-
-  // Replaces window.confirm(...) with an in-app toast that has its own
-  // OK / Cancel buttons, rendered in a dedicated centered container.
-  const confirmDelete = (id) => {
-    toast(
-      ({ closeToast }) => (
-        <div>
-          <p className="font-medium text-gray-800 mb-3">
-            Are you sure you want to delete this assignment?
-          </p>
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={closeToast}
-              className="px-4 py-1.5 text-sm rounded-full border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeToast();
-                performDelete(id);
-              }}
-              className="px-4 py-1.5 text-sm rounded-full bg-red-600 text-white hover:bg-red-700 transition"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        containerId: "confirmDialog",
-        autoClose: false,
-        closeOnClick: false,
-        closeButton: false,
-        draggable: false,
-      },
-    );
   };
 
   const handleAiCheck = async () => {
@@ -609,17 +575,7 @@ const LMSAssignments = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Renders the toast.success/toast.error/toast.warn notifications used
-          throughout this component. */}
       <ToastContainer position="top-center" autoClose={3000} />
-      {/* Dedicated, centered container used only for the delete confirmation
-          dialog (see confirmDelete). Kept separate so its CSS overrides
-          don't affect the regular top-center notifications above. */}
-      <ToastContainer
-        containerId="confirmDialog"
-        className="confirm-toast-container"
-        position="top-center"
-      />
 
       {/* Header */}
       <div className="mb-6">
@@ -761,7 +717,7 @@ const LMSAssignments = () => {
                     View Submissions
                   </button>
                   <button
-                    onClick={() => confirmDelete(assignment.id)}
+                    onClick={() => setDeleteTarget(assignment)}
                     className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -1432,8 +1388,8 @@ Ans: C`}
 
       {/* ── Grade Submission Modal ──────────────────────────────────────────── */}
       {showGradeModal && selectedSubmission && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+        <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="border-b px-6 py-4 flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-900">
                 Grade Submission
@@ -1592,6 +1548,42 @@ Ans: C`}
             setViewingDocument(null);
           }}
         />
+      )}
+
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-assignment-title"
+            className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="delete-assignment-title" className="text-lg font-bold text-slate-900">
+              Delete assignment?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Are you sure you want to delete “{deleteTarget.title}”? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >Cancel</button>
+              <button
+                type="button"
+                onClick={performDelete}
+                disabled={isDeleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >{isDeleting ? "Deleting..." : "Yes, delete assignment"}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

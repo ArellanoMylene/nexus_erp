@@ -25,7 +25,7 @@ const StaffLeave = {
   // Get all leave requests with employee details
   getAll: async (filters) => {
     let query = `
-      SELECT sl.*, er.employee_number, er.department, er.position,
+      SELECT sl.*, er.user_id, er.employee_number, er.department, er.position,
              u.first_name, u.middle_name, u.last_name,
              approver.first_name as approver_first_name,
              approver.last_name as approver_last_name
@@ -66,7 +66,7 @@ const StaffLeave = {
   // Get leave by ID
   getById: async (id) => {
     const query = `
-      SELECT sl.*, er.employee_number, er.department, er.position,
+      SELECT sl.*, er.user_id, er.employee_number, er.department, er.position,
              u.first_name, u.middle_name, u.last_name
       FROM staff_leave sl
       INNER JOIN employee_records er ON sl.employee_id = er.employee_id
