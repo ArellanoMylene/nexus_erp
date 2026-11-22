@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import api from "../../../api/axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -83,29 +83,20 @@ const UpcomingPayroll = ({ payroll }) => (
       <h4 className="font-semibold text-gray-900 text-sm">{payroll.period}</h4>
       <span
         className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-          payroll.status === "pending"
-            ? "bg-yellow-100 text-yellow-700"
-            : "bg-green-100 text-green-700"
+          String(payroll.status || "").toLowerCase() === "processed"
+            ? "bg-green-100 text-green-700"
+            : "bg-yellow-100 text-yellow-700"
         }`}
       >
         {payroll.status}
       </span>
     </div>
     <p className="text-xs text-gray-700 mb-2">{payroll.description}</p>
-    <div className="flex items-center justify-between text-xs text-gray-600">
-      <div className="flex items-center">
-        <DollarSign className="w-3 h-3 mr-1" />
-        <span>{payroll.amount}</span>
-      </div>
-      <div className="flex items-center">
-        <Users className="w-3 h-3 mr-1" />
-        <span>{payroll.employees} employees</span>
-      </div>
-    </div>
   </div>
 );
 
 const HRDashboard = () => {
+  const [loadError, setLoadError] = useState("");
   const [dashboardData, setDashboardData] = useState({
     stats: {
       totalEmployees: 0,
@@ -117,27 +108,17 @@ const HRDashboard = () => {
     upcomingPayrolls: [],
   });
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
-      // Fetch stats
-      const statsRes = await api.get("/api/hr/stats");
-      // Fetch recent activities
-      const activitiesRes = await api.get("/api/hr/activities");
-      // Fetch upcoming payrolls
-      const payrollsRes = await api.get("/api/hr/upcoming-payrolls");
-
+      setLoadError("");
+      const response = await api.get("/api/hr/dashboard");
+      const data = response.data?.data;
+      if (!response.data?.success || !data?.stats) {
+        throw new Error("Unexpected HR dashboard response");
+      }
       setDashboardData({
-        stats: statsRes.data || {
-          totalEmployees: 0,
-          pendingLeaves: 0,
-          payrollsProcessed: 0,
-          deductionRequests: 0,
-        },
-        recentActivities: (activitiesRes.data || []).map((a) => ({
+        stats: data.stats,
+        recentActivities: (data.recentActivities || []).map((a) => ({
           ...a,
           icon:
             a.type === "payroll"
@@ -156,12 +137,31 @@ const HRDashboard = () => {
                   ? "bg-yellow-500"
                   : "bg-indigo-500",
         })),
-        upcomingPayrolls: payrollsRes.data || [],
+        upcomingPayrolls: (data.upcomingPayrolls || []).map((item) => ({
+          ...item,
+          id: item.payroll_setup_id,
+          period: item.period_type || item.payroll_type || "Payroll",
+          description: `Pay date: ${dayjs(item.pay_date).format("MMM D, YYYY")}`,
+        })),
       });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      setLoadError("Dashboard data could not be loaded. Please refresh the page or contact your administrator.");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") fetchDashboardData();
+    };
+    const timer = window.setInterval(refreshWhenVisible, 30000);
+    window.addEventListener("focus", refreshWhenVisible);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refreshWhenVisible);
+    };
+  }, [fetchDashboardData]);
 
   return (
     <div className="bg-gray-50">
@@ -183,8 +183,7 @@ const HRDashboard = () => {
           value={dashboardData.stats.totalEmployees}
           icon={Users}
           color="bg-blue-500"
-          detail="Active employees in system"
-          trend={2}
+          detail="Employee records in system"
         />
         <StatCard
           title="Pending Leaves"
@@ -192,25 +191,24 @@ const HRDashboard = () => {
           icon={CalendarCheck}
           color="bg-yellow-500"
           detail="Awaiting approval"
-          trend={-1}
         />
         <StatCard
           title="Payrolls Processed"
           value={dashboardData.stats.payrollsProcessed}
           icon={FileText}
           color="bg-green-500"
-          detail="This fiscal year"
-          trend={5}
+          detail="Payroll runs marked processed"
         />
         <StatCard
-          title="Deduction Requests"
+          title="Active Deductions"
           value={dashboardData.stats.deductionRequests}
           icon={CheckSquare}
           color="bg-purple-500"
-          detail="Require your action"
-          trend={0}
+          detail="Currently active in the system"
         />
       </div>
+
+      {loadError && <p role="alert" className="mb-4 text-sm text-red-700">{loadError}</p>}
 
       {/* Main Content Grid - All sections side by side */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -261,9 +259,9 @@ const HRDashboard = () => {
             Upcoming Payrolls
           </h2>
           <div className="space-y-2">
-            {dashboardData.upcomingPayrolls.map((payroll) => (
+            {dashboardData.upcomingPayrolls.length ? dashboardData.upcomingPayrolls.map((payroll) => (
               <UpcomingPayroll key={payroll.id} payroll={payroll} />
-            ))}
+            )) : <p className="text-sm text-gray-500 text-center py-4">No upcoming payrolls scheduled</p>}
           </div>
         </div>
 

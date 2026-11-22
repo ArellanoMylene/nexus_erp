@@ -75,6 +75,7 @@ import rbacRoutes from "./routes/rbac.routes.js"; // RBAC routes
 import aiRoutes from "./routes/ai.routes.js"; // Nexus AI chat route
 import calendarRoutes from "./routes/calendar.routes.js"; // unified calendar routes
 import roomsRoutes from "./routes/rooms.routes.js"; // rooms management routes
+import hrDashboardRoutes from "./routes/hrDashboard.routes.js";
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || process.env.JWT_SECRET === "supersecretkey") {
   throw new Error("JWT_SECRET must be configured with at least 32 characters before starting the API");
@@ -202,6 +203,7 @@ app.use("/api/accounting", accountingRoutes);
 app.use("/api/payment-gateway", paymentGatewayRoutes);
 
 // HR & Payroll routes
+app.use("/api/hr", hrDashboardRoutes);
 app.use("/api/employees", employeeRecordsRoutes);
 app.use("/api/staff-leave", staffLeaveRoutes);
 app.use("/api/payroll", payrollRoutes);
