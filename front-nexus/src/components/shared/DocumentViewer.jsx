@@ -5,7 +5,7 @@ import mammoth from "mammoth";
 
 // Set up PDF.js worker with bundled worker
 const pdfjsWorkerURL = new URL(
-  "pdfjs-dist/build/pdf.worker.min.js",
+  "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
 );
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerURL.href;
@@ -184,7 +184,9 @@ const DocumentViewer = ({ fileUrl, fileName, onClose }) => {
       } catch (err) {
         console.error("Error loading document:", err);
         if (!cancelTokenRef.current?.cancelled) {
-          setError(err.message || "Failed to load file. Try downloading it instead.");
+          setError(
+            "We couldn't open this document. It may have been moved or deleted. Please upload it again or contact your instructor."
+          );
         }
       } finally {
         if (!cancelTokenRef.current?.cancelled) {
@@ -244,7 +246,7 @@ const DocumentViewer = ({ fileUrl, fileName, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gray-100 border-b px-6 py-4 flex justify-between items-center">
@@ -295,18 +297,9 @@ const DocumentViewer = ({ fileUrl, fileName, onClose }) => {
           ) : error ? (
             <div className="text-center text-gray-600 p-8 max-w-md">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-red-800 font-semibold text-sm mb-2">Error</p>
+                <p className="text-red-800 font-semibold text-sm mb-2">Document unavailable</p>
                 <p className="text-red-700 text-xs break-words">{error}</p>
               </div>
-              <p className="text-gray-600 text-sm mb-4">Please try downloading the file instead:</p>
-              <a
-                href={resolvedUrl}
-                download={fileName}
-                className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-              >
-                <Download className="w-4 h-4" />
-                Download File
-              </a>
             </div>
           ) : isPDF ? (
             <div className="flex flex-col items-center w-full h-full">
